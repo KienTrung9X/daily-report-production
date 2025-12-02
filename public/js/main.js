@@ -83,10 +83,10 @@ async function loadData() {
             // Convert YYYY-MM-DD to YYYYMMDD
             const startFormatted = startDate.replace(/-/g, '');
             const endFormatted = endDate.replace(/-/g, '');
-            url = `/api/data?startDate=${startFormatted}&endDate=${endFormatted}`;
+            url = `/api/production?startDate=${startFormatted}&endDate=${endFormatted}`;
         } else {
             // Use month/week filter
-            url = `/api/data?year=${currentYear}&month=${currentMonth}`;
+            url = `/api/production?year=${currentYear}&month=${currentMonth}`;
             if (currentWeek) {
                 const firstDay = new Date(currentYear, currentMonth - 1, 1);
                 const getWeek = (d) => {

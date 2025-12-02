@@ -1,0 +1,37 @@
+-- Production Data Queries
+
+-- Get production data by month
+-- @param yearMonth: YYYYMM format
+SELECT SUBSTR(COMP_DAY,1,6) AS YEAR_MONTH,
+       COMP_DAY, LINE1, LINE2, LN_NAME, PR, ITEM, ITEM1, ITEM2,
+       EST_PRO_QTY, ACT_PRO_QTY, UNIT, SIZE, CH
+FROM WAVEDLIB.ProductionData
+WHERE LINE1 IN ('111','121','122','161','312','315','313')
+AND SUBSTR(COMP_DAY,1,6) = ?
+ORDER BY COMP_DAY DESC;
+
+-- Get production data by date range
+-- @param startDate: YYYYMMDD format
+-- @param endDate: YYYYMMDD format
+SELECT SUBSTR(COMP_DAY,1,6) AS YEAR_MONTH,
+       COMP_DAY, LINE1, LINE2, LN_NAME, PR, ITEM, ITEM1, ITEM2,
+       EST_PRO_QTY, ACT_PRO_QTY, UNIT, SIZE, CH
+FROM WAVEDLIB.ProductionData
+WHERE LINE1 IN ('111','121','122','161','312','315','313')
+AND COMP_DAY BETWEEN ? AND ?
+ORDER BY COMP_DAY DESC;
+
+-- Get calendar data for dashboard
+SELECT COMP_DAY,
+       SUM(EST_PRO_QTY) as TOTAL_PLAN,
+       SUM(ACT_PRO_QTY) as TOTAL_ACTUAL,
+       CASE 
+         WHEN SUM(EST_PRO_QTY) > 0 
+         THEN ROUND((SUM(ACT_PRO_QTY) * 100.0 / SUM(EST_PRO_QTY)), 2)
+         ELSE 0 
+       END as PERCENTAGE
+FROM WAVEDLIB.ProductionData
+WHERE LINE1 IN ('111','121','122','161','312','315','313')
+AND SUBSTR(COMP_DAY,1,6) = ?
+GROUP BY COMP_DAY
+ORDER BY COMP_DAY;
