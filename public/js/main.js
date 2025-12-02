@@ -15,10 +15,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const startDateInput = document.getElementById('startDate');
     const endDateInput = document.getElementById('endDate');
     const viewRadios = document.querySelectorAll('input[name="viewMode"]');
+    const searchInput = document.getElementById('searchInput');
     
     const [y, m] = dateInput.value.split('-');
     currentYear = parseInt(y);
     currentMonth = parseInt(m);
+    
+    // Search functionality
+    let searchTimeout;
+    searchInput.addEventListener('input', (e) => {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            filterTable(e.target.value);
+        }, 300);
+    });
 
     // Add event listeners
     dateInput.addEventListener('change', (e) => {
@@ -112,10 +122,12 @@ async function loadData() {
         
         currentData = result.data;
         
-        // If pivot mode, we need to calculate summary manually from raw data or use what backend sent?
-        // Backend summary might be based on rawData anyway.
-        // But for consistency, let's use backend summary.
         renderSummary(result.summary);
+        
+        // Initialize charts with data
+        if (typeof initializeCharts === 'function') {
+            initializeCharts(currentData);
+        }
 
         if (currentViewMode === 'pivot') {
             renderPivotTable(currentData);
@@ -135,17 +147,38 @@ function renderSummary(summary) {
     
     const percentEl = document.getElementById('sum-percent');
     const cardPercent = document.getElementById('card-percent');
+    const progressBar = document.getElementById('progress-bar');
     
-    percentEl.innerText = summary.totalPercent + '%';
+    const percentage = parseFloat(summary.totalPercent);
+    percentEl.innerText = percentage + '%';
+    
+    // Update progress bar
+    progressBar.style.width = Math.min(percentage, 100) + '%';
     
     // Color coding for summary
-    if (parseFloat(summary.totalPercent) < 90) {
-        cardPercent.className = 'card text-white bg-warning h-100'; // Warning if below 90%
-        if (parseFloat(summary.totalPercent) < 80) {
-            cardPercent.className = 'card text-white bg-danger h-100'; // Danger if below 80%
-        }
+    const icon = cardPercent.querySelector('.summary-icon');
+    if (percentage < 80) {
+        progressBar.className = 'progress-bar bg-danger';
+        icon.className = 'bg-danger bg-opacity-10 rounded-circle p-3 me-3';
+        icon.querySelector('i').className = 'fas fa-exclamation-triangle text-danger fa-2x';
+    } else if (percentage < 90) {
+        progressBar.className = 'progress-bar bg-warning';
+        icon.className = 'bg-warning bg-opacity-10 rounded-circle p-3 me-3';
+        icon.querySelector('i').className = 'fas fa-clock text-warning fa-2x';
     } else {
-        cardPercent.className = 'card text-white bg-success h-100';
+        progressBar.className = 'progress-bar bg-success';
+        icon.className = 'bg-success bg-opacity-10 rounded-circle p-3 me-3';
+        icon.querySelector('i').className = 'fas fa-bullseye text-success fa-2x';
+    }
+    
+    // Calculate variance
+    const planNum = parseInt(summary.totalPlan.replace(/,/g, ''));
+    const actNum = parseInt(summary.totalAct.replace(/,/g, ''));
+    const variance = actNum - planNum;
+    const varianceEl = document.getElementById('sum-variance');
+    if (varianceEl) {
+        varianceEl.innerText = (variance >= 0 ? '+' : '') + variance.toLocaleString();
+        varianceEl.className = variance >= 0 ? 'mb-0 fw-bold text-success' : 'mb-0 fw-bold text-danger';
     }
 }
 
@@ -984,6 +1017,44 @@ async function importWorkDays() {
     } catch (error) {
         console.error('Error importing work days:', error);
         alert('Error importing work days');
+    }
+}
+
+// Search and filter functionality
+function filterTable(searchTerm) {
+    const tbody = document.getElementById('data-table-body');
+    const rows = tbody.querySelectorAll('tr');
+    
+    if (!searchTerm) {
+        rows.forEach(row => row.style.display = '');
+        return;
+    }
+    
+    const term = searchTerm.toLowerCase();
+    rows.forEach(row => {
+        const itemName = row.cells[1]?.textContent.toLowerCase() || '';
+        const itemCode = row.cells[2]?.textContent.toLowerCase() || '';
+        const line = row.cells[0]?.textContent.toLowerCase() || '';
+        
+        if (itemName.includes(term) || itemCode.includes(term) || line.includes(term)) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+}
+
+// Smooth scroll to section
+function scrollToSection(sectionId) {
+    const element = document.getElementById(sectionId);
+    if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        
+        // Update active nav pill
+        document.querySelectorAll('.nav-pills .nav-link').forEach(link => {
+            link.classList.remove('active');
+        });
+        document.querySelector(`[href="#${sectionId}"]`).classList.add('active');
     }
 }
 
