@@ -1,5 +1,13 @@
+const userConfig = require('./user-config.js');
+
 module.exports = {
-    hostname: '10.247.194.1',
-    uid: 'FA01001', 
-    pwd: 'FA01001'
+    hostname: userConfig.hostname,
+    uid: userConfig.uid,
+    pwd: userConfig.pwd,
+    database: userConfig.database,
+    provider: userConfig.provider,
+    startMonth: userConfig.startMonth,
+    endMonth: userConfig.endMonth,
+    lineCodes: userConfig.lineCodes,
+    rowLimit: userConfig.rowLimit
 };

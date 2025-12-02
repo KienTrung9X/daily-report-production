@@ -4,32 +4,6 @@ const path = require('path');
 const ADODB = require('node-adodb');
 const config = require('./config');
 
-// SQL Server Queries
-const SQL_QUERIES = {
-    BY_MONTH: `
-        SELECT SUBSTRING(COMP_DAY,1,6) AS YEAR_MONTH,
-               COMP_DAY, LINE1, LINE2, LN_NAME, PR, ITEM, ITEM1, ITEM2,
-               EST_PRO_QTY, ACT_PRO_QTY, UNIT, SIZE, CH, ITEM_NAME
-        FROM ProductionData p
-        INNER JOIN ItemMaster i ON p.ITEM = i.ITEM_CODE
-        WHERE LINE1 IN ('111','121','122','161','312','315','313')
-        AND SUBSTRING(COMP_DAY,1,6) = @yearMonth
-        ORDER BY COMP_DAY DESC
-    `,
-    BY_DATE_RANGE: `
-        SELECT SUBSTRING(COMP_DAY,1,6) AS YEAR_MONTH,
-               COMP_DAY, LINE1, LINE2, LN_NAME, PR, ITEM, ITEM1, ITEM2,
-               EST_PRO_QTY, ACT_PRO_QTY, UNIT, SIZE, CH, ITEM_NAME
-        FROM ProductionData p
-        INNER JOIN ItemMaster i ON p.ITEM = i.ITEM_CODE
-        WHERE LINE1 IN ('111','121','122','161','312','315','313')
-        AND COMP_DAY BETWEEN @startDate AND @endDate
-        ORDER BY COMP_DAY DESC
-    `
-};
-
-
-
 // Comments Storage (JSON File)
 const COMMENTS_FILE = path.join(__dirname, 'comments.json');
 
@@ -64,36 +38,46 @@ function getWeekNumber(d) {
 // IBM i Database functions
 async function getDataFromSQL(year, month, week = null, detailed = false, startDate = null, endDate = null) {
     try {
-        const connStr = `Provider=IBMDA400.DataSource;Data Source=${config.hostname};User ID=${config.uid};PASSWORD=${config.pwd};Default Collection=WAVEDLIB`;
+        const connStr = `Provider=${config.provider};Data Source=${config.hostname};User ID=${config.uid};PASSWORD=${config.pwd};Default Collection=${config.database}`;
         const connection = ADODB.open(connStr);
+        const lineFilter = config.lineCodes.map(code => `'${code}'`).join(',');
         let result;
         
         if (startDate && endDate) {
             const query = `
-                SELECT SUBSTR(COMP_DAY,1,6) AS YEAR_MONTH,
-                       COMP_DAY, LINE1, LINE2, LN_NAME, PR, ITEM, ITEM1, ITEM2,
-                       EST_PRO_QTY, ACT_PRO_QTY, UNIT, SIZE, CH
-                FROM WAVEDLIB.ProductionData
-                WHERE LINE1 IN ('111','121','122','161','312','315','313')
-                AND COMP_DAY BETWEEN '${startDate}' AND '${endDate}'
-                ORDER BY COMP_DAY DESC
+                SELECT SUBSTR(PCPU9H,1,6) AS YEAR_MONTH, PCPU9H AS COMP_DAY, LN1C9H AS LINE1, LN2C9H AS LINE2,
+                       LN_NAME, PSHN9H AS PR, ITMC9H AS ITEM, IT1IA0 AS ITEM1, IT2IA0 AS ITEM2,
+                       PCPQ9H AS ACT_PRO_QTY, QUNC9H AS UNIT, SIZCA0 AS SIZE, CHNCA0 AS CH
+                FROM WAVEDLIB.F9H00
+                INNER JOIN WAVEDLIB.FA000 ON ITMC9H = ITMCA0
+                INNER JOIN (SELECT DGRC09, SUBSTR(DDTC09,1,3) AS LN1, SUBSTR(DDTC09,4,2) AS LN2,
+                            CN1I09 AS LN_NAME FROM WAVEDLIB.C0900 WHERE DGRC09 = 'LN1C' AND SUBSTR(DDTC09,6,2) = '01')
+                ON LN1 = LN1C9H AND LN2 = LN2C9H
+                WHERE LN1C9H IN (${lineFilter})
+                AND SUBSTR(PCPU9H,1,6) BETWEEN '${config.startMonth}' AND '${config.endMonth}'
+                ORDER BY PCPU9H DESC
+                FETCH FIRST ${config.rowLimit} ROWS ONLY
             `;
             result = await connection.query(query);
         } else {
             const yearMonth = `${year}${month.toString().padStart(2, '0')}`;
             const query = `
-                SELECT SUBSTR(COMP_DAY,1,6) AS YEAR_MONTH,
-                       COMP_DAY, LINE1, LINE2, LN_NAME, PR, ITEM, ITEM1, ITEM2,
-                       EST_PRO_QTY, ACT_PRO_QTY, UNIT, SIZE, CH
-                FROM WAVEDLIB.ProductionData
-                WHERE LINE1 IN ('111','121','122','161','312','315','313')
-                AND SUBSTR(COMP_DAY,1,6) = '${yearMonth}'
-                ORDER BY COMP_DAY DESC
+                SELECT SUBSTR(PCPU9H,1,6) AS YEAR_MONTH, PCPU9H AS COMP_DAY, LN1C9H AS LINE1, LN2C9H AS LINE2,
+                       LN_NAME, PSHN9H AS PR, ITMC9H AS ITEM, IT1IA0 AS ITEM1, IT2IA0 AS ITEM2,
+                       PCPQ9H AS ACT_PRO_QTY, QUNC9H AS UNIT, SIZCA0 AS SIZE, CHNCA0 AS CH
+                FROM WAVEDLIB.F9H00
+                INNER JOIN WAVEDLIB.FA000 ON ITMC9H = ITMCA0
+                INNER JOIN (SELECT DGRC09, SUBSTR(DDTC09,1,3) AS LN1, SUBSTR(DDTC09,4,2) AS LN2,
+                            CN1I09 AS LN_NAME FROM WAVEDLIB.C0900 WHERE DGRC09 = 'LN1C' AND SUBSTR(DDTC09,6,2) = '01')
+                ON LN1 = LN1C9H AND LN2 = LN2C9H
+                WHERE LN1C9H IN (${lineFilter})
+                AND SUBSTR(PCPU9H,1,6) = '${yearMonth}'
+                ORDER BY PCPU9H DESC
+                FETCH FIRST ${config.rowLimit} ROWS ONLY
             `;
             result = await connection.query(query);
         }
         
-
         let rows = result;
         
         // Filter by week if needed
@@ -106,6 +90,12 @@ async function getDataFromSQL(year, month, week = null, detailed = false, startD
             });
         }
         
+        // Add default EST_PRO_QTY = 0 for all rows
+        rows = rows.map(row => ({
+            ...row,
+            EST_PRO_QTY: 0
+        }));
+        
         // Aggregate if not detailed
         if (!detailed) {
             const aggregated = {};
@@ -114,7 +104,6 @@ async function getDataFromSQL(year, month, week = null, detailed = false, startD
                 if (!aggregated[key]) {
                     aggregated[key] = { ...row };
                 } else {
-                    aggregated[key].EST_PRO_QTY += row.EST_PRO_QTY;
                     aggregated[key].ACT_PRO_QTY += row.ACT_PRO_QTY;
                 }
             });

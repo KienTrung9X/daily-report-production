@@ -18,6 +18,14 @@
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
         <div class="container-fluid">
             <a class="navbar-brand" href="#"><i class="fas fa-industry me-2"></i>Production Dashboard</a>
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link active" href="#" onclick="showTab('production')">Production</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" onclick="showTab('plan')">Plan</a>
+                </li>
+            </ul>
             <div class="d-flex align-items-center text-white">
                 <span id="current-date" class="me-3"></span>
             </div>
@@ -26,9 +34,11 @@
 
     <div class="container-fluid mt-4">
         
-        <!-- Controls & Filters -->
-        <div class="card shadow-sm mb-4">
-            <div class="card-body py-3">
+        <!-- Production Tab -->
+        <div id="production-tab" class="tab-content">
+            <!-- Controls & Filters -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-body py-3">
                 <div class="row align-items-center">
                     <div class="col-md-8">
                         <div class="row align-items-center">
@@ -135,6 +145,45 @@
                 </div>
             </div>
         </div>
+        </div>
+        
+        <!-- Plan Tab -->
+        <div id="plan-tab" class="tab-content" style="display: none;">
+            <!-- Plan Controls -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-body py-3">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h5 class="mb-0"><i class="fas fa-calendar-alt me-2"></i>Plan Management</h5>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <button class="btn btn-primary" onclick="openPlanImportModal()">
+                                <i class="fas fa-upload me-1"></i> Import New Plan
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Plan Data Table -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0 fw-bold"><i class="fas fa-table me-2"></i>Plan Data</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover mb-0 align-middle" style="font-size: 12px;">
+                            <thead class="table-light text-center" id="plan-table-header">
+                                <!-- Dynamic header will be generated -->
+                            </thead>
+                            <tbody id="plan-table-body">
+                                <tr><td colspan="7" class="text-center py-4">Loading plan data...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Comment Modal -->
@@ -161,8 +210,72 @@
         </div>
     </div>
 
+    <!-- Est Qty Modal -->
+    <div class="modal fade" id="estQtyModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Estimated Quantity</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="modal-est-item-code">
+                    <input type="hidden" id="modal-est-year-month">
+                    <div class="mb-3">
+                        <label class="form-label">Estimated Quantity:</label>
+                        <input type="number" class="form-control" id="modal-est-qty" step="0.01">
+                        <div class="form-text">This will override the database value for this item/month.</div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="submitEstQty()">Save Est Qty</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Plan Import Modal -->
+    <div class="modal fade" id="planImportModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Import Plan Data from Excel</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Select Excel File:</label>
+                                <input type="file" class="form-control" id="excel-file-input" accept=".xlsx,.xls,.csv" onchange="previewExcelData()">
+                                <div class="form-text">Upload Excel file with plan data. First row should be headers.</div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Or Paste from Excel:</label>
+                                <textarea class="form-control" id="plan-paste-data" rows="8" placeholder="Copy from Excel and paste here..." onpaste="setTimeout(previewPastedData, 100)"></textarea>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Preview:</h6>
+                            <div id="preview-container" style="max-height: 400px; overflow-y: auto;">
+                                <p class="text-muted">Upload file or paste data to see preview</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="import-plan-btn" onclick="submitPlanImport()" disabled>Import Plan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Bootstrap JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- SheetJS for Excel processing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <!-- Custom JS -->
     <script src="/js/main.js"></script>
 </body>
