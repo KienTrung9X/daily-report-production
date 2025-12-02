@@ -59,3 +59,80 @@ body {
 .card:hover {
     /* transform: translateY(-2px); */
 }
+
+/* Plan table compact styling */
+.plan-table {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 12px;
+}
+
+.plan-table th {
+    font-size: 11px;
+    padding: 4px 8px;
+    font-weight: bold;
+    line-height: 1.1;
+    border: 1px solid #ddd;
+    background-color: #f8f9fa;
+    color: #495057;
+    text-align: center;
+}
+
+.plan-table td {
+    font-size: 12px;
+    padding: 3px 8px;
+    line-height: 1.2;
+    white-space: nowrap;
+    border: 1px solid #ddd;
+}
+
+.plan-table .table-warning td {
+    font-size: 11px;
+    font-weight: bold;
+    background-color: #fff3cd;
+    border: 1px solid #ddd;
+}
+
+.plan-table tbody tr:hover {
+    background-color: #f9f9f9;
+}
+
+.plan-qty-cell:hover {
+    background-color: #e9ecef !important;
+    transition: background-color 0.2s;
+}
+
+.work-day-cell:hover {
+    background-color: #ffeaa7 !important;
+    transition: background-color 0.2s;
+}
+
+/* Calendar styles */
+.calendar-table {
+    width: 100%;
+    table-layout: fixed;
+}
+
+.calendar-day {
+    position: relative;
+    padding: 8px;
+    border: 1px solid #dee2e6;
+    background-color: #fff;
+}
+
+.calendar-day:hover {
+    background-color: #f8f9fa;
+}
+
+.calendar-day.weekend {
+    background-color: #f1f3f4;
+}
+
+.calendar-day.holiday {
+    background-color: #dc3545;
+    color: white;
+}
+
+.calendar-day.holiday:hover {
+    background-color: #c82333;
+}

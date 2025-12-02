@@ -1,27 +1,56 @@
 # Daily Production Report Dashboard
 
 ## Project Purpose
-A web-based dashboard application for tracking and analyzing daily production performance against planned targets. The system provides real-time visibility into production metrics with interactive data visualization and commentary capabilities.
+A web-based production monitoring dashboard that provides real-time visibility into manufacturing performance across multiple production lines. The system tracks planned vs actual production quantities, calculates performance percentages, and enables production planning and analysis.
 
 ## Key Features
-- **Production Performance Tracking**: Monitor actual vs estimated production quantities with percentage calculations
-- **Time-based Filtering**: View data by year, month, week, or custom date ranges
-- **Interactive Dashboard**: Dynamic charts and tables with drill-down capabilities
-- **Comment System**: Add and manage contextual comments for production items
-- **Summary Analytics**: Automated calculation of total planned, actual, and percentage performance
-- **Detailed/Summary Views**: Toggle between high-level summaries and detailed breakdowns
-- **Real-time Data**: Live database connectivity for up-to-date production metrics
+
+### Production Monitoring
+- Real-time production data visualization with calendar view
+- Planned vs actual quantity tracking with percentage calculations
+- Multi-line production monitoring (configurable production lines)
+- Historical data analysis with flexible date range selection
+
+### Data Management
+- DB2 database integration for production data retrieval
+- Manual estimation quantity override capabilities
+- Production plan import functionality from Excel/CSV
+- Work days configuration for accurate planning
+- Comment system for production notes and explanations
+
+### Dashboard Capabilities
+- Interactive calendar showing daily production performance
+- Detailed production reports with drill-down capabilities
+- Summary statistics and performance metrics
+- Color-coded performance indicators
+- Export functionality for reporting
+
+### Configuration Management
+- Flexible date range configuration (start/end months)
+- Production line selection and management
+- Database connection settings
+- Row limit controls for performance optimization
 
 ## Target Users
-- **Production Managers**: Monitor overall production performance and identify bottlenecks
-- **Operations Teams**: Track daily production targets and analyze trends
-- **Quality Assurance**: Review production data with contextual comments
-- **Management**: Access summary reports and performance analytics
 
-## Use Cases
-- Daily production monitoring and reporting
-- Monthly/weekly performance analysis
-- Production planning and target setting
-- Trend analysis and forecasting
-- Performance documentation with comments
-- Cross-period comparison and benchmarking
+### Production Managers
+- Monitor daily production performance across all lines
+- Identify underperforming periods and investigate causes
+- Track progress against monthly and weekly targets
+
+### Planning Teams
+- Import and manage production plans
+- Adjust estimated quantities based on capacity changes
+- Analyze historical performance for future planning
+
+### Operations Teams
+- Add comments and notes for production issues
+- Review detailed production data by line and item
+- Monitor real-time production status
+
+## Value Proposition
+- Centralized production visibility reducing manual reporting overhead
+- Data-driven decision making with historical trend analysis
+- Improved production planning accuracy through performance tracking
+- Enhanced communication through integrated comment system
+- Flexible configuration supporting various production scenarios

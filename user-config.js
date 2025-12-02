@@ -6,8 +6,8 @@ const config = {
     // ───────────────────────────────────────────────────────────
     // NGÀY THÁNG (Thay đổi ở đây)
     // ───────────────────────────────────────────────────────────
-    startMonth: 201912,  // Tháng bắt đầu (YYYYMM)
-    endMonth: 201912,    // Tháng kết thúc (YYYYMM)
+    startMonth: 202504,  // Tháng bắt đầu (YYYYMM)
+    endMonth: 202512,    // Tháng kết thúc (YYYYMM)
 
     // ───────────────────────────────────────────────────────────
     // DÂY CHUYỀN (Thay đổi ở đây)

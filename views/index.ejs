@@ -36,115 +36,188 @@
         
         <!-- Production Tab -->
         <div id="production-tab" class="tab-content">
-            <!-- Controls & Filters -->
-            <div class="card shadow-sm mb-4">
-                <div class="card-body py-3">
-                <div class="row align-items-center">
-                    <div class="col-md-8">
+            <!-- Navigation Pills -->
+            <div class="sticky-top bg-white py-3 mb-4 border-bottom">
+                <ul class="nav nav-pills justify-content-center">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#dashboard-section" onclick="scrollToSection('dashboard-section')">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#details-section" onclick="scrollToSection('details-section')">Details</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#chart-section" onclick="scrollToSection('chart-section')">Charts</a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Dashboard Section -->
+            <div id="dashboard-section" class="mb-5">
+                <!-- Controls & Filters -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-body py-3">
                         <div class="row align-items-center">
-                            <div class="col-md-6">
-                                <div class="d-flex align-items-center">
-                                    <label for="monthFilter" class="form-label fw-bold mb-0 me-2">Month:</label>
-                                    <input type="month" id="monthFilter" class="form-control d-inline-block w-auto me-3" value="<%= year %>-<%= month.toString().padStart(2, '0') %>">
-                                    
-                                    <label for="weekFilter" class="form-label fw-bold mb-0 me-2">Week:</label>
-                                    <select id="weekFilter" class="form-select d-inline-block w-auto">
-                                        <option value="">All Month</option>
-                                        <option value="1">Week 1</option>
-                                        <option value="2">Week 2</option>
-                                        <option value="3">Week 3</option>
-                                        <option value="4">Week 4</option>
-                                        <option value="5">Week 5</option>
-                                    </select>
+                            <div class="col-md-8">
+                                <div class="row align-items-center">
+                                    <div class="col-md-6">
+                                        <div class="d-flex align-items-center">
+                                            <label for="monthFilter" class="form-label fw-bold mb-0 me-2">Month:</label>
+                                            <input type="month" id="monthFilter" class="form-control d-inline-block w-auto me-3" value="<%= year %>-<%= month.toString().padStart(2, '0') %>">
+                                            
+                                            <label for="weekFilter" class="form-label fw-bold mb-0 me-2">Week:</label>
+                                            <select id="weekFilter" class="form-select d-inline-block w-auto">
+                                                <option value="">All Month</option>
+                                                <option value="1">Week 1</option>
+                                                <option value="2">Week 2</option>
+                                                <option value="3">Week 3</option>
+                                                <option value="4">Week 4</option>
+                                                <option value="5">Week 5</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="d-flex align-items-center">
+                                            <label class="form-label fw-bold mb-0 me-2">Date Range:</label>
+                                            <input type="date" id="startDate" class="form-control d-inline-block w-auto me-2" style="width: 140px!important;">
+                                            <span class="me-2">to</span>
+                                            <input type="date" id="endDate" class="form-control d-inline-block w-auto" style="width: 140px!important;">
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="col-md-6">
-                                <div class="d-flex align-items-center">
-                                    <label class="form-label fw-bold mb-0 me-2">Date Range:</label>
-                                    <input type="date" id="startDate" class="form-control d-inline-block w-auto me-2" style="width: 140px!important;">
-                                    <span class="me-2">to</span>
-                                    <input type="date" id="endDate" class="form-control d-inline-block w-auto" style="width: 140px!important;">
+                            <div class="col-md-4 text-end">
+                                <input type="text" id="searchInput" class="form-control d-inline-block w-auto me-2" placeholder="Search item..." style="width: 150px!important;">
+                                <button class="btn btn-outline-primary me-2" onclick="loadData()">
+                                    <i class="fas fa-sync-alt me-1"></i> Refresh
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+                <!-- Enhanced Summary Cards -->
+                <div class="row mb-4">
+                    <div class="col-md-4">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-body text-center">
+                                <div class="d-flex align-items-center justify-content-center mb-3">
+                                    <div class="bg-light rounded-circle p-3 me-3">
+                                        <i class="fas fa-clipboard-list text-secondary fa-2x"></i>
+                                    </div>
+                                    <div class="text-start">
+                                        <h6 class="text-muted mb-0">TOTAL PLAN</h6>
+                                        <h2 class="fw-bold mb-0" id="sum-plan">0</h2>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-4 text-end">
+                    <div class="col-md-4">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-body text-center">
+                                <div class="d-flex align-items-center justify-content-center mb-3">
+                                    <div class="bg-primary bg-opacity-10 rounded-circle p-3 me-3">
+                                        <i class="fas fa-chart-line text-primary fa-2x"></i>
+                                    </div>
+                                    <div class="text-start">
+                                        <h6 class="text-muted mb-0">TOTAL ACTUAL</h6>
+                                        <h2 class="fw-bold mb-0" id="sum-act">0</h2>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card border-0 shadow-sm h-100" id="card-percent">
+                            <div class="card-body text-center">
+                                <div class="d-flex align-items-center justify-content-center mb-3">
+                                    <div class="bg-success bg-opacity-10 rounded-circle p-3 me-3">
+                                        <i class="fas fa-bullseye text-success fa-2x"></i>
+                                    </div>
+                                    <div class="text-start">
+                                        <h6 class="text-muted mb-0">ACHIEVEMENT</h6>
+                                        <h2 class="fw-bold mb-0" id="sum-percent">0%</h2>
+                                    </div>
+                                </div>
+                                <div class="progress" style="height: 8px;">
+                                    <div class="progress-bar bg-success" id="progress-bar" style="width: 0%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Section -->
+            <div id="chart-section" class="mb-5">
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="card shadow-sm">
+                            <div class="card-header bg-white">
+                                <h5 class="mb-0"><i class="fas fa-chart-bar me-2"></i>Plan vs Actual Trend</h5>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="trendChart" height="100"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card shadow-sm">
+                            <div class="card-header bg-white">
+                                <h5 class="mb-0"><i class="fas fa-tachometer-alt me-2"></i>Performance</h5>
+                            </div>
+                            <div class="card-body text-center">
+                                <canvas id="gaugeChart" height="200"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Details Section -->
+            <div id="details-section" class="mb-5">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h4><i class="fas fa-table me-2"></i>Production Details</h4>
+                    <div>
                         <div class="btn-group me-2" role="group">
                             <input type="radio" class="btn-check" name="viewMode" id="viewList" value="list" checked autocomplete="off">
                             <label class="btn btn-outline-secondary" for="viewList"><i class="fas fa-list me-1"></i>List</label>
-                          
                             <input type="radio" class="btn-check" name="viewMode" id="viewPivot" value="pivot" autocomplete="off">
                             <label class="btn btn-outline-secondary" for="viewPivot"><i class="fas fa-th me-1"></i>Daily Matrix</label>
                         </div>
-
-                        <button class="btn btn-outline-primary me-2" onclick="loadData()">
-                            <i class="fas fa-sync-alt me-1"></i> Refresh
-                        </button>
                         <button class="btn btn-success" onclick="exportToExcel()">
                             <i class="fas fa-file-excel me-1"></i> Export
                         </button>
                     </div>
                 </div>
-            </div>
-        </div>
 
-        <!-- Summary Cards -->
-        <div class="row mb-4" id="summary-section">
-            <!-- Filled via JS -->
-            <div class="col-md-4">
-                <div class="card text-white bg-secondary h-100">
-                    <div class="card-body">
-                        <h5 class="card-title">Total Plan</h5>
-                        <h2 class="display-6 fw-bold" id="sum-plan">0</h2>
+                <!-- Main Data Table -->
+                <div class="card shadow-sm">
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0 align-middle">
+                                <thead class="table-light text-center sticky-top">
+                                    <tr>
+                                        <th style="width: 5%">Line</th>
+                                        <th style="width: 25%">Item Name</th>
+                                        <th style="width: 10%">Item Code</th>
+                                        <th style="width: 5%">Unit</th>
+                                        <th style="width: 10%">Est Qty</th>
+                                        <th style="width: 10%">Act Qty</th>
+                                        <th style="width: 10%">Act/Plan %</th>
+                                        <th style="width: 25%">Comment</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="data-table-body">
+                                    <!-- Rows loaded via JS -->
+                                    <tr><td colspan="8" class="text-center py-4">Loading data...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="card text-white bg-primary h-100">
-                    <div class="card-body">
-                        <h5 class="card-title">Total Actual</h5>
-                        <h2 class="display-6 fw-bold" id="sum-act">0</h2>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card text-white bg-success h-100" id="card-percent">
-                    <div class="card-body">
-                        <h5 class="card-title">Achievement %</h5>
-                        <h2 class="display-6 fw-bold" id="sum-percent">0%</h2>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Main Data Table -->
-        <div class="card shadow-sm">
-            <div class="card-header bg-white py-3">
-                <h5 class="mb-0 fw-bold"><i class="fas fa-table me-2"></i>Production Details</h5>
-            </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-bordered table-hover mb-0 align-middle">
-                        <thead class="table-light text-center">
-                            <tr>
-                                <th style="width: 5%">Line</th>
-                                <th style="width: 25%">Item Name</th>
-                                <th style="width: 10%">Item Code</th>
-                                <th style="width: 5%">Unit</th>
-                                <th style="width: 10%">Est Qty</th>
-                                <th style="width: 10%">Act Qty</th>
-                                <th style="width: 10%">Act/Plan %</th>
-                                <th style="width: 25%">Comment</th>
-                            </tr>
-                        </thead>
-                        <tbody id="data-table-body">
-                            <!-- Rows loaded via JS -->
-                            <tr><td colspan="8" class="text-center py-4">Loading data...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
         </div>
         
         <!-- Plan Tab -->
@@ -152,13 +225,23 @@
             <!-- Plan Controls -->
             <div class="card shadow-sm mb-4">
                 <div class="card-body py-3">
-                    <div class="row align-items-center">
-                        <div class="col-md-8">
-                            <h5 class="mb-0"><i class="fas fa-calendar-alt me-2"></i>Plan Management</h5>
-                        </div>
-                        <div class="col-md-4 text-end">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0 fw-bold text-primary">
+                            <i class="fas fa-calendar-alt me-2"></i>Plan Management
+                        </h5>
+                        <div class="d-flex gap-2">
                             <button class="btn btn-primary" onclick="openPlanImportModal()">
                                 <i class="fas fa-upload me-1"></i> Import New Plan
+                            </button>
+                            <button class="btn btn-info" onclick="openWorkDaysPasteModal()">
+                                <i class="fas fa-calendar me-1"></i> Paste Work Days
+                            </button>
+                            <button class="btn btn-warning" onclick="openHolidaysModal()">
+                                <i class="fas fa-calendar-times me-1"></i> Holidays
+                            </button>
+                            <div class="border-start mx-2"></div>
+                            <button class="btn btn-outline-danger" onclick="clearAllPlan()">
+                                <i class="fas fa-trash me-1"></i> Clear All
                             </button>
                         </div>
                     </div>
@@ -172,7 +255,7 @@
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
-                        <table class="table table-bordered table-hover mb-0 align-middle" style="font-size: 12px;">
+                        <table class="table table-bordered table-hover mb-0 align-middle plan-table">
                             <thead class="table-light text-center" id="plan-table-header">
                                 <!-- Dynamic header will be generated -->
                             </thead>
@@ -247,13 +330,9 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label class="form-label">Select Excel File:</label>
-                                <input type="file" class="form-control" id="excel-file-input" accept=".xlsx,.xls,.csv" onchange="previewExcelData()">
-                                <div class="form-text">Upload Excel file with plan data. First row should be headers.</div>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Or Paste from Excel:</label>
-                                <textarea class="form-control" id="plan-paste-data" rows="8" placeholder="Copy from Excel and paste here..." onpaste="setTimeout(previewPastedData, 100)"></textarea>
+                                <label class="form-label">Paste from Excel:</label>
+                                <textarea class="form-control" id="plan-paste-data" rows="10" placeholder="Copy from Excel and paste here..." onpaste="setTimeout(previewPastedData, 100)"></textarea>
+                                <div class="form-text">Copy data from Excel and paste here. First row should be headers.</div>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -267,6 +346,113 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     <button type="button" class="btn btn-primary" id="import-plan-btn" onclick="submitPlanImport()" disabled>Import Plan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Plan Quantity Modal -->
+    <div class="modal fade" id="editPlanQtyModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Plan Quantity</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="edit-item-code">
+                    <input type="hidden" id="edit-month">
+                    <div class="mb-3">
+                        <label class="form-label">Plan Quantity:</label>
+                        <input type="number" class="form-control" id="edit-plan-qty" step="0.0001">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="savePlanQty()">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Work Day Modal -->
+    <div class="modal fade" id="editWorkDayModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Work Days</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="edit-work-month">
+                    <div class="mb-3">
+                        <label class="form-label">Work Days:</label>
+                        <input type="number" class="form-control" id="edit-work-days" min="0" max="31">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="saveWorkDay()">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Paste Work Days Modal -->
+    <div class="modal fade" id="pasteWorkDaysModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Paste Work Days Data</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Paste Work Days from Excel:</label>
+                        <textarea class="form-control" id="workdays-paste-data" rows="5" placeholder="Category	202506	202507	202508	202509	202510	202511	202512	202601	202602	202603
+Work Date	21	22	23	22	23	20	23	22	15	26"></textarea>
+                        <div class="form-text">Copy work days data from Excel and paste here. Format: Category column with 'Work Date' and month columns.</div>
+                    </div>
+                    <div id="workdays-preview" style="max-height: 200px; overflow-y: auto;">
+                        <p class="text-muted">Paste data to see preview</p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="import-workdays-btn" onclick="importWorkDays()" disabled>Import Work Days</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Holidays Modal -->
+    <div class="modal fade" id="holidaysModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Holiday Calendar - Click dates to toggle holidays</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Select Month:</label>
+                            <input type="month" class="form-control" id="calendar-month" onchange="renderCalendar()">
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mt-4">
+                                <span class="badge bg-danger me-2">■</span> Holiday
+                                <span class="badge bg-light text-dark me-2">■</span> Working Day
+                                <span class="badge bg-secondary me-2">■</span> Weekend
+                            </div>
+                        </div>
+                    </div>
+                    <div id="holiday-calendar" class="border rounded p-3">
+                        <!-- Calendar will be rendered here -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>

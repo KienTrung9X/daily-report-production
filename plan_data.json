@@ -1,286 +1,127 @@
 {
-  "0208538_202511": {
-    "quantity": 8312.8,
-    "itemCode": "0208538",
-    "itemName": "POLYESTER ELEMENT EP050",
-    "itemDesc": "FOR 03 C",
+  "3604270_202506": {
+    "quantity": 2727.66,
+    "line1": "313",
+    "itemCode": "3604270",
+    "itemName": "03 CF CHAIN PB12 NAT",
+    "itemDesc": "GREEN-F",
     "category": "Pro"
   },
-  "0208538_202512": {
-    "quantity": 9559.7,
-    "itemCode": "0208538",
-    "itemName": "POLYESTER ELEMENT EP050",
-    "itemDesc": "FOR 03 C",
+  "3604270_202507": {
+    "quantity": 2335.44,
+    "line1": "313",
+    "itemCode": "3604270",
+    "itemName": "03 CF CHAIN PB12 NAT",
+    "itemDesc": "GREEN-F",
     "category": "Pro"
   },
-  "0208538_202601": {
-    "quantity": 9144.1,
-    "itemCode": "0208538",
-    "itemName": "POLYESTER ELEMENT EP050",
-    "itemDesc": "FOR 03 C",
+  "3604270_202508": {
+    "quantity": 2436.94,
+    "line1": "313",
+    "itemCode": "3604270",
+    "itemName": "03 CF CHAIN PB12 NAT",
+    "itemDesc": "GREEN-F",
     "category": "Pro"
   },
-  "0208538_202602": {
-    "quantity": 6584.8,
-    "itemCode": "0208538",
-    "itemName": "POLYESTER ELEMENT EP050",
-    "itemDesc": "FOR 03 C",
+  "3604270_202509": {
+    "quantity": 2469.91,
+    "line1": "313",
+    "itemCode": "3604270",
+    "itemName": "03 CF CHAIN PB12 NAT",
+    "itemDesc": "GREEN-F",
     "category": "Pro"
   },
-  "0208538_202603": {
-    "quantity": 11413.7,
-    "itemCode": "0208538",
-    "itemName": "POLYESTER ELEMENT EP050",
-    "itemDesc": "FOR 03 C",
-    "category": "Pro"
-  },
-  "3852204_202511": {
-    "quantity": 939.2,
-    "itemCode": "3852204",
-    "itemName": "POLYESTER ELEMENT EP050 DOPE",
-    "itemDesc": "FOR 03 C",
-    "category": "Pro"
-  },
-  "3852204_202512": {
-    "quantity": 1080.1,
-    "itemCode": "3852204",
-    "itemName": "POLYESTER ELEMENT EP050 DOPE",
-    "itemDesc": "FOR 03 C",
-    "category": "Pro"
-  },
-  "3852204_202601": {
-    "quantity": 516.6,
-    "itemCode": "3852204",
-    "itemName": "POLYESTER ELEMENT EP050 DOPE",
-    "itemDesc": "FOR 03 C",
-    "category": "Pro"
-  },
-  "3852204_202602": {
-    "quantity": 352.2,
-    "itemCode": "3852204",
-    "itemName": "POLYESTER ELEMENT EP050 DOPE",
-    "itemDesc": "FOR 03 C",
-    "category": "Pro"
-  },
-  "3852204_202603": {
-    "quantity": 610.5,
-    "itemCode": "3852204",
-    "itemName": "POLYESTER ELEMENT EP050 DOPE",
-    "itemDesc": "FOR 03 C",
-    "category": "Pro"
-  },
-  "6393943_202511": {
-    "quantity": 428.2,
-    "itemCode": "6393943",
-    "itemName": "POLYESTER ELEMENT EP050",
-    "itemDesc": "FOR 03 CFBE",
-    "category": "Pro"
-  },
-  "6393943_202512": {
-    "quantity": 492.4,
-    "itemCode": "6393943",
-    "itemName": "POLYESTER ELEMENT EP050",
-    "itemDesc": "FOR 03 CFBE",
-    "category": "Pro"
-  },
-  "6393943_202601": {
-    "quantity": 471,
-    "itemCode": "6393943",
-    "itemName": "POLYESTER ELEMENT EP050",
-    "itemDesc": "FOR 03 CFBE",
-    "category": "Pro"
-  },
-  "6393943_202602": {
-    "quantity": 321.2,
-    "itemCode": "6393943",
-    "itemName": "POLYESTER ELEMENT EP050",
-    "itemDesc": "FOR 03 CFBE",
-    "category": "Pro"
-  },
-  "6393943_202603": {
-    "quantity": 556.7,
-    "itemCode": "6393943",
-    "itemName": "POLYESTER ELEMENT EP050",
-    "itemDesc": "FOR 03 CFBE",
-    "category": "Pro"
-  },
-  "1924605_202511": {
-    "quantity": 25843.4,
-    "itemCode": "1924605",
-    "itemName": "POLYESTER ELEMENT EP074",
-    "itemDesc": "FOR 05 CI",
-    "category": "Pro"
-  },
-  "1924605_202512": {
-    "quantity": 29720,
-    "itemCode": "1924605",
-    "itemName": "POLYESTER ELEMENT EP074",
-    "itemDesc": "FOR 05 CI",
-    "category": "Pro"
-  },
-  "1924605_202601": {
-    "quantity": 31017,
-    "itemCode": "1924605",
-    "itemName": "POLYESTER ELEMENT EP074",
-    "itemDesc": "FOR 05 CI",
-    "category": "Pro"
-  },
-  "1924605_202602": {
-    "quantity": 22067.5,
-    "itemCode": "1924605",
-    "itemName": "POLYESTER ELEMENT EP074",
-    "itemDesc": "FOR 05 CI",
-    "category": "Pro"
-  },
-  "1924605_202603": {
-    "quantity": 36656.5,
-    "itemCode": "1924605",
-    "itemName": "POLYESTER ELEMENT EP074",
-    "itemDesc": "FOR 05 CI",
-    "category": "Pro"
-  },
-  "3850873_202511": {
-    "quantity": 1331.4,
-    "itemCode": "3850873",
-    "itemName": "POLYESTER ELEMENT EP074 DOPE",
-    "itemDesc": "FOR 05 CN",
-    "category": "Pro"
-  },
-  "3850873_202512": {
-    "quantity": 0,
-    "itemCode": "3850873",
-    "itemName": "POLYESTER ELEMENT EP074 DOPE",
-    "itemDesc": "FOR 05 CN",
-    "category": "Pro"
-  },
-  "3850873_202601": {
-    "quantity": 0,
-    "itemCode": "3850873",
-    "itemName": "POLYESTER ELEMENT EP074 DOPE",
-    "itemDesc": "FOR 05 CN",
-    "category": "Pro"
-  },
-  "3850873_202602": {
-    "quantity": 998.6,
-    "itemCode": "3850873",
-    "itemName": "POLYESTER ELEMENT EP074 DOPE",
-    "itemDesc": "FOR 05 CN",
-    "category": "Pro"
-  },
-  "3850873_202603": {
-    "quantity": 1730.9,
-    "itemCode": "3850873",
-    "itemName": "POLYESTER ELEMENT EP074 DOPE",
-    "itemDesc": "FOR 05 CN",
-    "category": "Pro"
-  },
-  "6095715_202511": {
-    "quantity": 1321,
-    "itemCode": "6095715",
-    "itemName": "POLYESTER ELEMENT EP074",
-    "itemDesc": "FOR 05 CIBE",
-    "category": "Pro"
-  },
-  "6095715_202512": {
-    "quantity": 0,
-    "itemCode": "6095715",
-    "itemName": "POLYESTER ELEMENT EP074",
-    "itemDesc": "FOR 05 CIBE",
-    "category": "Pro"
-  },
-  "6095715_202601": {
-    "quantity": 0,
-    "itemCode": "6095715",
-    "itemName": "POLYESTER ELEMENT EP074",
-    "itemDesc": "FOR 05 CIBE",
-    "category": "Pro"
-  },
-  "6095715_202602": {
-    "quantity": 990.7,
-    "itemCode": "6095715",
-    "itemName": "POLYESTER ELEMENT EP074",
-    "itemDesc": "FOR 05 CIBE",
-    "category": "Pro"
-  },
-  "6095715_202603": {
-    "quantity": 1717.3,
-    "itemCode": "6095715",
-    "itemName": "POLYESTER ELEMENT EP074",
-    "itemDesc": "FOR 05 CIBE",
-    "category": "Pro"
-  },
-  "0020109_202511": {
-    "quantity": 672.3,
-    "itemCode": "0020109",
-    "itemName": "POLYESTER ELEMENT EP060",
-    "itemDesc": "FOR 45 C",
-    "category": "Pro"
-  },
-  "0020109_202512": {
-    "quantity": 0,
-    "itemCode": "0020109",
-    "itemName": "POLYESTER ELEMENT EP060",
-    "itemDesc": "FOR 45 C",
-    "category": "Pro"
-  },
-  "0020109_202601": {
-    "quantity": 739.6,
-    "itemCode": "0020109",
-    "itemName": "POLYESTER ELEMENT EP060",
-    "itemDesc": "FOR 45 C",
-    "category": "Pro"
-  },
-  "0020109_202602": {
-    "quantity": 504.2,
-    "itemCode": "0020109",
-    "itemName": "POLYESTER ELEMENT EP060",
-    "itemDesc": "FOR 45 C",
-    "category": "Pro"
-  },
-  "0020109_202603": {
-    "quantity": 874,
-    "itemCode": "0020109",
-    "itemName": "POLYESTER ELEMENT EP060",
-    "itemDesc": "FOR 45 C",
+  "3604270_202510": {
+    "quantity": 2745.32,
+    "line1": "313",
+    "itemCode": "3604270",
+    "itemName": "03 CF CHAIN PB12 NAT",
+    "itemDesc": "GREEN-F",
     "category": "Pro"
   },
   "3604270_202511": {
-    "quantity": 2276.7,
+    "quantity": 2465.07,
+    "line1": "313",
     "itemCode": "3604270",
     "itemName": "03 CF CHAIN PB12 NAT",
     "itemDesc": "GREEN-F",
     "category": "Pro"
   },
   "3604270_202512": {
-    "quantity": 2618.2,
+    "quantity": 2618.18,
+    "line1": "313",
     "itemCode": "3604270",
     "itemName": "03 CF CHAIN PB12 NAT",
     "itemDesc": "GREEN-F",
     "category": "Pro"
   },
   "3604270_202601": {
-    "quantity": 2782.6,
+    "quantity": 2504.35,
+    "line1": "313",
     "itemCode": "3604270",
     "itemName": "03 CF CHAIN PB12 NAT",
     "itemDesc": "GREEN-F",
     "category": "Pro"
   },
   "3604270_202602": {
-    "quantity": 1897.2,
+    "quantity": 1707.51,
+    "line1": "313",
     "itemCode": "3604270",
     "itemName": "03 CF CHAIN PB12 NAT",
     "itemDesc": "GREEN-F",
     "category": "Pro"
   },
   "3604270_202603": {
-    "quantity": 3288.5,
+    "quantity": 2959.68,
+    "line1": "313",
     "itemCode": "3604270",
     "itemName": "03 CF CHAIN PB12 NAT",
     "itemDesc": "GREEN-F",
     "category": "Pro"
   },
+  "3852785_202506": {
+    "quantity": 0,
+    "line1": "313",
+    "itemCode": "3852785",
+    "itemName": "03 CF CHAIN P12S1 NAT",
+    "itemDesc": "DOPE EL-BK13",
+    "category": "Pro"
+  },
+  "3852785_202507": {
+    "quantity": 0,
+    "line1": "313",
+    "itemCode": "3852785",
+    "itemName": "03 CF CHAIN P12S1 NAT",
+    "itemDesc": "DOPE EL-BK13",
+    "category": "Pro"
+  },
+  "3852785_202508": {
+    "quantity": 0,
+    "line1": "313",
+    "itemCode": "3852785",
+    "itemName": "03 CF CHAIN P12S1 NAT",
+    "itemDesc": "DOPE EL-BK13",
+    "category": "Pro"
+  },
+  "3852785_202509": {
+    "quantity": 0,
+    "line1": "313",
+    "itemCode": "3852785",
+    "itemName": "03 CF CHAIN P12S1 NAT",
+    "itemDesc": "DOPE EL-BK13",
+    "category": "Pro"
+  },
+  "3852785_202510": {
+    "quantity": 0,
+    "line1": "313",
+    "itemCode": "3852785",
+    "itemName": "03 CF CHAIN P12S1 NAT",
+    "itemDesc": "DOPE EL-BK13",
+    "category": "Pro"
+  },
   "3852785_202511": {
     "quantity": 0,
+    "line1": "313",
     "itemCode": "3852785",
     "itemName": "03 CF CHAIN P12S1 NAT",
     "itemDesc": "DOPE EL-BK13",
@@ -288,6 +129,7 @@
   },
   "3852785_202512": {
     "quantity": 0,
+    "line1": "313",
     "itemCode": "3852785",
     "itemName": "03 CF CHAIN P12S1 NAT",
     "itemDesc": "DOPE EL-BK13",
@@ -295,6 +137,7 @@
   },
   "3852785_202601": {
     "quantity": 0,
+    "line1": "313",
     "itemCode": "3852785",
     "itemName": "03 CF CHAIN P12S1 NAT",
     "itemDesc": "DOPE EL-BK13",
@@ -302,6 +145,7 @@
   },
   "3852785_202602": {
     "quantity": 0,
+    "line1": "313",
     "itemCode": "3852785",
     "itemName": "03 CF CHAIN P12S1 NAT",
     "itemDesc": "DOPE EL-BK13",
@@ -309,83 +153,215 @@
   },
   "3852785_202603": {
     "quantity": 0,
+    "line1": "313",
     "itemCode": "3852785",
     "itemName": "03 CF CHAIN P12S1 NAT",
     "itemDesc": "DOPE EL-BK13",
     "category": "Pro"
   },
+  "8284071_202506": {
+    "quantity": 108.76,
+    "line1": "313",
+    "itemCode": "8284071",
+    "itemName": "03 CFA CHAIN R12S1 NAT",
+    "itemDesc": "EL-BK13 GREEN-F",
+    "category": "Pro"
+  },
+  "8284071_202507": {
+    "quantity": 144.74,
+    "line1": "313",
+    "itemCode": "8284071",
+    "itemName": "03 CFA CHAIN R12S1 NAT",
+    "itemDesc": "EL-BK13 GREEN-F",
+    "category": "Pro"
+  },
+  "8284071_202508": {
+    "quantity": 139.4,
+    "line1": "313",
+    "itemCode": "8284071",
+    "itemName": "03 CFA CHAIN R12S1 NAT",
+    "itemDesc": "EL-BK13 GREEN-F",
+    "category": "Pro"
+  },
+  "8284071_202509": {
+    "quantity": 139.12,
+    "line1": "313",
+    "itemCode": "8284071",
+    "itemName": "03 CFA CHAIN R12S1 NAT",
+    "itemDesc": "EL-BK13 GREEN-F",
+    "category": "Pro"
+  },
+  "8284071_202510": {
+    "quantity": 120.63,
+    "line1": "313",
+    "itemCode": "8284071",
+    "itemName": "03 CFA CHAIN R12S1 NAT",
+    "itemDesc": "EL-BK13 GREEN-F",
+    "category": "Pro"
+  },
   "8284071_202511": {
-    "quantity": 253,
+    "quantity": 200.66,
+    "line1": "313",
     "itemCode": "8284071",
     "itemName": "03 CFA CHAIN R12S1 NAT",
     "itemDesc": "EL-BK13 GREEN-F",
     "category": "Pro"
   },
   "8284071_202512": {
-    "quantity": 290.9,
+    "quantity": 232.73,
+    "line1": "313",
     "itemCode": "8284071",
     "itemName": "03 CFA CHAIN R12S1 NAT",
     "itemDesc": "EL-BK13 GREEN-F",
     "category": "Pro"
   },
   "8284071_202601": {
-    "quantity": 139.1,
+    "quantity": 139.13,
+    "line1": "313",
     "itemCode": "8284071",
     "itemName": "03 CFA CHAIN R12S1 NAT",
     "itemDesc": "EL-BK13 GREEN-F",
     "category": "Pro"
   },
   "8284071_202602": {
-    "quantity": 94.9,
+    "quantity": 94.86,
+    "line1": "313",
     "itemCode": "8284071",
     "itemName": "03 CFA CHAIN R12S1 NAT",
     "itemDesc": "EL-BK13 GREEN-F",
     "category": "Pro"
   },
   "8284071_202603": {
-    "quantity": 164.4,
+    "quantity": 164.43,
+    "line1": "313",
     "itemCode": "8284071",
     "itemName": "03 CFA CHAIN R12S1 NAT",
     "itemDesc": "EL-BK13 GREEN-F",
     "category": "Pro"
   },
+  "6815518_202506": {
+    "quantity": 126.46,
+    "line1": "313",
+    "itemCode": "6815518",
+    "itemName": "03 CFBE CHAIN PB12 NAT",
+    "itemDesc": "GREEN-F NEW-MF",
+    "category": "Pro"
+  },
+  "6815518_202507": {
+    "quantity": 150.49,
+    "line1": "313",
+    "itemCode": "6815518",
+    "itemName": "03 CFBE CHAIN PB12 NAT",
+    "itemDesc": "GREEN-F NEW-MF",
+    "category": "Pro"
+  },
+  "6815518_202508": {
+    "quantity": 150.74,
+    "line1": "313",
+    "itemCode": "6815518",
+    "itemName": "03 CFBE CHAIN PB12 NAT",
+    "itemDesc": "GREEN-F NEW-MF",
+    "category": "Pro"
+  },
+  "6815518_202509": {
+    "quantity": 139.56,
+    "line1": "313",
+    "itemCode": "6815518",
+    "itemName": "03 CFBE CHAIN PB12 NAT",
+    "itemDesc": "GREEN-F NEW-MF",
+    "category": "Pro"
+  },
+  "6815518_202510": {
+    "quantity": 138.94,
+    "line1": "313",
+    "itemCode": "6815518",
+    "itemName": "03 CFBE CHAIN PB12 NAT",
+    "itemDesc": "GREEN-F NEW-MF",
+    "category": "Pro"
+  },
   "6815518_202511": {
-    "quantity": 126.5,
+    "quantity": 140.63,
+    "line1": "313",
     "itemCode": "6815518",
     "itemName": "03 CFBE CHAIN PB12 NAT",
     "itemDesc": "GREEN-F NEW-MF",
     "category": "Pro"
   },
   "6815518_202512": {
-    "quantity": 145.5,
+    "quantity": 145.45,
+    "line1": "313",
     "itemCode": "6815518",
     "itemName": "03 CFBE CHAIN PB12 NAT",
     "itemDesc": "GREEN-F NEW-MF",
     "category": "Pro"
   },
   "6815518_202601": {
-    "quantity": 139.1,
+    "quantity": 139.13,
+    "line1": "313",
     "itemCode": "6815518",
     "itemName": "03 CFBE CHAIN PB12 NAT",
     "itemDesc": "GREEN-F NEW-MF",
     "category": "Pro"
   },
   "6815518_202602": {
-    "quantity": 94.9,
+    "quantity": 94.86,
+    "line1": "313",
     "itemCode": "6815518",
     "itemName": "03 CFBE CHAIN PB12 NAT",
     "itemDesc": "GREEN-F NEW-MF",
     "category": "Pro"
   },
   "6815518_202603": {
-    "quantity": 164.4,
+    "quantity": 164.43,
+    "line1": "313",
     "itemCode": "6815518",
     "itemName": "03 CFBE CHAIN PB12 NAT",
     "itemDesc": "GREEN-F NEW-MF",
     "category": "Pro"
   },
+  "8914987_202506": {
+    "quantity": 0,
+    "line1": "313",
+    "itemCode": "8914987",
+    "itemName": "03 CF CHAIN PBB18 NAT",
+    "itemDesc": "GREEN-F",
+    "category": "Pro"
+  },
+  "8914987_202507": {
+    "quantity": 0,
+    "line1": "313",
+    "itemCode": "8914987",
+    "itemName": "03 CF CHAIN PBB18 NAT",
+    "itemDesc": "GREEN-F",
+    "category": "Pro"
+  },
+  "8914987_202508": {
+    "quantity": 0,
+    "line1": "313",
+    "itemCode": "8914987",
+    "itemName": "03 CF CHAIN PBB18 NAT",
+    "itemDesc": "GREEN-F",
+    "category": "Pro"
+  },
+  "8914987_202509": {
+    "quantity": 4.11,
+    "line1": "313",
+    "itemCode": "8914987",
+    "itemName": "03 CF CHAIN PBB18 NAT",
+    "itemDesc": "GREEN-F",
+    "category": "Pro"
+  },
+  "8914987_202510": {
+    "quantity": 42.34,
+    "line1": "313",
+    "itemCode": "8914987",
+    "itemName": "03 CF CHAIN PBB18 NAT",
+    "itemDesc": "GREEN-F",
+    "category": "Pro"
+  },
   "8914987_202511": {
     "quantity": 0,
+    "line1": "313",
     "itemCode": "8914987",
     "itemName": "03 CF CHAIN PBB18 NAT",
     "itemDesc": "GREEN-F",
@@ -393,6 +369,7 @@
   },
   "8914987_202512": {
     "quantity": 0,
+    "line1": "313",
     "itemCode": "8914987",
     "itemName": "03 CF CHAIN PBB18 NAT",
     "itemDesc": "GREEN-F",
@@ -400,6 +377,7 @@
   },
   "8914987_202601": {
     "quantity": 0,
+    "line1": "313",
     "itemCode": "8914987",
     "itemName": "03 CF CHAIN PBB18 NAT",
     "itemDesc": "GREEN-F",
@@ -407,6 +385,7 @@
   },
   "8914987_202602": {
     "quantity": 0,
+    "line1": "313",
     "itemCode": "8914987",
     "itemName": "03 CF CHAIN PBB18 NAT",
     "itemDesc": "GREEN-F",
@@ -414,48 +393,135 @@
   },
   "8914987_202603": {
     "quantity": 0,
+    "line1": "313",
     "itemCode": "8914987",
     "itemName": "03 CF CHAIN PBB18 NAT",
     "itemDesc": "GREEN-F",
     "category": "Pro"
   },
+  "3603614_202506": {
+    "quantity": 2455.85,
+    "line1": "313",
+    "itemCode": "3603614",
+    "itemName": "05 CI CHAIN PB16 NAT",
+    "itemDesc": "GREEN-F",
+    "category": "Pro"
+  },
+  "3603614_202507": {
+    "quantity": 2616.78,
+    "line1": "313",
+    "itemCode": "3603614",
+    "itemName": "05 CI CHAIN PB16 NAT",
+    "itemDesc": "GREEN-F",
+    "category": "Pro"
+  },
+  "3603614_202508": {
+    "quantity": 2813.2,
+    "line1": "313",
+    "itemCode": "3603614",
+    "itemName": "05 CI CHAIN PB16 NAT",
+    "itemDesc": "GREEN-F",
+    "category": "Pro"
+  },
+  "3603614_202509": {
+    "quantity": 2772.41,
+    "line1": "313",
+    "itemCode": "3603614",
+    "itemName": "05 CI CHAIN PB16 NAT",
+    "itemDesc": "GREEN-F",
+    "category": "Pro"
+  },
+  "3603614_202510": {
+    "quantity": 3194.39,
+    "line1": "313",
+    "itemCode": "3603614",
+    "itemName": "05 CI CHAIN PB16 NAT",
+    "itemDesc": "GREEN-F",
+    "category": "Pro"
+  },
   "3603614_202511": {
-    "quantity": 3138.3,
+    "quantity": 3036.72,
+    "line1": "313",
     "itemCode": "3603614",
     "itemName": "05 CI CHAIN PB16 NAT",
     "itemDesc": "GREEN-F",
     "category": "Pro"
   },
   "3603614_202512": {
-    "quantity": 3609,
+    "quantity": 3969.93,
+    "line1": "313",
     "itemCode": "3603614",
     "itemName": "05 CI CHAIN PB16 NAT",
     "itemDesc": "GREEN-F",
     "category": "Pro"
   },
   "3603614_202601": {
-    "quantity": 3797.3,
+    "quantity": 3797.32,
+    "line1": "313",
     "itemCode": "3603614",
     "itemName": "05 CI CHAIN PB16 NAT",
     "itemDesc": "GREEN-F",
     "category": "Pro"
   },
   "3603614_202602": {
-    "quantity": 2589.1,
+    "quantity": 2706.77,
+    "line1": "313",
     "itemCode": "3603614",
     "itemName": "05 CI CHAIN PB16 NAT",
     "itemDesc": "GREEN-F",
     "category": "Pro"
   },
   "3603614_202603": {
-    "quantity": 4487.7,
+    "quantity": 4691.73,
+    "line1": "313",
     "itemCode": "3603614",
     "itemName": "05 CI CHAIN PB16 NAT",
     "itemDesc": "GREEN-F",
     "category": "Pro"
   },
+  "3850864_202506": {
+    "quantity": 0,
+    "line1": "313",
+    "itemCode": "3850864",
+    "itemName": "05 CI CHAIN P16S1 NAT",
+    "itemDesc": "DOPE EL-BK13",
+    "category": "Pro"
+  },
+  "3850864_202507": {
+    "quantity": 0,
+    "line1": "313",
+    "itemCode": "3850864",
+    "itemName": "05 CI CHAIN P16S1 NAT",
+    "itemDesc": "DOPE EL-BK13",
+    "category": "Pro"
+  },
+  "3850864_202508": {
+    "quantity": 0,
+    "line1": "313",
+    "itemCode": "3850864",
+    "itemName": "05 CI CHAIN P16S1 NAT",
+    "itemDesc": "DOPE EL-BK13",
+    "category": "Pro"
+  },
+  "3850864_202509": {
+    "quantity": 0,
+    "line1": "313",
+    "itemCode": "3850864",
+    "itemName": "05 CI CHAIN P16S1 NAT",
+    "itemDesc": "DOPE EL-BK13",
+    "category": "Pro"
+  },
+  "3850864_202510": {
+    "quantity": 0,
+    "line1": "313",
+    "itemCode": "3850864",
+    "itemName": "05 CI CHAIN P16S1 NAT",
+    "itemDesc": "DOPE EL-BK13",
+    "category": "Pro"
+  },
   "3850864_202511": {
     "quantity": 0,
+    "line1": "313",
     "itemCode": "3850864",
     "itemName": "05 CI CHAIN P16S1 NAT",
     "itemDesc": "DOPE EL-BK13",
@@ -463,6 +529,7 @@
   },
   "3850864_202512": {
     "quantity": 0,
+    "line1": "313",
     "itemCode": "3850864",
     "itemName": "05 CI CHAIN P16S1 NAT",
     "itemDesc": "DOPE EL-BK13",
@@ -470,6 +537,7 @@
   },
   "3850864_202601": {
     "quantity": 0,
+    "line1": "313",
     "itemCode": "3850864",
     "itemName": "05 CI CHAIN P16S1 NAT",
     "itemDesc": "DOPE EL-BK13",
@@ -477,6 +545,7 @@
   },
   "3850864_202602": {
     "quantity": 0,
+    "line1": "313",
     "itemCode": "3850864",
     "itemName": "05 CI CHAIN P16S1 NAT",
     "itemDesc": "DOPE EL-BK13",
@@ -484,13 +553,55 @@
   },
   "3850864_202603": {
     "quantity": 0,
+    "line1": "313",
     "itemCode": "3850864",
     "itemName": "05 CI CHAIN P16S1 NAT",
     "itemDesc": "DOPE EL-BK13",
     "category": "Pro"
   },
+  "8284060_202506": {
+    "quantity": 143.49,
+    "line1": "313",
+    "itemCode": "8284060",
+    "itemName": "05 CIA CHAIN R16S1 NAT",
+    "itemDesc": "EL-BK13 GREEN-F",
+    "category": "Pro"
+  },
+  "8284060_202507": {
+    "quantity": 49.06,
+    "line1": "313",
+    "itemCode": "8284060",
+    "itemName": "05 CIA CHAIN R16S1 NAT",
+    "itemDesc": "EL-BK13 GREEN-F",
+    "category": "Pro"
+  },
+  "8284060_202508": {
+    "quantity": 0,
+    "line1": "313",
+    "itemCode": "8284060",
+    "itemName": "05 CIA CHAIN R16S1 NAT",
+    "itemDesc": "EL-BK13 GREEN-F",
+    "category": "Pro"
+  },
+  "8284060_202509": {
+    "quantity": 135.21,
+    "line1": "313",
+    "itemCode": "8284060",
+    "itemName": "05 CIA CHAIN R16S1 NAT",
+    "itemDesc": "EL-BK13 GREEN-F",
+    "category": "Pro"
+  },
+  "8284060_202510": {
+    "quantity": 184.14,
+    "line1": "313",
+    "itemCode": "8284060",
+    "itemName": "05 CIA CHAIN R16S1 NAT",
+    "itemDesc": "EL-BK13 GREEN-F",
+    "category": "Pro"
+  },
   "8284060_202511": {
-    "quantity": 156.9,
+    "quantity": 158.09,
+    "line1": "313",
     "itemCode": "8284060",
     "itemName": "05 CIA CHAIN R16S1 NAT",
     "itemDesc": "EL-BK13 GREEN-F",
@@ -498,6 +609,7 @@
   },
   "8284060_202512": {
     "quantity": 0,
+    "line1": "313",
     "itemCode": "8284060",
     "itemName": "05 CIA CHAIN R16S1 NAT",
     "itemDesc": "EL-BK13 GREEN-F",
@@ -505,27 +617,71 @@
   },
   "8284060_202601": {
     "quantity": 0,
+    "line1": "313",
     "itemCode": "8284060",
     "itemName": "05 CIA CHAIN R16S1 NAT",
     "itemDesc": "EL-BK13 GREEN-F",
     "category": "Pro"
   },
   "8284060_202602": {
-    "quantity": 117.7,
+    "quantity": 117.69,
+    "line1": "313",
     "itemCode": "8284060",
     "itemName": "05 CIA CHAIN R16S1 NAT",
     "itemDesc": "EL-BK13 GREEN-F",
     "category": "Pro"
   },
   "8284060_202603": {
-    "quantity": 204,
+    "quantity": 203.99,
+    "line1": "313",
     "itemCode": "8284060",
     "itemName": "05 CIA CHAIN R16S1 NAT",
     "itemDesc": "EL-BK13 GREEN-F",
     "category": "Pro"
   },
+  "6814972_202506": {
+    "quantity": 24.15,
+    "line1": "313",
+    "itemCode": "6814972",
+    "itemName": "05 CIBE CHAIN PB16 NAT",
+    "itemDesc": "GREEN-F NEW-MF",
+    "category": "Pro"
+  },
+  "6814972_202507": {
+    "quantity": 0,
+    "line1": "313",
+    "itemCode": "6814972",
+    "itemName": "05 CIBE CHAIN PB16 NAT",
+    "itemDesc": "GREEN-F NEW-MF",
+    "category": "Pro"
+  },
+  "6814972_202508": {
+    "quantity": 0,
+    "line1": "313",
+    "itemCode": "6814972",
+    "itemName": "05 CIBE CHAIN PB16 NAT",
+    "itemDesc": "GREEN-F NEW-MF",
+    "category": "Pro"
+  },
+  "6814972_202509": {
+    "quantity": 4.16,
+    "line1": "313",
+    "itemCode": "6814972",
+    "itemName": "05 CIBE CHAIN PB16 NAT",
+    "itemDesc": "GREEN-F NEW-MF",
+    "category": "Pro"
+  },
+  "6814972_202510": {
+    "quantity": 137.62,
+    "line1": "313",
+    "itemCode": "6814972",
+    "itemName": "05 CIBE CHAIN PB16 NAT",
+    "itemDesc": "GREEN-F NEW-MF",
+    "category": "Pro"
+  },
   "6814972_202511": {
-    "quantity": 156.9,
+    "quantity": 158.2,
+    "line1": "313",
     "itemCode": "6814972",
     "itemName": "05 CIBE CHAIN PB16 NAT",
     "itemDesc": "GREEN-F NEW-MF",
@@ -533,6 +689,7 @@
   },
   "6814972_202512": {
     "quantity": 0,
+    "line1": "313",
     "itemCode": "6814972",
     "itemName": "05 CIBE CHAIN PB16 NAT",
     "itemDesc": "GREEN-F NEW-MF",
@@ -540,55 +697,103 @@
   },
   "6814972_202601": {
     "quantity": 0,
+    "line1": "313",
     "itemCode": "6814972",
     "itemName": "05 CIBE CHAIN PB16 NAT",
     "itemDesc": "GREEN-F NEW-MF",
     "category": "Pro"
   },
   "6814972_202602": {
-    "quantity": 117.7,
+    "quantity": 0,
+    "line1": "313",
     "itemCode": "6814972",
     "itemName": "05 CIBE CHAIN PB16 NAT",
     "itemDesc": "GREEN-F NEW-MF",
     "category": "Pro"
   },
   "6814972_202603": {
-    "quantity": 204,
+    "quantity": 203.99,
+    "line1": "313",
     "itemCode": "6814972",
     "itemName": "05 CIBE CHAIN PB16 NAT",
     "itemDesc": "GREEN-F NEW-MF",
     "category": "Pro"
   },
+  "3647575_202506": {
+    "quantity": 207.83,
+    "line1": "313",
+    "itemCode": "3647575",
+    "itemName": "45 CF CHAIN PB14 NAT",
+    "itemDesc": " ",
+    "category": "Pro"
+  },
+  "3647575_202507": {
+    "quantity": 41.59,
+    "line1": "313",
+    "itemCode": "3647575",
+    "itemName": "45 CF CHAIN PB14 NAT",
+    "itemDesc": " ",
+    "category": "Pro"
+  },
+  "3647575_202508": {
+    "quantity": 0,
+    "line1": "313",
+    "itemCode": "3647575",
+    "itemName": "45 CF CHAIN PB14 NAT",
+    "itemDesc": " ",
+    "category": "Pro"
+  },
+  "3647575_202509": {
+    "quantity": 160.75,
+    "line1": "313",
+    "itemCode": "3647575",
+    "itemName": "45 CF CHAIN PB14 NAT",
+    "itemDesc": " ",
+    "category": "Pro"
+  },
+  "3647575_202510": {
+    "quantity": 169.37,
+    "line1": "313",
+    "itemCode": "3647575",
+    "itemName": "45 CF CHAIN PB14 NAT",
+    "itemDesc": " ",
+    "category": "Pro"
+  },
   "3647575_202511": {
-    "quantity": 123.8,
+    "quantity": 126.79,
+    "line1": "313",
     "itemCode": "3647575",
     "itemName": "45 CF CHAIN PB14 NAT",
     "itemDesc": " ",
     "category": "Pro"
   },
   "3647575_202512": {
-    "quantity": 0,
+    "quantity": 142.36,
+    "line1": "313",
     "itemCode": "3647575",
     "itemName": "45 CF CHAIN PB14 NAT",
     "itemDesc": " ",
     "category": "Pro"
   },
   "3647575_202601": {
-    "quantity": 136.2,
+    "quantity": 0,
+    "line1": "313",
     "itemCode": "3647575",
     "itemName": "45 CF CHAIN PB14 NAT",
     "itemDesc": " ",
     "category": "Pro"
   },
   "3647575_202602": {
-    "quantity": 92.8,
+    "quantity": 92.84,
+    "line1": "313",
     "itemCode": "3647575",
     "itemName": "45 CF CHAIN PB14 NAT",
     "itemDesc": " ",
     "category": "Pro"
   },
   "3647575_202603": {
-    "quantity": 160.9,
+    "quantity": 160.92,
+    "line1": "313",
     "itemCode": "3647575",
     "itemName": "45 CF CHAIN PB14 NAT",
     "itemDesc": " ",

@@ -2,97 +2,102 @@
 
 ## Code Quality Standards
 
-### File Structure and Organization
-- **Modular Architecture**: Separate concerns with dedicated files (server.js, db_service.js, config.js)
-- **Static Asset Organization**: Public assets organized in `/public/css/` and `/public/js/` directories
-- **Template Structure**: EJS templates in `/views/` directory with semantic HTML structure
-- **Configuration Management**: Centralized configuration in dedicated config.js module
+### File Organization and Structure
+- **Modular Architecture**: Separate concerns into dedicated files (server.js for routes, db_service.js for database operations, config files for settings)
+- **Clear File Naming**: Use descriptive names that indicate purpose (user-config.js for user settings, db_service.js for database operations)
+- **Consistent Directory Structure**: Organize static assets in public/ directory with css/ and js/ subdirectories
 
-### JavaScript Coding Standards
-- **ES6+ Features**: Use const/let declarations, arrow functions, async/await patterns
-- **Error Handling**: Comprehensive try-catch blocks with meaningful error messages
-- **Function Naming**: Descriptive function names (loadData, renderTable, openCommentModal)
-- **Variable Naming**: camelCase for variables, UPPER_CASE for constants and SQL field names
-- **Code Comments**: Descriptive section headers and inline documentation for complex logic
+### Code Formatting and Style
+- **Consistent Indentation**: Use consistent spacing throughout files (4 spaces observed in server.js, 2 spaces in JSON files)
+- **Semicolon Usage**: Always terminate statements with semicolons in JavaScript files
+- **String Literals**: Use single quotes for string literals consistently
+- **Line Length**: Keep reasonable line lengths, break long lines for readability
+
+### Variable and Function Naming
+- **camelCase Convention**: Use camelCase for JavaScript variables and functions (currentData, loadData, getComments)
+- **Descriptive Names**: Choose meaningful names that describe purpose (estQtyFile, planData, processedData)
+- **Constant Naming**: Use UPPER_CASE for constants and file paths (COMMENTS_FILE, PORT)
+- **Boolean Prefixes**: Use descriptive prefixes for boolean variables (detailed, IS_MANUAL_EST)
+
+### Comment Standards
+- **Header Comments**: Use decorative comment blocks for major sections with clear visual separation
+- **Inline Documentation**: Add comments for complex logic and business rules
+- **Vietnamese Language Support**: Include Vietnamese comments for user-facing configuration (as seen in user-config.js)
+- **API Documentation**: Document API endpoints with clear descriptions of parameters and responses
+
+## Semantic Patterns and Architecture
 
 ### Database Integration Patterns
-- **Connection String Format**: Use template literals for dynamic connection strings with config variables
-- **SQL Query Organization**: Store queries in constants object for maintainability
-- **Parameter Binding**: Use parameterized queries to prevent SQL injection
-- **Error Handling**: Wrap database operations in try-catch with specific error logging
-- **Connection Management**: Use ADODB.open() pattern for IBM i database connectivity
+- **Service Layer Abstraction**: Isolate database operations in dedicated service modules (db_service.js)
+- **Connection String Management**: Centralize database configuration with environment-specific settings
+- **Error Handling**: Implement try-catch blocks for all database operations with meaningful error messages
+- **Query Optimization**: Use FETCH FIRST clauses and configurable row limits for performance
 
-## Frontend Development Standards
+### API Design Patterns
+- **RESTful Conventions**: Follow REST principles for API endpoints (/api/production, /api/comments)
+- **Consistent Response Format**: Use standardized JSON response structure with data and summary fields
+- **Error Response Handling**: Return appropriate HTTP status codes (400 for bad requests, 500 for server errors)
+- **Parameter Validation**: Validate required parameters and return meaningful error messages
 
-### DOM Manipulation Patterns
-- **Event Listeners**: Use addEventListener() for all event handling, avoid inline handlers
-- **Element Creation**: Use createElement() and appendChild() for dynamic content generation
-- **Safe Content Insertion**: Use textContent for user data to prevent XSS attacks
-- **Class Management**: Use classList.add/remove for dynamic styling changes
-- **Query Selectors**: Use getElementById() for single elements, querySelectorAll() for collections
+### Frontend Architecture Patterns
+- **Global State Management**: Use global variables for application state (currentData, currentYear, currentMonth)
+- **Event-Driven Programming**: Attach event listeners to DOM elements for user interactions
+- **Async/Await Pattern**: Use modern async/await syntax for API calls and asynchronous operations
+- **DOM Manipulation**: Create elements programmatically and use safe text content assignment to prevent XSS
 
-### API Integration Standards
-- **Fetch API**: Use modern fetch() for all HTTP requests with proper error handling
-- **URL Construction**: Build query parameters dynamically based on filter state
-- **Response Handling**: Parse JSON responses and handle both success and error cases
-- **Loading States**: Show loading indicators during async operations
-- **Data Validation**: Validate required parameters before API calls
+### Configuration Management Patterns
+- **Layered Configuration**: Separate user-configurable settings from system configuration
+- **Configuration Inheritance**: Use module.exports to expose configuration objects from user-config to main config
+- **Environment Flexibility**: Support different database connections and application parameters through configuration files
 
-### UI/UX Implementation Patterns
-- **Bootstrap Integration**: Use Bootstrap 5 classes for consistent styling and responsive design
-- **Modal Management**: Use Bootstrap modal API with proper initialization and event handling
-- **Form Handling**: Validate form inputs and provide user feedback
-- **Table Rendering**: Dynamic table generation with proper cell formatting and event binding
-- **Color Coding**: Implement conditional styling based on performance thresholds (90%, 80%)
-
-## Backend Development Standards
-
-### Express.js Application Structure
-- **Middleware Configuration**: Standard middleware stack (bodyParser, static files, view engine)
-- **Route Organization**: RESTful API endpoints with clear HTTP method usage
-- **Error Handling**: Consistent error response format with appropriate HTTP status codes
-- **Request Processing**: Extract and validate query parameters with default values
-- **Response Format**: Standardized JSON response structure with data and summary sections
+## Implementation Patterns
 
 ### Data Processing Patterns
-- **Aggregation Logic**: Implement data summarization with reduce() operations
-- **Percentage Calculations**: Consistent formula application with proper rounding
-- **Date Handling**: Use Date objects for date manipulation and formatting
-- **Data Transformation**: Map operations to enhance raw data with calculated fields
-- **Comment Integration**: Merge comment data with production data using composite keys
+- **Array Methods**: Use functional programming methods (map, reduce, forEach, filter) for data transformation
+- **Object Destructuring**: Extract properties from objects using destructuring syntax
+- **Template Literals**: Use template literals for string interpolation and multi-line strings
+- **Spread Operator**: Use spread operator for object composition and array operations
 
 ### File System Operations
-- **JSON File Handling**: Use fs.readFileSync/writeFileSync for configuration persistence
-- **Error Resilience**: Handle missing files gracefully with default values
-- **Data Serialization**: Use JSON.stringify with formatting for readable output
+- **Synchronous File Operations**: Use fs.readFileSync and fs.writeFileSync for configuration and data files
 - **Path Management**: Use path.join() for cross-platform file path construction
+- **File Existence Checking**: Always check file existence before reading with fs.existsSync()
+- **JSON Data Persistence**: Store application data in JSON files with proper formatting (null, 2 indentation)
 
-## Security and Performance Guidelines
+### Error Handling Patterns
+- **Comprehensive Try-Catch**: Wrap all async operations in try-catch blocks
+- **Console Logging**: Use console.error for error logging with descriptive messages
+- **Graceful Degradation**: Provide fallback behavior when operations fail (empty objects for missing files)
+- **User-Friendly Messages**: Display meaningful error messages to users in the UI
 
-### Security Practices
-- **Input Validation**: Validate all user inputs before processing
-- **XSS Prevention**: Use textContent instead of innerHTML for user data
-- **SQL Injection Prevention**: Use parameterized queries for database operations
-- **Configuration Security**: Store sensitive data in separate config files (not in version control)
-- **Error Information**: Avoid exposing sensitive system information in error messages
+### Frontend Development Patterns
+- **Bootstrap Integration**: Use Bootstrap classes for responsive design and component styling
+- **Modal Management**: Use Bootstrap modal components for user interactions (comments, data entry)
+- **Dynamic Content Generation**: Build HTML content programmatically using createElement and innerHTML
+- **CSS Class Management**: Use classList.add/remove for dynamic styling and state management
+
+## Security and Best Practices
+
+### Input Validation and Sanitization
+- **Parameter Validation**: Check for required fields and validate data types before processing
+- **XSS Prevention**: Use textContent instead of innerHTML when displaying user data
+- **SQL Injection Prevention**: Use parameterized queries and proper escaping for database operations
+- **File Path Security**: Use path.join() to prevent directory traversal attacks
 
 ### Performance Optimization
-- **Database Queries**: Implement efficient filtering and aggregation at database level
-- **Data Caching**: Store current data in global variables to avoid unnecessary API calls
-- **DOM Updates**: Batch DOM operations and use document fragments for multiple insertions
-- **Event Delegation**: Use event listeners on parent elements for dynamic content
-- **Resource Loading**: Load external libraries from CDN for better caching
+- **Database Query Limits**: Implement configurable row limits to prevent memory issues
+- **Efficient Data Structures**: Use Maps and Sets for data grouping and uniqueness operations
+- **Lazy Loading**: Load data on demand rather than preloading all information
+- **Client-Side Caching**: Store current data in global variables to avoid unnecessary API calls
 
-## Testing and Debugging Standards
-
-### Testing Utilities
-- **Database Testing**: Implement test scripts for database connectivity and data export
-- **Sample Data**: Use console.table() for readable data output during development
-- **Export Functions**: Provide CSV/TSV export capabilities for data validation
-- **Connection Validation**: Test database connections with meaningful error messages
+### Code Maintainability
+- **Single Responsibility**: Each function and module should have a single, well-defined purpose
+- **DRY Principle**: Avoid code duplication by extracting common functionality into reusable functions
+- **Consistent Error Handling**: Use similar error handling patterns throughout the application
+- **Configuration Externalization**: Keep configurable values in separate configuration files
 
 ### Development Workflow
-- **Hot Reload**: Use nodemon for development server with automatic restart
-- **Script Organization**: Define npm scripts for different environments (start, dev, test-export)
-- **Dependency Management**: Use package-lock.json for consistent dependency versions
-- **Environment Configuration**: Separate development and production configurations
+- **Modular Development**: Develop features in isolated modules that can be tested independently
+- **API-First Design**: Design API endpoints before implementing frontend functionality
+- **Progressive Enhancement**: Build core functionality first, then add advanced features
+- **Documentation**: Maintain clear documentation for configuration options and API endpoints

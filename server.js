@@ -90,6 +90,14 @@ app.get('/api/production', async (req, res) => {
         if (fs.existsSync(planFile)) {
             planData = JSON.parse(fs.readFileSync(planFile, 'utf8'));
         }
+        
+        // Load holidays
+        const holidaysFile = path.join(__dirname, 'holidays.json');
+        let holidays = [];
+        if (fs.existsSync(holidaysFile)) {
+            holidays = JSON.parse(fs.readFileSync(holidaysFile, 'utf8'));
+        }
+        const holidayDates = holidays.map(h => h.date.replace(/-/g, ''));
 
         const processedData = rawData.map(row => {
             const commentKey = `${row.ITEM}_${row.YEAR_MONTH}`;
@@ -108,7 +116,8 @@ app.get('/api/production', async (req, res) => {
                 EST_PRO_QTY: estQty,
                 PERCENTAGE: estQty > 0 ? ((row.ACT_PRO_QTY / estQty) * 100).toFixed(2) : 0,
                 COMMENT: comments[commentKey] || '',
-                IS_MANUAL_EST: manualEstQty[estQtyKey] !== undefined
+                IS_MANUAL_EST: manualEstQty[estQtyKey] !== undefined,
+                IS_HOLIDAY: holidayDates.includes(row.COMP_DAY.toString())
             };
         });
 
@@ -217,15 +226,17 @@ app.post('/api/plan-import', (req, res) => {
     planData.forEach(row => {
         const itemCode = row['ITEM CD'];
         
-        // Check if this is work days row (Category column = 'Work Date')
-        if (row['Category'] === 'Work Date' || row['ITEM2'] === 'Work Date') {
+        // Check if this is work days row
+        if (row['Category'] === 'Work Date' || row['ITEM2'] === 'Work Date' || row['ITEM1'] === 'Work Date' || (!itemCode && !row['ITEM1'] && !row['ITEM2'])) {
             // This is work days row
             Object.keys(row).forEach(key => {
                 if (key.match(/^\d{6}$/)) { // YYYYMM format
-                    workDays[key] = parseFloat(row[key]) || 0;
+                    // Remove commas and convert to number
+                    const value = typeof row[key] === 'string' ? row[key].replace(/,/g, '') : row[key];
+                    workDays[key] = parseInt(value) || 0;
                 }
             });
-        } else if (itemCode) {
+        } else if (itemCode && row['Category'] !== 'Work Date') {
             // This is plan data row
             const itemInfo = {
                 itemCode: itemCode,
@@ -237,8 +248,11 @@ app.post('/api/plan-import', (req, res) => {
             Object.keys(row).forEach(key => {
                 if (key.match(/^\d{6}$/)) { // YYYYMM format
                     const planKey = `${itemCode}_${key}`;
+                    // Remove commas and convert to number
+                    const value = typeof row[key] === 'string' ? row[key].replace(/,/g, '') : row[key];
                     existingPlan[planKey] = {
-                        quantity: parseFloat(row[key]) || 0,
+                        quantity: parseFloat((parseFloat(value) || 0).toFixed(4)),
+                        line1: row['Line1'] || row['LINE1'] || row['Line 1'] || '',
                         ...itemInfo
                     };
                 }
@@ -301,6 +315,155 @@ app.post('/api/comments', (req, res) => {
     }
     dbService.saveComment(itemCode, yearMonth, comment);
     res.json({ success: true });
+});
+
+// API to clear all plan data
+app.post('/api/plan-clear', (req, res) => {
+    try {
+        const planFile = path.join(__dirname, 'plan_data.json');
+        const workDaysFile = path.join(__dirname, 'work_days.json');
+        
+        fs.writeFileSync(planFile, '{}');
+        fs.writeFileSync(workDaysFile, '{}');
+        
+        res.json({ success: true });
+    } catch (error) {
+        console.error('Error clearing plan data:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+// API to edit plan quantity
+app.post('/api/plan-edit', (req, res) => {
+    const { itemCode, month, quantity } = req.body;
+    if (!itemCode || !month || quantity === undefined) {
+        return res.status(400).json({ error: 'Missing required fields' });
+    }
+    
+    try {
+        const planFile = path.join(__dirname, 'plan_data.json');
+        let planData = {};
+        
+        if (fs.existsSync(planFile)) {
+            planData = JSON.parse(fs.readFileSync(planFile, 'utf8'));
+        }
+        
+        const planKey = `${itemCode}_${month}`;
+        if (planData[planKey]) {
+            planData[planKey].quantity = parseFloat(parseFloat(quantity).toFixed(4));
+            fs.writeFileSync(planFile, JSON.stringify(planData, null, 2));
+            res.json({ success: true });
+        } else {
+            res.status(404).json({ error: 'Plan entry not found' });
+        }
+    } catch (error) {
+        console.error('Error editing plan data:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+// API to edit work days
+app.post('/api/workday-edit', (req, res) => {
+    const { month, days } = req.body;
+    if (!month || days === undefined) {
+        return res.status(400).json({ error: 'Missing required fields' });
+    }
+    
+    try {
+        const workDaysFile = path.join(__dirname, 'work_days.json');
+        let workDays = {};
+        
+        if (fs.existsSync(workDaysFile)) {
+            workDays = JSON.parse(fs.readFileSync(workDaysFile, 'utf8'));
+        }
+        
+        workDays[month] = parseInt(days);
+        fs.writeFileSync(workDaysFile, JSON.stringify(workDays, null, 2));
+        res.json({ success: true });
+    } catch (error) {
+        console.error('Error editing work days:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+// API to bulk edit work days
+app.post('/api/workdays-bulk', (req, res) => {
+    const { workDays } = req.body;
+    if (!workDays || typeof workDays !== 'object') {
+        return res.status(400).json({ error: 'Invalid work days data' });
+    }
+    
+    try {
+        const workDaysFile = path.join(__dirname, 'work_days.json');
+        fs.writeFileSync(workDaysFile, JSON.stringify(workDays, null, 2));
+        res.json({ success: true });
+    } catch (error) {
+        console.error('Error bulk editing work days:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+// API to get holidays
+app.get('/api/holidays', (req, res) => {
+    const holidaysFile = path.join(__dirname, 'holidays.json');
+    let holidays = [];
+    
+    if (fs.existsSync(holidaysFile)) {
+        holidays = JSON.parse(fs.readFileSync(holidaysFile, 'utf8'));
+    }
+    
+    res.json(holidays);
+});
+
+// API to add holiday
+app.post('/api/holidays', (req, res) => {
+    const { date, description } = req.body;
+    if (!date) {
+        return res.status(400).json({ error: 'Date is required' });
+    }
+    
+    try {
+        const holidaysFile = path.join(__dirname, 'holidays.json');
+        let holidays = [];
+        
+        if (fs.existsSync(holidaysFile)) {
+            holidays = JSON.parse(fs.readFileSync(holidaysFile, 'utf8'));
+        }
+        
+        // Check if holiday already exists
+        if (!holidays.find(h => h.date === date)) {
+            holidays.push({ date, description: description || 'Holiday' });
+            holidays.sort((a, b) => new Date(a.date) - new Date(b.date));
+            fs.writeFileSync(holidaysFile, JSON.stringify(holidays, null, 2));
+        }
+        
+        res.json({ success: true });
+    } catch (error) {
+        console.error('Error adding holiday:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+// API to delete holiday
+app.delete('/api/holidays/:date', (req, res) => {
+    const { date } = req.params;
+    
+    try {
+        const holidaysFile = path.join(__dirname, 'holidays.json');
+        let holidays = [];
+        
+        if (fs.existsSync(holidaysFile)) {
+            holidays = JSON.parse(fs.readFileSync(holidaysFile, 'utf8'));
+        }
+        
+        holidays = holidays.filter(h => h.date !== date);
+        fs.writeFileSync(holidaysFile, JSON.stringify(holidays, null, 2));
+        
+        res.json({ success: true });
+    } catch (error) {
+        console.error('Error deleting holiday:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
 });
 
 // Start Server

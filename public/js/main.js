@@ -179,8 +179,11 @@ function renderTable(data) {
         const tr = document.createElement('tr');
         const percentage = parseFloat(row.PERCENTAGE);
         
-        // Highlight low performance rows
-        if (percentage < 90) {
+        // Highlight low performance rows and holidays
+        if (row.IS_HOLIDAY) {
+            tr.classList.add('table-secondary');
+            tr.title = 'Holiday - No production expected';
+        } else if (percentage < 90) {
             tr.classList.add('bg-low-perf');
         }
 
@@ -550,36 +553,14 @@ let previewData = [];
 
 function openPlanImportModal() {
     // Reset modal
-    document.getElementById('excel-file-input').value = '';
     document.getElementById('plan-paste-data').value = '';
-    document.getElementById('preview-container').innerHTML = '<p class="text-muted">Upload file or paste data to see preview</p>';
+    document.getElementById('preview-container').innerHTML = '<p class="text-muted">Paste data to see preview</p>';
     document.getElementById('import-plan-btn').disabled = true;
     previewData = [];
     planImportModal.show();
 }
 
-function previewExcelData() {
-    const fileInput = document.getElementById('excel-file-input');
-    const file = fileInput.files[0];
-    
-    if (!file) return;
-    
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        try {
-            const data = new Uint8Array(e.target.result);
-            const workbook = XLSX.read(data, { type: 'array' });
-            const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-            const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
-            
-            processAndPreview(jsonData);
-        } catch (error) {
-            console.error('Error reading Excel file:', error);
-            alert('Error reading Excel file');
-        }
-    };
-    reader.readAsArrayBuffer(file);
-}
+
 
 function previewPastedData() {
     const pastedData = document.getElementById('plan-paste-data').value.trim();
@@ -720,7 +701,14 @@ async function loadPlanData() {
         const workDays = await workDaysResponse.json();
         
         if (Object.keys(planData).length === 0) {
-            tbody.innerHTML = '<tr><td colspan="10" class="text-center py-4">No plan data found. Click "Import New Plan" to add data.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="3" class="text-center py-4">No plan data found. Click "Import New Plan" to add data.</td></tr>';
+            thead.innerHTML = `
+                <tr>
+                    <th style="width: 8%">Line</th>
+                    <th style="width: 15%">Item Code</th>
+                    <th style="width: 77%">Item Description</th>
+                </tr>
+            `;
             return;
         }
         
@@ -729,20 +717,21 @@ async function loadPlanData() {
         
         // Build header
         let headerHtml = '<tr>';
+        headerHtml += '<th style="width: 8%">Line</th>';
         headerHtml += '<th style="width: 12%">Item Code</th>';
-        headerHtml += '<th style="width: 25%">Item Name</th>';
-        headerHtml += '<th style="width: 20%">Item Description</th>';
-        headerHtml += '<th style="width: 8%">Category</th>';
+        headerHtml += '<th style="width: 35%">Item Description</th>';
         months.forEach(month => {
-            headerHtml += `<th style="width: ${35/months.length}%" class="text-center">${month}</th>`;
+            headerHtml += `<th style="width: ${45/(months.length*2)}%" class="text-center">${month}<br><small>Plan</small></th>`;
+            headerHtml += `<th style="width: ${45/(months.length*2)}%" class="text-center"><small>Daily</small></th>`;
         });
         headerHtml += '</tr>';
         
         // Add work days row
         headerHtml += '<tr class="table-warning">';
-        headerHtml += '<td colspan="4" class="text-center fw-bold">Work Date</td>';
+        headerHtml += '<td colspan="3" class="text-center fw-bold">Work Date</td>';
         months.forEach(month => {
-            headerHtml += `<td class="text-center fw-bold">${workDays[month] || 0}</td>`;
+            headerHtml += `<td class="text-center fw-bold work-day-cell" style="cursor: pointer;" onclick="editWorkDay('${month}', ${workDays[month] || 0})" title="Click to edit work days">${workDays[month] || 0}</td>`;
+            headerHtml += `<td class="text-center fw-bold">-</td>`;
         });
         headerHtml += '</tr>';
         
@@ -759,7 +748,8 @@ async function loadPlanData() {
                     itemCode: itemCode,
                     itemName: typeof planInfo === 'object' ? planInfo.itemName : '',
                     itemDesc: typeof planInfo === 'object' ? planInfo.itemDesc : '',
-                    category: typeof planInfo === 'object' ? planInfo.category : '',
+
+                    line1: typeof planInfo === 'object' ? planInfo.line1 : '',
                     months: {}
                 };
             }
@@ -772,15 +762,18 @@ async function loadPlanData() {
         Object.values(itemGroups).forEach(item => {
             const tr = document.createElement('tr');
             let rowHtml = `
-                <td>${item.itemCode}</td>
-                <td>${item.itemName}</td>
-                <td>${item.itemDesc}</td>
-                <td class="text-center">${item.category}</td>
+                <td class="text-center">${item.line1 || ''}</td>
+                <td class="text-center">${item.itemCode}</td>
+                <td>${item.itemName}${item.itemDesc ? ' - ' + item.itemDesc : ''}</td>
             `;
             
             months.forEach(month => {
                 const qty = item.months[month] || 0;
-                rowHtml += `<td class="text-end">${qty > 0 ? qty.toLocaleString() : '0'}</td>`;
+                const workDay = workDays[month] || 0;
+                const dailyProduct = workDay > 0 ? (qty / workDay).toFixed(0) : 0;
+                
+                rowHtml += `<td class="text-end plan-qty-cell" style="cursor: pointer; background-color: #f8f9fa;" onclick="editPlanQty('${item.itemCode}', '${month}', ${qty})" title="Click to edit">${qty > 0 ? qty.toLocaleString() : '0'}</td>`;
+                rowHtml += `<td class="text-end fw-bold text-primary">${dailyProduct > 0 ? parseInt(dailyProduct).toLocaleString() : '0'}</td>`;
             });
             
             tr.innerHTML = rowHtml;
@@ -795,4 +788,316 @@ async function loadPlanData() {
 
 function exportToExcel() {
     alert("Export functionality would be implemented here (e.g. generating a CSV or .xlsx file).");
+}
+
+async function clearAllPlan() {
+    if (!confirm('Are you sure you want to clear all plan data? This action cannot be undone.')) {
+        return;
+    }
+    
+    try {
+        console.log('Sending clear request...');
+        const response = await fetch('/api/plan-clear', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        console.log('Response status:', response.status);
+        const result = await response.json();
+        console.log('Response result:', result);
+        
+        if (result.success) {
+            alert('All plan data cleared successfully');
+            loadPlanData();
+        } else {
+            alert('Failed to clear plan data: ' + (result.error || 'Unknown error'));
+        }
+    } catch (error) {
+        console.error('Error clearing plan data:', error);
+        alert('Error clearing plan data: ' + error.message);
+    }
+}
+
+// Edit Plan Quantity
+const editPlanQtyModal = new bootstrap.Modal(document.getElementById('editPlanQtyModal'));
+const editWorkDayModal = new bootstrap.Modal(document.getElementById('editWorkDayModal'));
+const pasteWorkDaysModal = new bootstrap.Modal(document.getElementById('pasteWorkDaysModal'));
+const holidaysModal = new bootstrap.Modal(document.getElementById('holidaysModal'));
+let workDaysPreviewData = {};
+let holidays = [];
+
+function editPlanQty(itemCode, month, currentQty) {
+    document.getElementById('edit-item-code').value = itemCode;
+    document.getElementById('edit-month').value = month;
+    document.getElementById('edit-plan-qty').value = currentQty;
+    editPlanQtyModal.show();
+}
+
+async function savePlanQty() {
+    const itemCode = document.getElementById('edit-item-code').value;
+    const month = document.getElementById('edit-month').value;
+    const qty = document.getElementById('edit-plan-qty').value;
+    
+    try {
+        const response = await fetch('/api/plan-edit', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ itemCode, month, quantity: parseFloat(qty) })
+        });
+        
+        const result = await response.json();
+        if (result.success) {
+            editPlanQtyModal.hide();
+            loadPlanData();
+        } else {
+            alert('Failed to save plan quantity');
+        }
+    } catch (error) {
+        console.error('Error saving plan quantity:', error);
+        alert('Error saving plan quantity');
+    }
+}
+
+// Edit Work Day
+function editWorkDay(month, currentDays) {
+    document.getElementById('edit-work-month').value = month;
+    document.getElementById('edit-work-days').value = currentDays;
+    editWorkDayModal.show();
+}
+
+async function saveWorkDay() {
+    const month = document.getElementById('edit-work-month').value;
+    const days = document.getElementById('edit-work-days').value;
+    
+    try {
+        const response = await fetch('/api/workday-edit', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ month, days: parseInt(days) })
+        });
+        
+        const result = await response.json();
+        if (result.success) {
+            editWorkDayModal.hide();
+            loadPlanData();
+        } else {
+            alert('Failed to save work days');
+        }
+    } catch (error) {
+        console.error('Error saving work days:', error);
+        alert('Error saving work days');
+    }
+}
+
+// Paste Work Days
+function openWorkDaysPasteModal() {
+    document.getElementById('workdays-paste-data').value = '';
+    document.getElementById('workdays-preview').innerHTML = '<p class="text-muted">Paste data to see preview</p>';
+    document.getElementById('import-workdays-btn').disabled = true;
+    workDaysPreviewData = {};
+    pasteWorkDaysModal.show();
+    
+    // Add paste event listener
+    const textarea = document.getElementById('workdays-paste-data');
+    textarea.addEventListener('input', previewWorkDaysData);
+}
+
+function previewWorkDaysData() {
+    const pastedData = document.getElementById('workdays-paste-data').value.trim();
+    if (!pastedData) {
+        document.getElementById('workdays-preview').innerHTML = '<p class="text-muted">Paste data to see preview</p>';
+        document.getElementById('import-workdays-btn').disabled = true;
+        return;
+    }
+    
+    try {
+        const lines = pastedData.split('\n');
+        if (lines.length < 2) {
+            throw new Error('Need at least 2 lines (header and data)');
+        }
+        
+        const headers = lines[0].split('\t');
+        const dataRow = lines[1].split('\t');
+        
+        // Check if first column is Category and second row starts with Work Date
+        if (headers[0] !== 'Category' || dataRow[0] !== 'Work Date') {
+            throw new Error('Invalid format. First column should be "Category" and data row should start with "Work Date"');
+        }
+        
+        workDaysPreviewData = {};
+        let previewHtml = '<table class="table table-sm table-bordered"><thead><tr>';
+        
+        headers.forEach(header => {
+            previewHtml += `<th>${header}</th>`;
+        });
+        previewHtml += '</tr></thead><tbody><tr>';
+        
+        dataRow.forEach((value, index) => {
+            previewHtml += `<td>${value}</td>`;
+            // Store work days data (skip Category column)
+            if (index > 0 && headers[index].match(/^\d{6}$/)) {
+                workDaysPreviewData[headers[index]] = parseInt(value) || 0;
+            }
+        });
+        
+        previewHtml += '</tr></tbody></table>';
+        previewHtml += `<p class="small text-info">Found ${Object.keys(workDaysPreviewData).length} months of work days data</p>`;
+        
+        document.getElementById('workdays-preview').innerHTML = previewHtml;
+        document.getElementById('import-workdays-btn').disabled = false;
+        
+    } catch (error) {
+        document.getElementById('workdays-preview').innerHTML = `<p class="text-danger">Error: ${error.message}</p>`;
+        document.getElementById('import-workdays-btn').disabled = true;
+    }
+}
+
+async function importWorkDays() {
+    if (Object.keys(workDaysPreviewData).length === 0) {
+        alert('No work days data to import');
+        return;
+    }
+    
+    try {
+        const response = await fetch('/api/workdays-bulk', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ workDays: workDaysPreviewData })
+        });
+        
+        const result = await response.json();
+        if (result.success) {
+            pasteWorkDaysModal.hide();
+            loadPlanData();
+            alert(`Successfully imported work days for ${Object.keys(workDaysPreviewData).length} months`);
+        } else {
+            alert('Failed to import work days');
+        }
+    } catch (error) {
+        console.error('Error importing work days:', error);
+        alert('Error importing work days');
+    }
+}
+
+// Holidays Management
+function openHolidaysModal() {
+    const now = new Date();
+    document.getElementById('calendar-month').value = `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}`;
+    holidaysModal.show();
+    loadHolidays();
+}
+
+async function loadHolidays() {
+    try {
+        const response = await fetch('/api/holidays');
+        holidays = await response.json();
+        renderCalendar();
+    } catch (error) {
+        console.error('Error loading holidays:', error);
+    }
+}
+
+function renderCalendar() {
+    const monthInput = document.getElementById('calendar-month').value;
+    if (!monthInput) return;
+    
+    const [year, month] = monthInput.split('-').map(Number);
+    const firstDay = new Date(year, month - 1, 1);
+    const lastDay = new Date(year, month, 0);
+    const startDate = new Date(firstDay);
+    startDate.setDate(startDate.getDate() - firstDay.getDay());
+    
+    let html = '<table class="table table-bordered calendar-table">';
+    html += '<thead><tr><th>Sun</th><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th></tr></thead><tbody>';
+    
+    const current = new Date(startDate);
+    while (current <= lastDay || current.getDay() !== 0) {
+        html += '<tr>';
+        for (let i = 0; i < 7; i++) {
+            const dateStr = current.toISOString().split('T')[0];
+            const isCurrentMonth = current.getMonth() === month - 1;
+            const isWeekend = current.getDay() === 0 || current.getDay() === 6;
+            const isHoliday = holidays.some(h => h.date === dateStr);
+            
+            let cellClass = 'calendar-day';
+            if (!isCurrentMonth) cellClass += ' text-muted';
+            if (isWeekend) cellClass += ' weekend';
+            if (isHoliday) cellClass += ' holiday';
+            
+            html += `<td class="${cellClass}" onclick="toggleHoliday('${dateStr}')" style="cursor: pointer; height: 60px; vertical-align: top;">`;
+            html += `<div class="fw-bold">${current.getDate()}</div>`;
+            if (isHoliday) {
+                const holiday = holidays.find(h => h.date === dateStr);
+                html += `<small class="text-white">${holiday.description}</small>`;
+            }
+            html += '</td>';
+            
+            current.setDate(current.getDate() + 1);
+        }
+        html += '</tr>';
+        
+        if (current > lastDay && current.getDay() === 0) break;
+    }
+    
+    html += '</tbody></table>';
+    document.getElementById('holiday-calendar').innerHTML = html;
+}
+
+async function toggleHoliday(dateStr) {
+    const isHoliday = holidays.some(h => h.date === dateStr);
+    
+    if (isHoliday) {
+        await deleteHoliday(dateStr);
+    } else {
+        const description = prompt('Enter holiday description:', 'Holiday');
+        if (description !== null) {
+            await addHoliday(dateStr, description);
+        }
+    }
+}
+
+async function addHoliday(date, description) {
+    try {
+        const response = await fetch('/api/holidays', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ date, description })
+        });
+        
+        const result = await response.json();
+        if (result.success) {
+            loadHolidays();
+        }
+    } catch (error) {
+        console.error('Error adding holiday:', error);
+    }
+}
+
+async function deleteHoliday(date) {
+    try {
+        const response = await fetch(`/api/holidays/${date}`, {
+            method: 'DELETE'
+        });
+        
+        const result = await response.json();
+        if (result.success) {
+            loadHolidays();
+        }
+    } catch (error) {
+        console.error('Error deleting holiday:', error);
+    }
+}
+
+function isHoliday(dateStr) {
+    return holidays.some(h => h.date === dateStr);
 }

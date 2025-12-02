@@ -90,10 +90,11 @@ async function getDataFromSQL(year, month, week = null, detailed = false, startD
             });
         }
         
-        // Add default EST_PRO_QTY = 0 for all rows
+        // Add default EST_PRO_QTY = 0 and create ITEM_NAME from ITEM1 and ITEM2
         rows = rows.map(row => ({
             ...row,
-            EST_PRO_QTY: 0
+            EST_PRO_QTY: 0,
+            ITEM_NAME: `${row.ITEM1 || ''}${row.ITEM2 ? ' - ' + row.ITEM2 : ''}`.trim()
         }));
         
         // Aggregate if not detailed
