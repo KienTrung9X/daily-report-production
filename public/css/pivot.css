@@ -1,0 +1,87 @@
+/* Pivot Table Styles */
+.pivot-table-container {
+    overflow-x: auto;
+    max-width: 100%;
+    margin-bottom: 1rem;
+    border: 1px solid #dee2e6;
+}
+
+.pivot-table th, .pivot-table td {
+    white-space: nowrap;
+    font-size: 0.85rem;
+    padding: 0.5rem;
+    text-align: center;
+    vertical-align: middle;
+}
+
+/* Sticky Column Base */
+.pivot-table th.sticky-col, .pivot-table td.sticky-col {
+    position: sticky;
+    background-color: #fff;
+    z-index: 10;
+    border-right: 1px solid #dee2e6;
+}
+
+.pivot-table th.sticky-col {
+    z-index: 20; /* Higher than td sticky */
+    background-color: #f8f9fa;
+}
+
+/* Specific Column Widths & Offsets */
+.col-line { 
+    min-width: 60px; 
+    max-width: 60px; 
+    left: 0; 
+}
+.col-name { 
+    min-width: 180px; 
+    max-width: 180px; 
+    left: 60px; 
+    white-space: normal !important; /* Allow wrapping for long names */
+    text-align: left !important;
+}
+.col-code { 
+    min-width: 100px; 
+    max-width: 100px; 
+    left: 240px; /* 60 + 180 */
+}
+.col-unit { 
+    min-width: 60px; 
+    max-width: 60px; 
+    left: 340px; /* 240 + 100 */
+}
+.col-metric { 
+    min-width: 60px; 
+    max-width: 60px; 
+    left: 400px; /* 340 + 60 */
+    text-align: right !important;
+    padding-right: 10px !important;
+}
+
+/* Ensure sub-row headers (Metric labels) align with the metric column */
+.sub-row-header {
+    font-weight: bold;
+    background-color: #f9f9f9;
+}
+
+.pivot-day-header {
+    min-width: 60px;
+    font-size: 0.8rem;
+}
+
+/* Row coloring */
+.row-plan {
+    background-color: #f8f9fa;
+}
+.row-act {
+    background-color: #ffffff;
+}
+.row-percent {
+    background-color: #f8f9fa;
+    border-bottom: 2px solid #adb5bd; /* Stronger separator between items */
+}
+
+/* Compact cells */
+.cell-val {
+    min-width: 45px;
+}
