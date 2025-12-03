@@ -57,6 +57,129 @@ body {
     box-shadow: 0 4px 20px rgba(0,0,0,0.12);
 }
 
+/* Enhanced Table Styles */
+.table {
+    font-size: 13px;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.table thead th {
+    border-bottom: 2px solid #dee2e6;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 0.5px;
+    position: sticky;
+    top: 0;
+    background: #212529;
+    z-index: 10;
+}
+
+/* Zebra striping for data rows */
+.table tbody tr:nth-child(even):not(.line-header) {
+    background-color: #f8f9fa;
+}
+
+.table tbody tr:nth-child(odd):not(.line-header) {
+    background-color: #ffffff;
+}
+
+.line-header {
+    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%) !important;
+    border-left: 4px solid #1976d2;
+    font-weight: 700;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.line-header:hover {
+    background: linear-gradient(135deg, #bbdefb 0%, #90caf9 100%) !important;
+    transform: translateY(-1px);
+}
+
+.sticky-col {
+    position: sticky;
+    z-index: 5;
+    border-right: 2px solid #dee2e6;
+    box-shadow: 2px 0 4px rgba(0,0,0,0.1);
+}
+
+.progress {
+    border-radius: 12px;
+    background-color: #f1f3f4;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.progress-bar {
+    border-radius: 12px;
+    font-size: 9px;
+    font-weight: 700;
+    line-height: 1;
+    text-align: center;
+    color: white;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+    transition: width 0.6s ease;
+}
+
+/* Performance color coding */
+.perf-excellent { color: #198754; font-weight: 700; }
+.perf-good { color: #fd7e14; font-weight: 600; }
+.perf-poor { color: #dc3545; font-weight: 700; }
+.perf-critical { color: #dc3545; font-weight: 700; animation: pulse 2s infinite; }
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.7; }
+    100% { opacity: 1; }
+}
+
+.badge {
+    font-size: 10px;
+    padding: 4px 8px;
+    font-weight: 600;
+}
+
+code {
+    background-color: #f8f9fa;
+    color: #6f42c1;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.collapse-icon {
+    transition: transform 0.3s ease;
+}
+
+.table tbody tr:hover:not(.line-header) {
+    background-color: rgba(13, 110, 253, 0.08) !important;
+    transform: scale(1.01);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: all 0.2s ease;
+}
+
+/* Sparkline styles */
+.sparkline {
+    width: 40px;
+    height: 20px;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+/* Number formatting */
+.number-large {
+    font-weight: 600;
+    font-family: 'Courier New', monospace;
+}
+
+/* Empty state */
+.empty-plan {
+    background-color: #fff3cd;
+    color: #856404;
+    font-style: italic;
+}
+
 /* Search Input */
 #searchInput {
     border-radius: 20px;

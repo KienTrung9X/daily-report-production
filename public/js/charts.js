@@ -20,6 +20,7 @@ function initializeCharts(data) {
 function renderCharts(data) {
     renderTrendChart(data);
     renderGaugeChart(data);
+    renderTopPerformers(data);
 }
 
 function renderTrendChart(data) {
@@ -162,4 +163,48 @@ function renderGaugeChart(data) {
             }
         }]
     });
+}
+
+function renderTopPerformers(data) {
+    const container = document.getElementById('topPerformers');
+    if (!container) return;
+    
+    // Calculate performance for each item
+    const items = data.map(row => ({
+        name: row.ITEM_NAME,
+        code: row.ITEM,
+        line: row.LINE1,
+        plan: row.EST_PRO_QTY,
+        actual: row.ACT_PRO_QTY,
+        percentage: row.EST_PRO_QTY > 0 ? (row.ACT_PRO_QTY / row.EST_PRO_QTY * 100) : 0
+    })).filter(item => item.plan > 0);
+    
+    // Sort by percentage and take top 5
+    const topItems = items.sort((a, b) => b.percentage - a.percentage).slice(0, 5);
+    
+    let html = '';
+    topItems.forEach((item, index) => {
+        const badgeClass = item.percentage >= 100 ? 'bg-success' : item.percentage >= 90 ? 'bg-warning text-dark' : 'bg-danger';
+        const icon = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '🏅';
+        
+        html += `
+            <div class="d-flex align-items-center mb-2 p-2 rounded ${index < 3 ? 'bg-light' : ''}">
+                <div class="me-2">${icon}</div>
+                <div class="flex-grow-1">
+                    <div class="fw-medium" style="font-size: 12px;">${item.name}</div>
+                    <small class="text-muted">Line ${item.line} • ${item.code}</small>
+                </div>
+                <div class="text-end">
+                    <span class="badge ${badgeClass}" style="font-size: 10px;">
+                        ${item.percentage.toFixed(1)}%
+                    </span>
+                    <div style="font-size: 10px; color: #6c757d;">
+                        ${item.actual.toLocaleString()}/${item.plan.toLocaleString()}
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+    
+    container.innerHTML = html || '<div class="text-muted text-center p-3">No data available</div>';
 }

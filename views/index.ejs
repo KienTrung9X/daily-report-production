@@ -163,7 +163,7 @@
             <!-- Charts Section -->
             <div id="chart-section" class="mb-5">
                 <div class="row">
-                    <div class="col-md-8">
+                    <div class="col-md-6">
                         <div class="card shadow-sm">
                             <div class="card-header bg-white">
                                 <h5 class="mb-0"><i class="fas fa-chart-bar me-2"></i>Plan vs Actual Trend</h5>
@@ -173,13 +173,25 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <div class="card shadow-sm">
                             <div class="card-header bg-white">
                                 <h5 class="mb-0"><i class="fas fa-tachometer-alt me-2"></i>Performance</h5>
                             </div>
                             <div class="card-body text-center">
                                 <canvas id="gaugeChart" height="200"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card shadow-sm">
+                            <div class="card-header bg-white">
+                                <h5 class="mb-0"><i class="fas fa-trophy me-2"></i>Top Performers</h5>
+                            </div>
+                            <div class="card-body p-2">
+                                <div id="topPerformers" style="max-height: 250px; overflow-y: auto;">
+                                    <!-- Top performers will be populated here -->
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -208,16 +220,17 @@
                     <div class="card-body p-0">
                         <div class="table-responsive">
                             <table class="table table-hover mb-0 align-middle">
-                                <thead class="table-light text-center sticky-top">
+                                <thead class="table-dark text-center sticky-top">
                                     <tr>
-                                        <th style="width: 5%">Line</th>
-                                        <th style="width: 25%">Item Name</th>
-                                        <th style="width: 10%">Item Code</th>
+                                        <th style="width: 5%; position: sticky; left: 0; z-index: 10; background: #212529;">Line</th>
+                                        <th style="width: 20%; position: sticky; left: 5%; z-index: 10; background: #212529;">Item Name</th>
+                                        <th style="width: 8%">Code</th>
                                         <th style="width: 5%">Unit</th>
-                                        <th style="width: 10%">Est Qty</th>
-                                        <th style="width: 10%">Act Qty</th>
-                                        <th style="width: 10%">Act/Plan %</th>
-                                        <th style="width: 25%">Comment</th>
+                                        <th style="width: 12%">Plan Qty</th>
+                                        <th style="width: 12%">Actual Qty</th>
+                                        <th style="width: 15%">Performance</th>
+                                        <th style="width: 8%">Status</th>
+                                        <th style="width: 15%">Comment</th>
                                     </tr>
                                 </thead>
                                 <tbody id="data-table-body">
@@ -477,6 +490,8 @@ Work Date	21	22	23	22	23	20	23	22	15	26"></textarea>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Custom JS -->
     <script src="/js/charts.js"></script>
+    <script src="/js/sparkline.js"></script>
+    <script src="/js/table-enhanced.js"></script>
     <script src="/js/main.js"></script>
 </body>
 </html>
