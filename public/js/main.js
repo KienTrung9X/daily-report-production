@@ -22,6 +22,9 @@ document.addEventListener('DOMContentLoaded', () => {
     currentYear = parseInt(y);
     currentMonth = parseInt(m);
     
+    // Set default line filter to 313
+    lineInput.value = '313';
+    
     // Search functionality
     let searchTimeout;
     searchInput.addEventListener('input', (e) => {
@@ -87,9 +90,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function loadData() {
     const tbody = document.getElementById('data-table-body');
-    tbody.innerHTML = '<tr><td colspan="8" class="text-center py-4"><div class="spinner-border text-primary" role="status"></div><span class="ms-2">Loading data...</span></td></tr>';
+    tbody.innerHTML = '<tr><td colspan="7" class="text-center py-4"><div class="spinner-border text-primary" role="status"></div><span class="ms-2">Loading data...</span></td></tr>';
 
     try {
+        // Load work days data
+        const workDaysResponse = await fetch('/api/work-days');
+        const workDays = await workDaysResponse.json();
         const startDate = document.getElementById('startDate').value;
         const endDate = document.getElementById('endDate').value;
         
@@ -147,14 +153,20 @@ async function loadData() {
         }
 
         if (currentViewMode === 'pivot') {
-            renderPivotTable(currentData);
+            renderPivotTable(currentData, workDays, currentYear, currentMonth);
+            // Initialize column resizer after table is rendered
+            requestAnimationFrame(() => {
+                if (typeof initColumnResizer === 'function') {
+                    initColumnResizer();
+                }
+            });
         } else {
             renderTable(currentData);
         }
 
     } catch (error) {
         console.error('Error loading data:', error);
-        tbody.innerHTML = '<tr><td colspan="8" class="text-center text-danger py-4">Error loading data. Please try again.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" class="text-center text-danger py-4">Error loading data. Please try again.</td></tr>';
     }
 }
 
@@ -214,15 +226,20 @@ function renderSummary(summary) {
 
 function renderTable(data) {
     const table = document.querySelector('table');
+    const tableContainer = table.closest('.table-responsive');
+    
+    // Remove pivot classes
     table.classList.remove('pivot-table');
+    if (tableContainer) {
+        tableContainer.classList.remove('pivot-table-container');
+    }
 
     const thead = document.querySelector('.table thead');
     thead.innerHTML = `
         <tr class="table-light text-center">
             <th style="width: 5%">Line</th>
-            <th style="width: 25%">Item Name</th>
+            <th style="width: 30%">Item Name</th>
             <th style="width: 10%">Item Code</th>
-            <th style="width: 5%">Unit</th>
             <th style="width: 10%">Est Qty</th>
             <th style="width: 10%">Act Qty</th>
             <th style="width: 10%">Act/Plan %</th>
@@ -234,7 +251,7 @@ function renderTable(data) {
     tbody.innerHTML = '';
 
     if (data.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="8" class="text-center py-4">No production data found for this period.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" class="text-center py-4">No production data found for this period.</td></tr>';
         return;
     }
 
@@ -263,10 +280,6 @@ function renderTable(data) {
         const codeCell = document.createElement('td');
         codeCell.className = 'text-center';
         codeCell.textContent = row.ITEM;
-
-        const unitCell = document.createElement('td');
-        unitCell.className = 'text-center';
-        unitCell.textContent = row.UNIT;
 
         const planCell = document.createElement('td');
         planCell.className = 'text-end est-qty-cell';
@@ -316,7 +329,6 @@ function renderTable(data) {
         tr.appendChild(lineCell);
         tr.appendChild(nameCell);
         tr.appendChild(codeCell);
-        tr.appendChild(unitCell);
         tr.appendChild(planCell);
         tr.appendChild(actCell);
         tr.appendChild(percentCell);
@@ -326,7 +338,7 @@ function renderTable(data) {
     });
 }
 
-function renderPivotTable(data) {
+function renderPivotTable(data, workDays, year, month) {
     try {
         console.log('Rendering pivot table with', data ? data.length : 0, 'records');
         console.log('Sample data:', data ? data.slice(0, 2) : 'No data');
@@ -334,13 +346,18 @@ function renderPivotTable(data) {
         const table = document.querySelector('table');
         const tbody = document.getElementById('data-table-body');
         const thead = document.querySelector('.table thead');
+        const tableContainer = table.closest('.table-responsive');
         
         if (!table || !tbody || !thead) {
             console.error('Missing table elements');
             return;
         }
         
+        // Add pivot classes
         table.classList.add('pivot-table');
+        if (tableContainer) {
+            tableContainer.classList.add('pivot-table-container');
+        }
         tbody.innerHTML = '';
         thead.innerHTML = '';
 
@@ -387,18 +404,11 @@ function renderPivotTable(data) {
     const headerRow = document.createElement('tr');
     
     // Fixed Columns
-    const fixedHeaders = [
-        { text: 'Line', cls: 'col-line' },
-        { text: 'Item Name', cls: 'col-name' },
-        { text: 'Item Code', cls: 'col-code' },
-        { text: 'Unit', cls: 'col-unit' },
-        { text: 'Metric', cls: 'col-metric' }
-    ];
+    const fixedHeaders = ['Product / Line', 'Metric'];
     
-    fixedHeaders.forEach(header => {
+    fixedHeaders.forEach(text => {
         const th = document.createElement('th');
-        th.textContent = header.text;
-        th.classList.add('sticky-col', header.cls);
+        th.textContent = text;
         headerRow.appendChild(th);
     });
 
@@ -415,16 +425,19 @@ function renderPivotTable(data) {
         
         th.textContent = dateLabel;
         th.classList.add('pivot-day-header');
+        th.setAttribute('data-rtc-resizable', 'day-' + dayStr);
         headerRow.appendChild(th);
     });
 
     // Summary Column
     const totalTh = document.createElement('th');
     totalTh.textContent = 'Total';
+    totalTh.setAttribute('data-rtc-resizable', 'total');
     headerRow.appendChild(totalTh);
     
     const commentTh = document.createElement('th');
     commentTh.textContent = 'Comment';
+    commentTh.setAttribute('data-rtc-resizable', 'comment');
     headerRow.appendChild(commentTh);
 
     thead.appendChild(headerRow);
@@ -454,28 +467,19 @@ function renderPivotTable(data) {
 
             // Fixed Columns (Line, Name, Code, Unit) - Render only on first row with rowspan=3
             if (index === 0) {
-                const fixedCols = [
-                    { text: info.LINE1, cls: 'col-line' },
-                    { text: info.ITEM_NAME, cls: 'col-name' },
-                    { text: info.ITEM, cls: 'col-code' },
-                    { text: info.UNIT, cls: 'col-unit' }
-                ];
-                
-                fixedCols.forEach(col => {
-                    const td = document.createElement('td');
-                    td.textContent = col.text;
-                    td.rowSpan = 3;
-                    td.classList.add('sticky-col', 'align-middle', col.cls);
-                    td.style.backgroundColor = '#fff'; // Ensure opaque behind sticky
-                    tr.appendChild(td);
-                });
+                const td = document.createElement('td');
+                td.innerHTML = `<div class="fw-bold text-dark">${info.ITEM_NAME}</div><div class="small text-muted">${info.ITEM} • Line ${info.LINE1}</div>`;
+                td.rowSpan = 3;
+                td.style.verticalAlign = 'top';
+                td.style.paddingTop = '10px';
+                td.style.textAlign = 'left';
+                tr.appendChild(td);
             }
 
-            // Metric Label
+            // Metric Label with styling
             const tdMetric = document.createElement('td');
             tdMetric.textContent = metric;
-            tdMetric.className = 'sub-row-header sticky-col col-metric';
-            // We don't need top: auto hack if we aren't using sticky top for rows, only left for cols
+            tdMetric.className = 'text-muted small';
             tr.appendChild(tdMetric);
 
             // Daily Data Columns
@@ -488,53 +492,74 @@ function renderPivotTable(data) {
                     if (metric === 'Plan') {
                         // Show daily plan in KM (monthly plan / work days / 1000)
                         const monthlyPlan = dayData.plan;
-                        const workDaysInMonth = 20; // Default, should get from work_days.json
-                        const dailyPlanKm = monthlyPlan > 0 ? Math.round(monthlyPlan / workDaysInMonth / 1000 * 100) / 100 : 0;
-                        td.textContent = dailyPlanKm;
+                        const yearMonth = `${year}${month.toString().padStart(2, '0')}`;
+                        const workDaysInMonth = workDays[yearMonth] || 20;
+                        const dailyPlanKm = monthlyPlan > 0 ? (monthlyPlan / workDaysInMonth / 1000) : 0;
+                        td.textContent = dailyPlanKm > 0 ? Math.round(dailyPlanKm) : '-';
+                        td.className = 'cell-val text-end text-muted';
                     }
                     if (metric === 'Act') {
-                        const actKm = Math.round(dayData.act / 1000 * 100) / 100;
-                        td.textContent = actKm;
+                        const actKm = Math.round(dayData.act / 1000);
+                        td.textContent = actKm > 0 ? actKm : '-';
+                        td.className = 'cell-val text-end fw-bold';
+                        if (actKm === 0) td.classList.add('text-muted');
                     }
                     if (metric === '%') {
                         const monthlyPlan = dayData.plan;
-                        const workDaysInMonth = 20;
+                        const yearMonth = `${year}${month.toString().padStart(2, '0')}`;
+                        const workDaysInMonth = workDays[yearMonth] || 20;
                         const dailyPlan = monthlyPlan > 0 ? monthlyPlan / workDaysInMonth : 0;
                         const pct = dailyPlan > 0 ? (dayData.act / dailyPlan * 100).toFixed(0) + '%' : '-';
                         td.textContent = pct;
                         
-                        // Color code %
+                        td.className = 'cell-val text-end';
+                        // Color code % with badge style
                         if (dailyPlan > 0) {
                              const val = (dayData.act / dailyPlan * 100);
-                             if (val < 80) td.classList.add('text-danger', 'fw-bold');
-                             else if (val >= 100) td.classList.add('text-success', 'fw-bold');
+                             if (val < 80) {
+                                 td.innerHTML = `<span class="badge bg-danger">${pct}</span>`;
+                             } else if (val >= 100) {
+                                 td.innerHTML = `<span class="badge bg-success">${pct}</span>`;
+                             } else {
+                                 td.innerHTML = `<span class="badge bg-warning text-dark">${pct}</span>`;
+                             }
+                        } else {
+                            td.classList.add('text-muted');
                         }
                     }
                 } else {
                     td.textContent = '-';
-                    td.classList.add('text-muted');
+                    td.classList.add('text-muted', 'cell-val', 'text-end');
                 }
                 tr.appendChild(td);
             });
 
-            // Total Column
+            // Total Column with highlight
             const tdTotal = document.createElement('td');
-            tdTotal.className = 'fw-bold';
+            tdTotal.className = 'fw-bold text-end total-col';
             if (metric === 'Plan') {
-                const planKm = Math.round(totalPlan / 1000 * 100) / 100;
-                tdTotal.textContent = planKm;
+                const planKm = Math.round(totalPlan / 1000);
+                tdTotal.textContent = planKm.toLocaleString();
+                tdTotal.classList.add('text-muted');
             }
             if (metric === 'Act') {
-                const actKm = Math.round(totalAct / 1000 * 100) / 100;
-                tdTotal.textContent = actKm;
+                const actKm = Math.round(totalAct / 1000);
+                tdTotal.textContent = actKm.toLocaleString();
             }
             if (metric === '%') {
-                const pct = totalPlan > 0 ? (totalAct / totalPlan * 100).toFixed(2) + '%' : '-';
-                tdTotal.textContent = pct;
-                 if (totalPlan > 0) {
-                     const val = (totalAct / totalPlan * 100);
-                     if (val < 90) tdTotal.classList.add('text-danger');
-                     else tdTotal.classList.add('text-success');
+                const pct = totalPlan > 0 ? (totalAct / totalPlan * 100).toFixed(0) + '%' : '-';
+                if (totalPlan > 0) {
+                    const val = (totalAct / totalPlan * 100);
+                    if (val < 80) {
+                        tdTotal.innerHTML = `<span class="badge bg-danger">${pct}</span>`;
+                    } else if (val >= 100) {
+                        tdTotal.innerHTML = `<span class="badge bg-success">${pct}</span>`;
+                    } else {
+                        tdTotal.innerHTML = `<span class="badge bg-warning text-dark">${pct}</span>`;
+                    }
+                } else {
+                    tdTotal.textContent = '-';
+                    tdTotal.classList.add('text-muted');
                 }
             }
             tr.appendChild(tdTotal);
@@ -750,9 +775,9 @@ async function submitPlanImport() {
             planImportModal.hide();
             if (currentTab === 'plan') {
                 loadPlanData();
-            } else {
-                loadData();
             }
+            // Always refresh production data to update EST_PRO_QTY
+            loadData();
         } else {
             alert('Failed to import plan data');
         }
@@ -979,6 +1004,10 @@ async function savePlanQty() {
         if (result.success) {
             editPlanQtyModal.hide();
             loadPlanData();
+            // Refresh production data to update EST_PRO_QTY
+            if (currentTab === 'production') {
+                loadData();
+            }
         } else {
             alert('Failed to save plan quantity');
         }
@@ -1012,6 +1041,10 @@ async function saveWorkDay() {
         if (result.success) {
             editWorkDayModal.hide();
             loadPlanData();
+            // Refresh production data to update daily plan calculations
+            if (currentTab === 'production') {
+                loadData();
+            }
         } else {
             alert('Failed to save work days');
         }
@@ -1103,6 +1136,10 @@ async function importWorkDays() {
         if (result.success) {
             pasteWorkDaysModal.hide();
             loadPlanData();
+            // Refresh production data to update daily plan calculations
+            if (currentTab === 'production') {
+                loadData();
+            }
             alert(`Successfully imported work days for ${Object.keys(workDaysPreviewData).length} months`);
         } else {
             alert('Failed to import work days');

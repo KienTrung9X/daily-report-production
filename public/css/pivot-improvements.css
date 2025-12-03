@@ -1,0 +1,192 @@
+/* Pivot Table Improvements - Fixed Layout */
+
+/* Container with horizontal scroll */
+.pivot-table-container {
+    overflow-x: auto;
+    overflow-y: visible;
+    width: 100%;
+    border: 1px solid #dee2e6;
+    position: relative;
+}
+
+/* Force table to fill container width */
+.pivot-table-container .pivot-table {
+    width: 100% !important;
+    min-width: 100% !important;
+}
+
+/* Table layout fixes */
+.pivot-table {
+    table-layout: fixed !important;
+    border-collapse: collapse !important;
+    border-spacing: 0 !important;
+    min-width: 100%;
+    width: auto;
+}
+
+/* Fixed column widths to prevent overlapping */
+.col-product {
+    width: 200px !important;
+    min-width: 200px !important;
+    max-width: 200px !important;
+    position: sticky;
+    left: 0;
+    background-color: #ffffff !important;
+    z-index: 10;
+    border-right: 2px solid #dee2e6 !important;
+    vertical-align: top !important;
+    padding: 8px !important;
+}
+
+.col-metric {
+    width: 60px !important;
+    min-width: 60px !important;
+    max-width: 60px !important;
+    position: sticky;
+    left: 200px;
+    background-color: #f8f9fa !important;
+    z-index: 9;
+    border-right: 2px solid #dee2e6 !important;
+    text-align: center !important;
+    font-size: 0.8rem !important;
+    font-weight: 500 !important;
+}
+
+/* Day columns - auto width */
+.pivot-day-header,
+.cell-val {
+    text-align: center !important;
+    padding: 4px 2px !important;
+    font-size: 0.8rem !important;
+    white-space: nowrap !important;
+}
+
+/* Total and Comment columns */
+.total-col {
+    width: 80px !important;
+    min-width: 80px !important;
+    background-color: #f8f9fa !important;
+    border-left: 2px solid #dee2e6 !important;
+    font-weight: bold !important;
+}
+
+.comment-cell {
+    width: 120px !important;
+    min-width: 120px !important;
+    font-size: 0.75rem !important;
+    cursor: pointer;
+}
+
+/* Row styling */
+.row-plan {
+    background-color: #f8f9fa;
+    border-top: 1px solid #e9ecef;
+}
+
+.row-act {
+    background-color: #ffffff;
+}
+
+.row-percent {
+    background-color: #f1f3f4;
+    border-bottom: 2px solid #dee2e6;
+}
+
+/* Cell content alignment */
+.pivot-table td {
+    padding: 3px 4px !important;
+    vertical-align: middle !important;
+    border: 1px solid #f0f0f0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.pivot-table th {
+    padding: 6px 4px !important;
+    vertical-align: middle !important;
+    border: 1px solid #dee2e6;
+    background-color: #212529 !important;
+    color: white !important;
+    font-size: 0.8rem !important;
+    font-weight: 600 !important;
+}
+
+/* Badge styling */
+.badge {
+    font-size: 0.7rem !important;
+    padding: 2px 6px !important;
+    border-radius: 3px !important;
+}
+
+/* Product info styling */
+.col-product .fw-bold {
+    font-size: 0.85rem;
+    line-height: 1.2;
+    margin-bottom: 2px;
+    color: #212529;
+}
+
+.col-product .small {
+    font-size: 0.7rem;
+    line-height: 1.1;
+    color: #6c757d;
+}
+
+/* Header sticky positioning */
+thead .col-product {
+    position: sticky;
+    top: 0;
+    left: 0;
+    z-index: 25 !important;
+    background-color: #212529 !important;
+}
+
+thead .col-metric {
+    position: sticky;
+    top: 0;
+    left: 200px;
+    z-index: 24 !important;
+    background-color: #212529 !important;
+}
+
+/* Body sticky columns */
+tbody .col-product {
+    position: sticky;
+    left: 0;
+    z-index: 15 !important;
+    background-color: #ffffff !important;
+}
+
+tbody .col-metric {
+    position: sticky;
+    left: 200px;
+    z-index: 14 !important;
+    background-color: #f8f9fa !important;
+}
+
+/* Ensure proper stacking */
+.sticky-col {
+    position: sticky;
+    background-color: inherit;
+    z-index: 5;
+}
+
+/* Column Resizer */
+.column-resizer {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 5px;
+    height: 100%;
+    cursor: col-resize;
+    background: transparent;
+    z-index: 30;
+}
+
+.column-resizer:hover {
+    background: rgba(0, 123, 255, 0.3);
+}
+
+.pivot-table th {
+    user-select: none;
+}

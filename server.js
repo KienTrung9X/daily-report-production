@@ -20,10 +20,10 @@ app.set('views', path.join(__dirname, 'views'));
 
 // Routes
 app.get('/', (req, res) => {
-    // Use config start month for default
-    const startMonthStr = config.startMonth.toString();
-    const defaultYear = parseInt(startMonthStr.substring(0, 4));
-    const defaultMonth = parseInt(startMonthStr.substring(4, 6));
+    // Use current month for default
+    const now = new Date();
+    const defaultYear = now.getFullYear();
+    const defaultMonth = now.getMonth() + 1;
 
     res.render('index', { 
         year: defaultYear, 

@@ -1,28 +1,37 @@
 # Technology Stack
 
+## Programming Languages
+- **JavaScript (Node.js)** - Backend server and API development
+- **JavaScript (ES6+)** - Frontend client-side functionality
+- **HTML5** - Markup structure
+- **CSS3** - Styling and responsive design
+- **EJS** - Server-side templating engine
+
 ## Backend Technologies
-- **Node.js**: JavaScript runtime environment
-- **Express.js 4.18.2**: Web application framework
-- **EJS 3.1.9**: Embedded JavaScript templating engine
-- **body-parser 1.20.2**: HTTP request body parsing middleware
-- **node-adodb 5.0.3**: Microsoft Access database connectivity
-
-## Frontend Technologies
-- **Vanilla JavaScript**: Core client-side functionality
-- **CSS3**: Modern styling with Grid and Flexbox
-- **HTML5**: Semantic markup structure
-- **Chart Libraries**: Custom sparkline and chart implementations
-
-## Development Tools
-- **nodemon 3.0.1**: Development server with auto-restart
-- **npm**: Package management and script execution
+- **Node.js** - Runtime environment
+- **Express.js ^4.18.2** - Web application framework
+- **node-adodb ^5.0.3** - DB2 database connectivity
+- **body-parser ^1.20.2** - HTTP request body parsing
+- **EJS ^3.1.9** - Embedded JavaScript templating
 
 ## Database
-- **Microsoft Access**: Production data storage via ADODB connection
+- **IBM DB2** - Production data storage
+- **JSON Files** - Configuration and user data storage
+  - Comments, estimated quantities, plan data, holidays, work days
 
-## File System
-- **JSON**: Configuration and user data persistence
-- **CSV**: Data export functionality
+## Development Tools
+- **nodemon ^3.0.1** - Development server with auto-restart
+- **npm** - Package management
+
+## Frontend Libraries
+- **Vanilla JavaScript** - No external frameworks, pure JS implementation
+- **CSS Grid & Flexbox** - Modern layout systems
+- **Custom Chart Library** - Proprietary chart rendering system
+
+## Build System
+- **npm scripts** - Simple build and development commands
+  - `npm start` - Production server start
+  - `npm run dev` - Development server with auto-reload
 
 ## Development Commands
 
@@ -31,26 +40,30 @@
 npm install
 ```
 
-### Development Mode
+### Development
 ```bash
-npm run dev
-# Starts server with nodemon for auto-restart on file changes
+npm run dev  # Start development server with nodemon
 ```
 
-### Production Mode
+### Production
 ```bash
-npm start
-# Starts server with node server.js
+npm start    # Start production server
 ```
 
-## Environment Configuration
-- **PORT**: Server port (defaults to dynamic allocation if not set)
-- **Database Connection**: Configured via config.js
-- **Static Assets**: Served from public/ directory
-- **Views**: EJS templates in views/ directory
+## Database Configuration
+- **Provider**: IBMDA400.DataSource
+- **Connection**: DB2 system via ODBC
+- **Authentication**: Username/password based
+- **Data Source**: WAVEDLIB database
 
 ## Performance Features
-- **Data Caching**: Automatic cache refresh for current month data
-- **Static File Serving**: Optimized asset delivery
-- **JSON File Storage**: Fast configuration access
-- **Lazy Loading**: On-demand data fetching for historical periods
+- **Data Caching**: Intelligent caching system with auto-refresh
+- **Lazy Loading**: On-demand data loading for large datasets
+- **Compression**: Efficient data transfer and storage
+- **Connection Pooling**: Optimized database connections
+
+## Security Considerations
+- **Input Validation**: Server-side validation for all API inputs
+- **SQL Injection Prevention**: Parameterized queries
+- **File System Security**: Controlled file access and validation
+- **Error Handling**: Comprehensive error management without data exposure
