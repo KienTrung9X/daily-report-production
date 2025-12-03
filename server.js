@@ -4,6 +4,7 @@ const path = require('path');
 const fs = require('fs');
 const config = require('./config');
 const dbService = require('./db_service');
+const dataCache = require('./data-cache');
 
 const app = express();
 const PORT = process.env.PORT || 0;
@@ -64,7 +65,7 @@ app.get('/api/dashboard/calendar', async (req, res) => {
     }
 });
 
-// API: Production Data
+// API: Production Data (using cache)
 app.get('/api/production', async (req, res) => {
     try {
         const year = parseInt(req.query.year) || new Date().getFullYear();
@@ -75,7 +76,46 @@ app.get('/api/production', async (req, res) => {
         const endDate = req.query.endDate;
         const lineFilter = req.query.line;
 
-        const rawData = await dbService.getData(year, month, week, detailed, startDate, endDate, lineFilter);
+        // Use cached data for current month, otherwise query database
+        const currentYear = new Date().getFullYear();
+        const currentMonth = new Date().getMonth() + 1;
+        
+        let rawData;
+        if (year === currentYear && month === currentMonth && !startDate && !endDate) {
+            const cached = dataCache.getCachedData();
+            if (cached && cached.data && cached.data.length > 0) {
+                rawData = cached.data;
+                console.log('Using cached data:', rawData.length, 'records');
+            } else {
+                rawData = await dbService.getData(year, month, week, detailed, startDate, endDate, lineFilter);
+            }
+        } else {
+            rawData = await dbService.getData(year, month, week, detailed, startDate, endDate, lineFilter);
+        }
+        
+        // Apply filters to cached data
+        if (year === currentYear && month === currentMonth && !startDate && !endDate) {
+            if (lineFilter) {
+                rawData = rawData.filter(row => row.LINE1 === lineFilter);
+            }
+            if (week) {
+                rawData = rawData.filter(row => {
+                    const day = parseInt(row.COMP_DAY.slice(6, 8));
+                    const date = new Date(year, month - 1, day);
+                    const rowWeek = getWeekNumber(date);
+                    return rowWeek === parseInt(week);
+                });
+            }
+        }
+        
+        function getWeekNumber(d) {
+            d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+            d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
+            var yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+            var weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+            return weekNo;
+        }
+        
         const comments = dbService.getComments();
         
         // Load manual Est Qty
@@ -406,6 +446,8 @@ app.post('/api/workdays-bulk', (req, res) => {
     }
 });
 
+
+
 // API to get holidays
 app.get('/api/holidays', (req, res) => {
     const holidaysFile = path.join(__dirname, 'holidays.json');
@@ -469,7 +511,7 @@ app.delete('/api/holidays/:date', (req, res) => {
     }
 });
 
-// API to export CSV
+// API to export CSV with full SQL data
 app.get('/api/export-csv', async (req, res) => {
     try {
         const year = parseInt(req.query.year) || new Date().getFullYear();
@@ -478,43 +520,38 @@ app.get('/api/export-csv', async (req, res) => {
         
         const rawData = await dbService.getData(year, month, null, true, null, null, lineFilter);
         
-        // CSV headers
-        const headers = ['Date', 'Line', 'Item Code', 'Item Name', 'Unit', 'Actual Qty', 'Plan Qty', 'Achievement %'];
+        // Full CSV headers matching SQL query fields
+        const headers = [
+            'YEAR_MONTH', 'COMP_DAY', 'LINE1', 'LINE2', 'LN_NAME', 'PR', 
+            'ITEM', 'ITEM1', 'ITEM2', 'ITEM_NAME', 'ACT_PRO_QTY', 'UNIT', 'SIZE', 'CH'
+        ];
         let csvContent = headers.join(',') + '\n';
         
-        // Load plan data for comparison
-        const planFile = path.join(__dirname, 'plan_data.json');
-        let planData = {};
-        if (fs.existsSync(planFile)) {
-            planData = JSON.parse(fs.readFileSync(planFile, 'utf8'));
-        }
-        
-        // Process data
+        // Export all raw SQL data
         rawData.forEach(row => {
-            const estQtyKey = `${row.ITEM}_${row.YEAR_MONTH}`;
-            let planQty = 0;
-            if (planData[estQtyKey]) {
-                planQty = typeof planData[estQtyKey] === 'object' ? planData[estQtyKey].quantity * 1000 : planData[estQtyKey] * 1000;
-            }
-            
-            const percentage = planQty > 0 ? ((row.ACT_PRO_QTY / planQty) * 100).toFixed(2) : 0;
-            
             const csvRow = [
-                row.COMP_DAY,
-                row.LINE1,
-                row.ITEM,
-                `"${row.ITEM_NAME}"`,
-                row.UNIT,
-                row.ACT_PRO_QTY,
-                planQty,
-                percentage
+                row.YEAR_MONTH || '',
+                row.COMP_DAY || '',
+                row.LINE1 || '',
+                row.LINE2 || '',
+                `"${(row.LN_NAME || '').replace(/"/g, '""')}"`,
+                row.PR || '',
+                row.ITEM || '',
+                `"${(row.ITEM1 || '').replace(/"/g, '""')}"`,
+                `"${(row.ITEM2 || '').replace(/"/g, '""')}"`,
+                `"${(row.ITEM_NAME || '').replace(/"/g, '""')}"`,
+                row.ACT_PRO_QTY || 0,
+                row.UNIT || '',
+                row.SIZE || '',
+                row.CH || ''
             ];
             csvContent += csvRow.join(',') + '\n';
         });
         
-        res.setHeader('Content-Type', 'text/csv');
-        res.setHeader('Content-Disposition', `attachment; filename="production_${year}_${month.toString().padStart(2, '0')}.csv"`);
-        res.send(csvContent);
+        const filename = `raw_sql_data_${year}_${month.toString().padStart(2, '0')}_${lineFilter || 'all'}.csv`;
+        res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+        res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+        res.send('\uFEFF' + csvContent); // Add BOM for Excel UTF-8 support
         
     } catch (error) {
         console.error('CSV Export Error:', error);
@@ -526,4 +563,7 @@ app.get('/api/export-csv', async (req, res) => {
 const server = app.listen(PORT, () => {
     const actualPort = server.address().port;
     console.log(`Server is running on http://localhost:${actualPort}`);
+    
+    // Start auto-refresh cache
+    dataCache.startAutoRefresh();
 });

@@ -32,9 +32,9 @@ function renderEnhancedTable(data) {
         headerRow.className = 'line-header';
         headerRow.style.cursor = 'pointer';
         
-        // Format line totals
-        const planTotal = Math.round(lineTotal.plan);
-        const actualTotal = Math.round(lineTotal.actual);
+        // Convert to KM and format line totals
+        const planTotal = Math.round(lineTotal.plan / 1000 * 100) / 100;
+        const actualTotal = Math.round(lineTotal.actual / 1000 * 100) / 100;
         const variance = actualTotal - planTotal;
         
         headerRow.innerHTML = `
@@ -113,9 +113,9 @@ function renderEnhancedTable(data) {
                 perfIcon = '🚨';
             }
             
-            // Format numbers with proper rounding
-            const planQty = Math.round(row.EST_PRO_QTY);
-            const actQty = Math.round(row.ACT_PRO_QTY);
+            // Convert to KM and format numbers
+            const planQty = Math.round(row.EST_PRO_QTY / 1000 * 100) / 100; // Convert M to KM with 2 decimals
+            const actQty = Math.round(row.ACT_PRO_QTY / 1000 * 100) / 100;   // Convert M to KM with 2 decimals
             
             // Check if plan is empty
             const isPlanEmpty = planQty === 0;
@@ -129,7 +129,7 @@ function renderEnhancedTable(data) {
                     <small class="text-muted">${row.ITEM}</small>
                 </td>
                 <td class="text-center"><code>${row.ITEM}</code></td>
-                <td class="text-center"><span class="badge bg-light text-dark">${row.UNIT}</span></td>
+                <td class="text-center"><span class="badge bg-primary text-white">KM</span></td>
                 <td class="text-end est-qty-cell number-large ${isPlanEmpty ? 'empty-plan' : ''}" 
                     style="cursor: pointer; ${row.IS_MANUAL_EST ? 'background-color: #fff3cd;' : ''}" 
                     onclick="openEstQtyModal('${row.ITEM}', '${row.YEAR_MONTH}', ${row.EST_PRO_QTY})" 

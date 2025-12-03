@@ -478,13 +478,16 @@ function renderPivotTable(data) {
                 
                 if (dayData) {
                     if (metric === 'Plan') {
-                        // Show daily plan (monthly plan / work days)
+                        // Show daily plan in KM (monthly plan / work days / 1000)
                         const monthlyPlan = dayData.plan;
                         const workDaysInMonth = 20; // Default, should get from work_days.json
-                        const dailyPlan = monthlyPlan > 0 ? Math.round(monthlyPlan / workDaysInMonth) : 0;
-                        td.textContent = dailyPlan;
+                        const dailyPlanKm = monthlyPlan > 0 ? Math.round(monthlyPlan / workDaysInMonth / 1000 * 100) / 100 : 0;
+                        td.textContent = dailyPlanKm;
                     }
-                    if (metric === 'Act') td.textContent = dayData.act;
+                    if (metric === 'Act') {
+                        const actKm = Math.round(dayData.act / 1000 * 100) / 100;
+                        td.textContent = actKm;
+                    }
                     if (metric === '%') {
                         const monthlyPlan = dayData.plan;
                         const workDaysInMonth = 20;
@@ -509,8 +512,14 @@ function renderPivotTable(data) {
             // Total Column
             const tdTotal = document.createElement('td');
             tdTotal.className = 'fw-bold';
-            if (metric === 'Plan') tdTotal.textContent = totalPlan;
-            if (metric === 'Act') tdTotal.textContent = totalAct;
+            if (metric === 'Plan') {
+                const planKm = Math.round(totalPlan / 1000 * 100) / 100;
+                tdTotal.textContent = planKm;
+            }
+            if (metric === 'Act') {
+                const actKm = Math.round(totalAct / 1000 * 100) / 100;
+                tdTotal.textContent = actKm;
+            }
             if (metric === '%') {
                 const pct = totalPlan > 0 ? (totalAct / totalPlan * 100).toFixed(2) + '%' : '-';
                 tdTotal.textContent = pct;

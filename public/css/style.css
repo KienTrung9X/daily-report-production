@@ -72,7 +72,8 @@ body {
     letter-spacing: 0.5px;
     position: sticky;
     top: 0;
-    background: #212529;
+    background: #212529 !important;
+    color: #ffffff !important;
     z-index: 10;
 }
 
@@ -92,10 +93,7 @@ body {
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-.line-header:hover {
-    background: linear-gradient(135deg, #bbdefb 0%, #90caf9 100%) !important;
-    transform: translateY(-1px);
-}
+
 
 .sticky-col {
     position: sticky;
@@ -152,12 +150,7 @@ code {
     transition: transform 0.3s ease;
 }
 
-.table tbody tr:hover:not(.line-header) {
-    background-color: rgba(13, 110, 253, 0.08) !important;
-    transform: scale(1.01);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    transition: all 0.2s ease;
-}
+
 
 /* Sparkline styles */
 .sparkline {

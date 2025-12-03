@@ -38,20 +38,7 @@
         
         <!-- Production Tab -->
         <div id="production-tab" class="tab-content">
-            <!-- Navigation Pills -->
-            <div class="sticky-top bg-white py-3 mb-4 border-bottom">
-                <ul class="nav nav-pills justify-content-center">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="#dashboard-section" onclick="scrollToSection('dashboard-section')">Dashboard</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#details-section" onclick="scrollToSection('details-section')">Details</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#chart-section" onclick="scrollToSection('chart-section')">Charts</a>
-                    </li>
-                </ul>
-            </div>
+
 
             <!-- Dashboard Section -->
             <div id="dashboard-section" class="mb-5">
@@ -59,6 +46,19 @@
                 <div class="card shadow-sm mb-4">
                     <div class="card-body py-2">
                         <div class="row align-items-center g-2">
+                            <div class="col-auto">
+                                <label class="form-label fw-bold mb-0 me-1">FY:</label>
+                                <select id="fiscalYearFilter" class="form-select form-select-sm" style="width: 100px;">
+                                    <option value="2020">FY2020</option>
+                                    <option value="2021">FY2021</option>
+                                    <option value="2022">FY2022</option>
+                                    <option value="2023">FY2023</option>
+                                    <option value="2024">FY2024</option>
+                                    <option value="2025" selected>FY2025</option>
+                                    <option value="2026">FY2026</option>
+                                    <option value="2027">FY2027</option>
+                                </select>
+                            </div>
                             <div class="col-auto">
                                 <label class="form-label fw-bold mb-0 me-1">Month:</label>
                                 <input type="month" id="monthFilter" class="form-control form-control-sm" style="width: 140px;" value="<%= year %>-<%= month.toString().padStart(2, '0') %>">
@@ -219,11 +219,11 @@
                 <div class="card shadow-sm">
                     <div class="card-body p-0">
                         <div class="table-responsive">
-                            <table class="table table-hover mb-0 align-middle">
+                            <table class="table mb-0 align-middle">
                                 <thead class="table-dark text-center sticky-top">
                                     <tr>
-                                        <th style="width: 5%; position: sticky; left: 0; z-index: 10; background: #212529;">Line</th>
-                                        <th style="width: 20%; position: sticky; left: 5%; z-index: 10; background: #212529;">Item Name</th>
+                                        <th style="width: 5%; position: sticky; left: 0; z-index: 10; background: #212529 !important; color: #ffffff !important;">Line</th>
+                                        <th style="width: 20%; position: sticky; left: 5%; z-index: 10; background: #212529 !important; color: #ffffff !important;">Item Name</th>
                                         <th style="width: 8%">Code</th>
                                         <th style="width: 5%">Unit</th>
                                         <th style="width: 12%">Plan Qty</th>
