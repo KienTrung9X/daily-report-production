@@ -10,10 +10,44 @@
 
 /* Base table structure */
 .pivot-table {
-    width: 100%;
+    width: auto;
+    min-width: 100%;
     border-collapse: collapse;
     border-spacing: 0;
     table-layout: auto;
+}
+
+/* Sticky first two columns */
+.pivot-table th:nth-child(1),
+.pivot-table td:nth-child(1) {
+    position: sticky;
+    left: 0;
+    background-color: #fff;
+    z-index: 10;
+    width: 250px;
+    min-width: 250px;
+    max-width: 250px;
+}
+
+.pivot-table th:nth-child(2),
+.pivot-table td:nth-child(2) {
+    position: sticky;
+    left: 250px;
+    background-color: #fff;
+    z-index: 10;
+    width: 80px;
+    min-width: 80px;
+    max-width: 80px;
+}
+
+.pivot-table th:nth-child(1) {
+    background-color: #212529 !important;
+    z-index: 15;
+}
+
+.pivot-table th:nth-child(2) {
+    background-color: #212529 !important;
+    z-index: 15;
 }
 
 .pivot-table th, 
