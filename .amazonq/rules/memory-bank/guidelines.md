@@ -2,102 +2,118 @@
 
 ## Code Quality Standards
 
-### File Organization and Structure
-- **Modular Architecture**: Separate concerns into dedicated files (server.js for routes, db_service.js for database operations, config files for settings)
-- **Clear File Naming**: Use descriptive names that indicate purpose (user-config.js for user settings, db_service.js for database operations)
-- **Consistent Directory Structure**: Organize static assets in public/ directory with css/ and js/ subdirectories
+### File Structure and Organization
+- **Configuration Pattern**: Use separate config files (`config.js`, `user-config.js`) with clear separation between system and user settings
+- **Service Layer**: Implement dedicated service modules (`db_service.js`) for database operations and business logic
+- **Static Assets**: Organize frontend assets in `public/` with subdirectories for `css/` and `js/`
+- **Template Organization**: Keep view templates in dedicated `views/` directory using EJS templating
 
-### Code Formatting and Style
-- **Consistent Indentation**: Use consistent spacing throughout files (4 spaces observed in server.js, 2 spaces in JSON files)
-- **Semicolon Usage**: Always terminate statements with semicolons in JavaScript files
-- **String Literals**: Use single quotes for string literals consistently
-- **Line Length**: Keep reasonable line lengths, break long lines for readability
-
-### Variable and Function Naming
-- **camelCase Convention**: Use camelCase for JavaScript variables and functions (currentData, loadData, getComments)
-- **Descriptive Names**: Choose meaningful names that describe purpose (estQtyFile, planData, processedData)
-- **Constant Naming**: Use UPPER_CASE for constants and file paths (COMMENTS_FILE, PORT)
-- **Boolean Prefixes**: Use descriptive prefixes for boolean variables (detailed, IS_MANUAL_EST)
-
-### Comment Standards
-- **Header Comments**: Use decorative comment blocks for major sections with clear visual separation
-- **Inline Documentation**: Add comments for complex logic and business rules
-- **Vietnamese Language Support**: Include Vietnamese comments for user-facing configuration (as seen in user-config.js)
-- **API Documentation**: Document API endpoints with clear descriptions of parameters and responses
-
-## Semantic Patterns and Architecture
-
-### Database Integration Patterns
-- **Service Layer Abstraction**: Isolate database operations in dedicated service modules (db_service.js)
-- **Connection String Management**: Centralize database configuration with environment-specific settings
-- **Error Handling**: Implement try-catch blocks for all database operations with meaningful error messages
-- **Query Optimization**: Use FETCH FIRST clauses and configurable row limits for performance
-
-### API Design Patterns
-- **RESTful Conventions**: Follow REST principles for API endpoints (/api/production, /api/comments)
-- **Consistent Response Format**: Use standardized JSON response structure with data and summary fields
-- **Error Response Handling**: Return appropriate HTTP status codes (400 for bad requests, 500 for server errors)
-- **Parameter Validation**: Validate required parameters and return meaningful error messages
-
-### Frontend Architecture Patterns
-- **Global State Management**: Use global variables for application state (currentData, currentYear, currentMonth)
-- **Event-Driven Programming**: Attach event listeners to DOM elements for user interactions
-- **Async/Await Pattern**: Use modern async/await syntax for API calls and asynchronous operations
-- **DOM Manipulation**: Create elements programmatically and use safe text content assignment to prevent XSS
-
-### Configuration Management Patterns
-- **Layered Configuration**: Separate user-configurable settings from system configuration
-- **Configuration Inheritance**: Use module.exports to expose configuration objects from user-config to main config
-- **Environment Flexibility**: Support different database connections and application parameters through configuration files
-
-## Implementation Patterns
-
-### Data Processing Patterns
-- **Array Methods**: Use functional programming methods (map, reduce, forEach, filter) for data transformation
-- **Object Destructuring**: Extract properties from objects using destructuring syntax
-- **Template Literals**: Use template literals for string interpolation and multi-line strings
-- **Spread Operator**: Use spread operator for object composition and array operations
-
-### File System Operations
-- **Synchronous File Operations**: Use fs.readFileSync and fs.writeFileSync for configuration and data files
-- **Path Management**: Use path.join() for cross-platform file path construction
-- **File Existence Checking**: Always check file existence before reading with fs.existsSync()
-- **JSON Data Persistence**: Store application data in JSON files with proper formatting (null, 2 indentation)
+### Naming Conventions
+- **Variables**: Use camelCase for JavaScript variables (`startMonth`, `yearMonth`, `estQty`)
+- **Constants**: Use UPPER_CASE for file paths and database field names (`COMMENTS_FILE`, `COMP_DAY`, `ACT_PRO_QTY`)
+- **API Endpoints**: Use kebab-case for URL paths (`/api/dashboard/calendar`, `/api/plan-data`)
+- **File Names**: Use kebab-case for multi-word files (`db_service.js`, `user-config.js`)
 
 ### Error Handling Patterns
-- **Comprehensive Try-Catch**: Wrap all async operations in try-catch blocks
-- **Console Logging**: Use console.error for error logging with descriptive messages
-- **Graceful Degradation**: Provide fallback behavior when operations fail (empty objects for missing files)
-- **User-Friendly Messages**: Display meaningful error messages to users in the UI
+- **Try-Catch Blocks**: Wrap all async operations and file I/O in try-catch blocks
+- **Consistent Error Responses**: Return standardized JSON error objects with `error` field
+- **Console Logging**: Use descriptive error messages with context (`'Calendar API Error:'`, `'Error editing plan data:'`)
+- **HTTP Status Codes**: Use appropriate status codes (400 for bad requests, 500 for server errors, 404 for not found)
 
-### Frontend Development Patterns
-- **Bootstrap Integration**: Use Bootstrap classes for responsive design and component styling
-- **Modal Management**: Use Bootstrap modal components for user interactions (comments, data entry)
-- **Dynamic Content Generation**: Build HTML content programmatically using createElement and innerHTML
-- **CSS Class Management**: Use classList.add/remove for dynamic styling and state management
+## API Design Standards
 
-## Security and Best Practices
+### Request Validation
+- **Required Field Checks**: Always validate required parameters before processing
+- **Type Conversion**: Use `parseInt()` and `parseFloat()` for numeric conversions with fallbacks
+- **Default Values**: Provide sensible defaults using logical OR operator (`|| new Date().getFullYear()`)
 
-### Input Validation and Sanitization
-- **Parameter Validation**: Check for required fields and validate data types before processing
-- **XSS Prevention**: Use textContent instead of innerHTML when displaying user data
-- **SQL Injection Prevention**: Use parameterized queries and proper escaping for database operations
-- **File Path Security**: Use path.join() to prevent directory traversal attacks
+### Response Structure
+- **Consistent Format**: Use standardized response objects with `data` and `summary` fields
+- **Success Indicators**: Include `success: true` in successful POST/PUT responses
+- **Data Transformation**: Process raw data before sending to client (add calculated fields, format numbers)
 
-### Performance Optimization
-- **Database Query Limits**: Implement configurable row limits to prevent memory issues
-- **Efficient Data Structures**: Use Maps and Sets for data grouping and uniqueness operations
-- **Lazy Loading**: Load data on demand rather than preloading all information
-- **Client-Side Caching**: Store current data in global variables to avoid unnecessary API calls
+### Route Organization
+```javascript
+// Pattern: Verb + Resource + Action
+app.get('/api/production', handler);      // Get data
+app.post('/api/est-qty', handler);        // Create/Update
+app.delete('/api/holidays/:date', handler); // Delete with parameter
+```
 
-### Code Maintainability
-- **Single Responsibility**: Each function and module should have a single, well-defined purpose
-- **DRY Principle**: Avoid code duplication by extracting common functionality into reusable functions
-- **Consistent Error Handling**: Use similar error handling patterns throughout the application
-- **Configuration Externalization**: Keep configurable values in separate configuration files
+## Data Management Patterns
 
-### Development Workflow
-- **Modular Development**: Develop features in isolated modules that can be tested independently
-- **API-First Design**: Design API endpoints before implementing frontend functionality
-- **Progressive Enhancement**: Build core functionality first, then add advanced features
-- **Documentation**: Maintain clear documentation for configuration options and API endpoints
+### File-Based Persistence
+- **JSON Storage**: Use JSON files for configuration and user data with proper formatting (`JSON.stringify(data, null, 2)`)
+- **File Existence Checks**: Always check `fs.existsSync()` before reading files
+- **Atomic Writes**: Write complete objects to avoid partial data corruption
+- **Backup Strategy**: Load existing data before modifications to preserve state
+
+### Database Integration
+- **Connection Strings**: Use configuration-driven connection parameters
+- **Query Parameterization**: Build dynamic queries with proper escaping and filtering
+- **Result Processing**: Transform database results to match frontend expectations
+- **Connection Management**: Handle database errors gracefully with meaningful messages
+
+## Frontend Development Standards
+
+### JavaScript Patterns
+- **Dynamic Loading**: Load external libraries conditionally (`typeof Chart === 'undefined'`)
+- **Event-Driven Architecture**: Use callback functions for asynchronous operations
+- **Data Aggregation**: Group and process data client-side for performance
+- **Chart Configuration**: Use consistent color schemes and responsive settings
+
+### Chart.js Implementation
+```javascript
+// Standard chart options pattern
+options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: { legend: { position: 'top' } },
+    scales: { y: { beginAtZero: true } }
+}
+```
+
+### Data Processing
+- **Aggregation Logic**: Group data by keys using object accumulation patterns
+- **Date Formatting**: Convert database date formats (YYYYMMDD) to display formats
+- **Percentage Calculations**: Use `.toFixed(2)` for consistent decimal places
+- **Null Safety**: Check for undefined/null values before operations
+
+## Configuration Management
+
+### Environment Settings
+- **User Configuration**: Keep user-modifiable settings in separate files
+- **System Configuration**: Abstract system settings through configuration layer
+- **Database Credentials**: Store connection details in configuration objects
+- **Feature Flags**: Use configuration for enabling/disabling features
+
+### Multilingual Support
+- **Comment Standards**: Use Vietnamese comments for user-facing configuration
+- **Code Documentation**: Use English for technical comments and variable names
+- **User Interface**: Support localized date formats and number formatting
+
+## Performance Optimization
+
+### Database Queries
+- **Row Limiting**: Use `FETCH FIRST n ROWS ONLY` for large datasets
+- **Selective Fields**: Query only required columns to reduce data transfer
+- **Filtering**: Apply WHERE clauses at database level rather than application level
+- **Indexing**: Structure queries to leverage database indexes
+
+### Memory Management
+- **Data Streaming**: Process large datasets in chunks rather than loading entirely
+- **Object Reuse**: Reuse configuration objects and connections where possible
+- **Garbage Collection**: Clear large objects after processing to free memory
+
+## Security Considerations
+
+### Input Validation
+- **SQL Injection Prevention**: Use parameterized queries and input sanitization
+- **File Path Validation**: Validate file paths to prevent directory traversal
+- **Data Type Checking**: Verify data types before processing
+- **Range Validation**: Check numeric ranges for dates and quantities
+
+### Access Control
+- **Configuration Security**: Protect database credentials and sensitive settings
+- **File Permissions**: Ensure appropriate read/write permissions on data files
+- **Error Information**: Avoid exposing sensitive information in error messages

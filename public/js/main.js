@@ -5,13 +5,14 @@ let currentData = [];
 let currentYear = 0;
 let currentMonth = 0;
 let currentWeek = '';
-let currentViewMode = 'list'; // 'list' or 'pivot'
+let currentViewMode = 'pivot'; // 'list' or 'pivot'
 let currentTab = 'production'; // 'production' or 'plan'
 
 document.addEventListener('DOMContentLoaded', () => {
     // Set initial date from input value
     const dateInput = document.getElementById('monthFilter');
     const weekInput = document.getElementById('weekFilter');
+    const lineInput = document.getElementById('lineFilter');
     const startDateInput = document.getElementById('startDate');
     const endDateInput = document.getElementById('endDate');
     const viewRadios = document.querySelectorAll('input[name="viewMode"]');
@@ -49,6 +50,10 @@ document.addEventListener('DOMContentLoaded', () => {
         loadData();
     });
 
+    lineInput.addEventListener('change', () => {
+        loadData();
+    });
+
     // Date range change listeners
     startDateInput.addEventListener('change', () => {
         if (startDateInput.value && endDateInput.value) {
@@ -76,6 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Initial Load
+    showTab('production');
     loadData();
 });
 
@@ -116,6 +122,15 @@ async function loadData() {
         if (currentViewMode === 'pivot') {
             url += '&detailed=true';
         }
+        
+        // Add line filter
+        const selectedLine = document.getElementById('lineFilter').value;
+        if (selectedLine) {
+            url += `&line=${selectedLine}`;
+        }
+        
+        console.log('API URL:', url);
+        console.log('Line filter:', selectedLine);
 
         const response = await fetch(url);
         const result = await response.json();
@@ -142,12 +157,19 @@ async function loadData() {
 }
 
 function renderSummary(summary) {
-    document.getElementById('sum-plan').innerText = summary.totalPlan;
-    document.getElementById('sum-act').innerText = summary.totalAct;
-    
+    const sumPlan = document.getElementById('sum-plan');
+    const sumAct = document.getElementById('sum-act');
     const percentEl = document.getElementById('sum-percent');
     const cardPercent = document.getElementById('card-percent');
     const progressBar = document.getElementById('progress-bar');
+    
+    if (!sumPlan || !sumAct || !percentEl || !cardPercent || !progressBar) {
+        console.error('Missing summary elements');
+        return;
+    }
+    
+    sumPlan.innerText = summary.totalPlan;
+    sumAct.innerText = summary.totalAct;
     
     const percentage = parseFloat(summary.totalPercent);
     percentEl.innerText = percentage + '%';
@@ -156,27 +178,32 @@ function renderSummary(summary) {
     progressBar.style.width = Math.min(percentage, 100) + '%';
     
     // Color coding for summary
-    const icon = cardPercent.querySelector('.summary-icon');
-    if (percentage < 80) {
-        progressBar.className = 'progress-bar bg-danger';
-        icon.className = 'bg-danger bg-opacity-10 rounded-circle p-3 me-3';
-        icon.querySelector('i').className = 'fas fa-exclamation-triangle text-danger fa-2x';
-    } else if (percentage < 90) {
-        progressBar.className = 'progress-bar bg-warning';
-        icon.className = 'bg-warning bg-opacity-10 rounded-circle p-3 me-3';
-        icon.querySelector('i').className = 'fas fa-clock text-warning fa-2x';
-    } else {
-        progressBar.className = 'progress-bar bg-success';
-        icon.className = 'bg-success bg-opacity-10 rounded-circle p-3 me-3';
-        icon.querySelector('i').className = 'fas fa-bullseye text-success fa-2x';
+    const icon = cardPercent.querySelector('.bg-success');
+    if (icon) {
+        if (percentage < 80) {
+            progressBar.className = 'progress-bar bg-danger';
+            icon.className = 'bg-danger bg-opacity-10 rounded-circle p-3 me-3';
+            const iconElement = icon.querySelector('i');
+            if (iconElement) iconElement.className = 'fas fa-exclamation-triangle text-danger fa-2x';
+        } else if (percentage < 90) {
+            progressBar.className = 'progress-bar bg-warning';
+            icon.className = 'bg-warning bg-opacity-10 rounded-circle p-3 me-3';
+            const iconElement = icon.querySelector('i');
+            if (iconElement) iconElement.className = 'fas fa-clock text-warning fa-2x';
+        } else {
+            progressBar.className = 'progress-bar bg-success';
+            icon.className = 'bg-success bg-opacity-10 rounded-circle p-3 me-3';
+            const iconElement = icon.querySelector('i');
+            if (iconElement) iconElement.className = 'fas fa-bullseye text-success fa-2x';
+        }
     }
     
-    // Calculate variance
-    const planNum = parseInt(summary.totalPlan.replace(/,/g, ''));
-    const actNum = parseInt(summary.totalAct.replace(/,/g, ''));
-    const variance = actNum - planNum;
+    // Calculate variance (optional element)
     const varianceEl = document.getElementById('sum-variance');
     if (varianceEl) {
+        const planNum = parseInt(summary.totalPlan.replace(/,/g, ''));
+        const actNum = parseInt(summary.totalAct.replace(/,/g, ''));
+        const variance = actNum - planNum;
         varianceEl.innerText = (variance >= 0 ? '+' : '') + variance.toLocaleString();
         varianceEl.className = variance >= 0 ? 'mb-0 fw-bold text-success' : 'mb-0 fw-bold text-danger';
     }
@@ -299,12 +326,18 @@ function renderTable(data) {
 function renderPivotTable(data) {
     try {
         console.log('Rendering pivot table with', data ? data.length : 0, 'records');
+        console.log('Sample data:', data ? data.slice(0, 2) : 'No data');
         
         const table = document.querySelector('table');
-        table.classList.add('pivot-table');
-
         const tbody = document.getElementById('data-table-body');
         const thead = document.querySelector('.table thead');
+        
+        if (!table || !tbody || !thead) {
+            console.error('Missing table elements');
+            return;
+        }
+        
+        table.classList.add('pivot-table');
         tbody.innerHTML = '';
         thead.innerHTML = '';
 
@@ -313,27 +346,34 @@ function renderPivotTable(data) {
             return;
         }
 
-    // 1. Get Unique Dates and Sort them
-    const daysSet = new Set();
-    data.forEach(row => daysSet.add(row.COMP_DAY));
-    const sortedDays = Array.from(daysSet).sort();
+        // 1. Get Unique Dates and Sort them
+        const daysSet = new Set();
+        data.forEach(row => {
+            if (row.COMP_DAY) {
+                daysSet.add(row.COMP_DAY.toString());
+            }
+        });
+        const sortedDays = Array.from(daysSet).sort();
+        console.log('Found days:', sortedDays);
 
-    // 2. Group Data by Item (Line + Item)
-    const itemsMap = {};
-    data.forEach(row => {
-        const key = `${row.LINE1}_${row.ITEM}`;
-        if (!itemsMap[key]) {
-            itemsMap[key] = {
-                info: row,
-                days: {}
+        // 2. Group Data by Item (Line + Item)
+        const itemsMap = {};
+        data.forEach(row => {
+            const key = `${row.LINE1}_${row.ITEM}`;
+            if (!itemsMap[key]) {
+                itemsMap[key] = {
+                    info: row,
+                    days: {}
+                };
+            }
+            // Store daily data
+            const dayKey = row.COMP_DAY.toString();
+            itemsMap[key].days[dayKey] = {
+                plan: row.EST_PRO_QTY || 0,
+                act: row.ACT_PRO_QTY || 0
             };
-        }
-        // Store daily data
-        itemsMap[key].days[row.COMP_DAY] = {
-            plan: row.EST_PRO_QTY,
-            act: row.ACT_PRO_QTY
-        };
-    });
+        });
+        console.log('Items grouped:', Object.keys(itemsMap).length);
 
     // 3. Build Header
     const headerRow = document.createElement('tr');
@@ -437,15 +477,24 @@ function renderPivotTable(data) {
                 const dayData = itemGroup.days[day];
                 
                 if (dayData) {
-                    if (metric === 'Plan') td.textContent = dayData.plan;
+                    if (metric === 'Plan') {
+                        // Show daily plan (monthly plan / work days)
+                        const monthlyPlan = dayData.plan;
+                        const workDaysInMonth = 20; // Default, should get from work_days.json
+                        const dailyPlan = monthlyPlan > 0 ? Math.round(monthlyPlan / workDaysInMonth) : 0;
+                        td.textContent = dailyPlan;
+                    }
                     if (metric === 'Act') td.textContent = dayData.act;
                     if (metric === '%') {
-                        const pct = dayData.plan > 0 ? (dayData.act / dayData.plan * 100).toFixed(0) + '%' : '-';
+                        const monthlyPlan = dayData.plan;
+                        const workDaysInMonth = 20;
+                        const dailyPlan = monthlyPlan > 0 ? monthlyPlan / workDaysInMonth : 0;
+                        const pct = dailyPlan > 0 ? (dayData.act / dailyPlan * 100).toFixed(0) + '%' : '-';
                         td.textContent = pct;
                         
                         // Color code %
-                        if (dayData.plan > 0) {
-                             const val = (dayData.act / dayData.plan * 100);
+                        if (dailyPlan > 0) {
+                             const val = (dayData.act / dailyPlan * 100);
                              if (val < 80) td.classList.add('text-danger', 'fw-bold');
                              else if (val >= 100) td.classList.add('text-success', 'fw-bold');
                         }
@@ -706,10 +755,15 @@ function showTab(tabName) {
     document.getElementById(tabName + '-tab').style.display = 'block';
     
     // Update nav links
-    document.querySelectorAll('.nav-link').forEach(link => {
+    document.querySelectorAll('.navbar-nav .nav-link').forEach(link => {
         link.classList.remove('active');
     });
-    event.target.classList.add('active');
+    
+    // Find and activate the correct nav link
+    const activeLink = document.querySelector(`[onclick="showTab('${tabName}')"]`);
+    if (activeLink) {
+        activeLink.classList.add('active');
+    }
     
     currentTab = tabName;
     
@@ -754,8 +808,8 @@ async function loadPlanData() {
         headerHtml += '<th style="width: 12%">Item Code</th>';
         headerHtml += '<th style="width: 35%">Item Description</th>';
         months.forEach(month => {
-            headerHtml += `<th style="width: ${45/(months.length*2)}%" class="text-center">${month}<br><small>Plan</small></th>`;
-            headerHtml += `<th style="width: ${45/(months.length*2)}%" class="text-center"><small>Daily</small></th>`;
+            headerHtml += `<th style="width: ${45/(months.length*2)}%" class="text-center">${month}<br><small>Plan (km)</small></th>`;
+            headerHtml += `<th style="width: ${45/(months.length*2)}%" class="text-center"><small>Daily (m)</small></th>`;
         });
         headerHtml += '</tr>';
         
@@ -803,7 +857,8 @@ async function loadPlanData() {
             months.forEach(month => {
                 const qty = item.months[month] || 0;
                 const workDay = workDays[month] || 0;
-                const dailyProduct = workDay > 0 ? (qty / workDay).toFixed(0) : 0;
+                // Convert km to m for daily production
+                const dailyProduct = workDay > 0 ? ((qty * 1000) / workDay).toFixed(0) : 0;
                 
                 rowHtml += `<td class="text-end plan-qty-cell" style="cursor: pointer; background-color: #f8f9fa;" onclick="editPlanQty('${item.itemCode}', '${month}', ${qty})" title="Click to edit">${qty > 0 ? qty.toLocaleString() : '0'}</td>`;
                 rowHtml += `<td class="text-end fw-bold text-primary">${dailyProduct > 0 ? parseInt(dailyProduct).toLocaleString() : '0'}</td>`;
@@ -819,8 +874,29 @@ async function loadPlanData() {
     }
 }
 
-function exportToExcel() {
-    alert("Export functionality would be implemented here (e.g. generating a CSV or .xlsx file).");
+async function exportToExcel() {
+    try {
+        const year = currentYear;
+        const month = currentMonth;
+        const selectedLine = document.getElementById('lineFilter').value;
+        
+        let url = `/api/export-csv?year=${year}&month=${month}`;
+        if (selectedLine) {
+            url += `&line=${selectedLine}`;
+        }
+        
+        // Download CSV file
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `production_${year}_${month.toString().padStart(2, '0')}.csv`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+    } catch (error) {
+        console.error('Export error:', error);
+        alert('Error exporting data');
+    }
 }
 
 async function clearAllPlan() {

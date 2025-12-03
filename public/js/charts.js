@@ -1,5 +1,9 @@
 // Chart.js functionality for enhanced dashboard
 
+// Store chart instances
+let trendChartInstance = null;
+let gaugeChartInstance = null;
+
 // Initialize charts when data is loaded
 function initializeCharts(data) {
     if (typeof Chart === 'undefined') {
@@ -22,6 +26,11 @@ function renderTrendChart(data) {
     const ctx = document.getElementById('trendChart');
     if (!ctx) return;
     
+    // Destroy existing chart
+    if (trendChartInstance) {
+        trendChartInstance.destroy();
+    }
+    
     // Group data by date
     const dateGroups = {};
     data.forEach(row => {
@@ -43,7 +52,7 @@ function renderTrendChart(data) {
         return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
     });
     
-    new Chart(ctx, {
+    trendChartInstance = new Chart(ctx, {
         type: 'line',
         data: {
             labels: labels,
@@ -96,13 +105,18 @@ function renderGaugeChart(data) {
     const ctx = document.getElementById('gaugeChart');
     if (!ctx) return;
     
+    // Destroy existing chart
+    if (gaugeChartInstance) {
+        gaugeChartInstance.destroy();
+    }
+    
     // Calculate overall percentage
     const totalPlan = data.reduce((sum, row) => sum + row.EST_PRO_QTY, 0);
     const totalActual = data.reduce((sum, row) => sum + row.ACT_PRO_QTY, 0);
     const percentage = totalPlan > 0 ? (totalActual / totalPlan) * 100 : 0;
     
     // Create gauge chart using doughnut chart
-    new Chart(ctx, {
+    gaugeChartInstance = new Chart(ctx, {
         type: 'doughnut',
         data: {
             datasets: [{

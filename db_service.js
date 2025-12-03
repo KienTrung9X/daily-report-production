@@ -36,25 +36,27 @@ function getWeekNumber(d) {
 }
 
 // IBM i Database functions
-async function getDataFromSQL(year, month, week = null, detailed = false, startDate = null, endDate = null) {
+async function getDataFromSQL(year, month, week = null, detailed = false, startDate = null, endDate = null, lineFilter = null) {
     try {
         const connStr = `Provider=${config.provider};Data Source=${config.hostname};User ID=${config.uid};PASSWORD=${config.pwd};Default Collection=${config.database}`;
         const connection = ADODB.open(connStr);
-        const lineFilter = config.lineCodes.map(code => `'${code}'`).join(',');
+        const lineCodesFilter = config.lineCodes.map(code => `'${code}'`).join(',');
         let result;
         
         if (startDate && endDate) {
             const query = `
                 SELECT SUBSTR(PCPU9H,1,6) AS YEAR_MONTH, PCPU9H AS COMP_DAY, LN1C9H AS LINE1, LN2C9H AS LINE2,
                        LN_NAME, PSHN9H AS PR, ITMC9H AS ITEM, IT1IA0 AS ITEM1, IT2IA0 AS ITEM2,
-                       PCPQ9H AS ACT_PRO_QTY, QUNC9H AS UNIT, SIZCA0 AS SIZE, CHNCA0 AS CH
+                       SUM(PCPQ9H) AS ACT_PRO_QTY, QUNC9H AS UNIT, SIZCA0 AS SIZE, CHNCA0 AS CH
                 FROM WAVEDLIB.F9H00
                 INNER JOIN WAVEDLIB.FA000 ON ITMC9H = ITMCA0
                 INNER JOIN (SELECT DGRC09, SUBSTR(DDTC09,1,3) AS LN1, SUBSTR(DDTC09,4,2) AS LN2,
                             CN1I09 AS LN_NAME FROM WAVEDLIB.C0900 WHERE DGRC09 = 'LN1C' AND SUBSTR(DDTC09,6,2) = '01')
                 ON LN1 = LN1C9H AND LN2 = LN2C9H
-                WHERE LN1C9H IN (${lineFilter})
+                WHERE LN1C9H IN (${lineCodesFilter})
+                ${lineFilter ? `AND LN1C9H = '${lineFilter}'` : ''}
                 AND SUBSTR(PCPU9H,1,6) BETWEEN '${config.startMonth}' AND '${config.endMonth}'
+                GROUP BY SUBSTR(PCPU9H,1,6), PCPU9H, LN1C9H, LN2C9H, LN_NAME, PSHN9H, ITMC9H, IT1IA0, IT2IA0, QUNC9H, SIZCA0, CHNCA0
                 ORDER BY PCPU9H DESC
                 FETCH FIRST ${config.rowLimit} ROWS ONLY
             `;
@@ -64,14 +66,16 @@ async function getDataFromSQL(year, month, week = null, detailed = false, startD
             const query = `
                 SELECT SUBSTR(PCPU9H,1,6) AS YEAR_MONTH, PCPU9H AS COMP_DAY, LN1C9H AS LINE1, LN2C9H AS LINE2,
                        LN_NAME, PSHN9H AS PR, ITMC9H AS ITEM, IT1IA0 AS ITEM1, IT2IA0 AS ITEM2,
-                       PCPQ9H AS ACT_PRO_QTY, QUNC9H AS UNIT, SIZCA0 AS SIZE, CHNCA0 AS CH
+                       SUM(PCPQ9H) AS ACT_PRO_QTY, QUNC9H AS UNIT, SIZCA0 AS SIZE, CHNCA0 AS CH
                 FROM WAVEDLIB.F9H00
                 INNER JOIN WAVEDLIB.FA000 ON ITMC9H = ITMCA0
                 INNER JOIN (SELECT DGRC09, SUBSTR(DDTC09,1,3) AS LN1, SUBSTR(DDTC09,4,2) AS LN2,
                             CN1I09 AS LN_NAME FROM WAVEDLIB.C0900 WHERE DGRC09 = 'LN1C' AND SUBSTR(DDTC09,6,2) = '01')
                 ON LN1 = LN1C9H AND LN2 = LN2C9H
-                WHERE LN1C9H IN (${lineFilter})
+                WHERE LN1C9H IN (${lineCodesFilter})
+                ${lineFilter ? `AND LN1C9H = '${lineFilter}'` : ''}
                 AND SUBSTR(PCPU9H,1,6) = '${yearMonth}'
+                GROUP BY SUBSTR(PCPU9H,1,6), PCPU9H, LN1C9H, LN2C9H, LN_NAME, PSHN9H, ITMC9H, IT1IA0, IT2IA0, QUNC9H, SIZCA0, CHNCA0
                 ORDER BY PCPU9H DESC
                 FETCH FIRST ${config.rowLimit} ROWS ONLY
             `;
@@ -97,19 +101,7 @@ async function getDataFromSQL(year, month, week = null, detailed = false, startD
             ITEM_NAME: `${row.ITEM1 || ''}${row.ITEM2 ? ' - ' + row.ITEM2 : ''}`.trim()
         }));
         
-        // Aggregate if not detailed
-        if (!detailed) {
-            const aggregated = {};
-            rows.forEach(row => {
-                const key = `${row.LINE1}_${row.ITEM}`;
-                if (!aggregated[key]) {
-                    aggregated[key] = { ...row };
-                } else {
-                    aggregated[key].ACT_PRO_QTY += row.ACT_PRO_QTY;
-                }
-            });
-            return Object.values(aggregated);
-        }
+        // No need for client-side aggregation since we GROUP BY in SQL
         
         return rows;
     } catch (error) {

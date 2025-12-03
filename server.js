@@ -6,7 +6,7 @@ const config = require('./config');
 const dbService = require('./db_service');
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 0;
 
 // Middleware
 app.use(bodyParser.json());
@@ -73,8 +73,9 @@ app.get('/api/production', async (req, res) => {
         const detailed = req.query.detailed === 'true';
         const startDate = req.query.startDate;
         const endDate = req.query.endDate;
+        const lineFilter = req.query.line;
 
-        const rawData = await dbService.getData(year, month, week, detailed, startDate, endDate);
+        const rawData = await dbService.getData(year, month, week, detailed, startDate, endDate, lineFilter);
         const comments = dbService.getComments();
         
         // Load manual Est Qty
@@ -108,7 +109,9 @@ app.get('/api/production', async (req, res) => {
             if (manualEstQty[estQtyKey] !== undefined) {
                 estQty = manualEstQty[estQtyKey];
             } else if (planData[estQtyKey] !== undefined) {
-                estQty = typeof planData[estQtyKey] === 'object' ? planData[estQtyKey].quantity : planData[estQtyKey];
+                let planQty = typeof planData[estQtyKey] === 'object' ? planData[estQtyKey].quantity : planData[estQtyKey];
+                // Convert km to m (plan is in km, actual is in m)
+                estQty = planQty * 1000;
             }
             
             return {
@@ -466,7 +469,61 @@ app.delete('/api/holidays/:date', (req, res) => {
     }
 });
 
+// API to export CSV
+app.get('/api/export-csv', async (req, res) => {
+    try {
+        const year = parseInt(req.query.year) || new Date().getFullYear();
+        const month = parseInt(req.query.month) || (new Date().getMonth() + 1);
+        const lineFilter = req.query.line;
+        
+        const rawData = await dbService.getData(year, month, null, true, null, null, lineFilter);
+        
+        // CSV headers
+        const headers = ['Date', 'Line', 'Item Code', 'Item Name', 'Unit', 'Actual Qty', 'Plan Qty', 'Achievement %'];
+        let csvContent = headers.join(',') + '\n';
+        
+        // Load plan data for comparison
+        const planFile = path.join(__dirname, 'plan_data.json');
+        let planData = {};
+        if (fs.existsSync(planFile)) {
+            planData = JSON.parse(fs.readFileSync(planFile, 'utf8'));
+        }
+        
+        // Process data
+        rawData.forEach(row => {
+            const estQtyKey = `${row.ITEM}_${row.YEAR_MONTH}`;
+            let planQty = 0;
+            if (planData[estQtyKey]) {
+                planQty = typeof planData[estQtyKey] === 'object' ? planData[estQtyKey].quantity * 1000 : planData[estQtyKey] * 1000;
+            }
+            
+            const percentage = planQty > 0 ? ((row.ACT_PRO_QTY / planQty) * 100).toFixed(2) : 0;
+            
+            const csvRow = [
+                row.COMP_DAY,
+                row.LINE1,
+                row.ITEM,
+                `"${row.ITEM_NAME}"`,
+                row.UNIT,
+                row.ACT_PRO_QTY,
+                planQty,
+                percentage
+            ];
+            csvContent += csvRow.join(',') + '\n';
+        });
+        
+        res.setHeader('Content-Type', 'text/csv');
+        res.setHeader('Content-Disposition', `attachment; filename="production_${year}_${month.toString().padStart(2, '0')}.csv"`);
+        res.send(csvContent);
+        
+    } catch (error) {
+        console.error('CSV Export Error:', error);
+        res.status(500).json({ error: 'Export failed' });
+    }
+});
+
 // Start Server
-app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
+const server = app.listen(PORT, () => {
+    const actualPort = server.address().port;
+    console.log(`Server is running on http://localhost:${actualPort}`);
 });

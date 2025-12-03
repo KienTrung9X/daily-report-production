@@ -57,47 +57,56 @@
             <div id="dashboard-section" class="mb-5">
                 <!-- Controls & Filters -->
                 <div class="card shadow-sm mb-4">
-                    <div class="card-body py-3">
-                        <div class="row align-items-center">
-                            <div class="col-md-8">
-                                <div class="row align-items-center">
-                                    <div class="col-md-6">
-                                        <div class="d-flex align-items-center">
-                                            <label for="monthFilter" class="form-label fw-bold mb-0 me-2">Month:</label>
-                                            <input type="month" id="monthFilter" class="form-control d-inline-block w-auto me-3" value="<%= year %>-<%= month.toString().padStart(2, '0') %>">
-                                            
-                                            <label for="weekFilter" class="form-label fw-bold mb-0 me-2">Week:</label>
-                                            <select id="weekFilter" class="form-select d-inline-block w-auto">
-                                                <option value="">All Month</option>
-                                                <option value="1">Week 1</option>
-                                                <option value="2">Week 2</option>
-                                                <option value="3">Week 3</option>
-                                                <option value="4">Week 4</option>
-                                                <option value="5">Week 5</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="d-flex align-items-center">
-                                            <label class="form-label fw-bold mb-0 me-2">Date Range:</label>
-                                            <input type="date" id="startDate" class="form-control d-inline-block w-auto me-2" style="width: 140px!important;">
-                                            <span class="me-2">to</span>
-                                            <input type="date" id="endDate" class="form-control d-inline-block w-auto" style="width: 140px!important;">
-                                        </div>
-                                    </div>
-                                </div>
+                    <div class="card-body py-2">
+                        <div class="row align-items-center g-2">
+                            <div class="col-auto">
+                                <label class="form-label fw-bold mb-0 me-1">Month:</label>
+                                <input type="month" id="monthFilter" class="form-control form-control-sm" style="width: 140px;" value="<%= year %>-<%= month.toString().padStart(2, '0') %>">
                             </div>
-                            <div class="col-md-4 text-end">
-                                <input type="text" id="searchInput" class="form-control d-inline-block w-auto me-2" placeholder="Search item..." style="width: 150px!important;">
-                                <button class="btn btn-outline-primary me-2" onclick="loadData()">
-                                    <i class="fas fa-sync-alt me-1"></i> Refresh
+                            <div class="col-auto">
+                                <label class="form-label fw-bold mb-0 me-1">Week:</label>
+                                <select id="weekFilter" class="form-select form-select-sm" style="width: 100px;">
+                                    <option value="">All</option>
+                                    <option value="1">W1</option>
+                                    <option value="2">W2</option>
+                                    <option value="3">W3</option>
+                                    <option value="4">W4</option>
+                                    <option value="5">W5</option>
+                                </select>
+                            </div>
+                            <div class="col-auto">
+                                <label class="form-label fw-bold mb-0 me-1">Line:</label>
+                                <select id="lineFilter" class="form-select form-select-sm" style="width: 80px;">
+                                    <option value="">All</option>
+                                    <option value="111">111</option>
+                                    <option value="121">121</option>
+                                    <option value="312">312</option>
+                                    <option value="313">313</option>
+                                    <option value="315">315</option>
+                                    <option value="161">161</option>
+                                </select>
+                            </div>
+                            <div class="col-auto">
+                                <span class="text-muted">|</span>
+                            </div>
+                            <div class="col-auto">
+                                <label class="form-label fw-bold mb-0 me-1">From:</label>
+                                <input type="date" id="startDate" class="form-control form-control-sm" style="width: 130px;">
+                            </div>
+                            <div class="col-auto">
+                                <label class="form-label fw-bold mb-0 me-1">To:</label>
+                                <input type="date" id="endDate" class="form-control form-control-sm" style="width: 130px;">
+                            </div>
+                            <div class="col-auto ms-auto">
+                                <input type="text" id="searchInput" class="form-control form-control-sm me-2" placeholder="Search..." style="width: 120px; display: inline-block;">
+                                <button class="btn btn-outline-primary btn-sm" onclick="loadData()">
+                                    <i class="fas fa-sync-alt"></i>
                                 </button>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-
+                
                 <!-- Enhanced Summary Cards -->
                 <div class="row mb-4">
                     <div class="col-md-4">
@@ -183,9 +192,9 @@
                     <h4><i class="fas fa-table me-2"></i>Production Details</h4>
                     <div>
                         <div class="btn-group me-2" role="group">
-                            <input type="radio" class="btn-check" name="viewMode" id="viewList" value="list" checked autocomplete="off">
+                            <input type="radio" class="btn-check" name="viewMode" id="viewList" value="list" autocomplete="off">
                             <label class="btn btn-outline-secondary" for="viewList"><i class="fas fa-list me-1"></i>List</label>
-                            <input type="radio" class="btn-check" name="viewMode" id="viewPivot" value="pivot" autocomplete="off">
+                            <input type="radio" class="btn-check" name="viewMode" id="viewPivot" value="pivot" checked autocomplete="off">
                             <label class="btn btn-outline-secondary" for="viewPivot"><i class="fas fa-th me-1"></i>Daily Matrix</label>
                         </div>
                         <button class="btn btn-success" onclick="exportToExcel()">
