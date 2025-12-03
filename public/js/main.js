@@ -137,7 +137,9 @@ async function loadData() {
         
         currentData = result.data;
         
-        renderSummary(result.summary);
+        if (result.summary) {
+            renderSummary(result.summary);
+        }
         
         // Initialize charts with data
         if (typeof initializeCharts === 'function') {
@@ -157,6 +159,8 @@ async function loadData() {
 }
 
 function renderSummary(summary) {
+    if (!summary) return;
+    
     const sumPlan = document.getElementById('sum-plan');
     const sumAct = document.getElementById('sum-act');
     const percentEl = document.getElementById('sum-percent');
@@ -164,7 +168,6 @@ function renderSummary(summary) {
     const progressBar = document.getElementById('progress-bar');
     
     if (!sumPlan || !sumAct || !percentEl || !cardPercent || !progressBar) {
-        console.error('Missing summary elements');
         return;
     }
     
@@ -366,12 +369,17 @@ function renderPivotTable(data) {
                     days: {}
                 };
             }
-            // Store daily data
+            // Store daily data - sum if multiple records per day
             const dayKey = row.COMP_DAY.toString();
-            itemsMap[key].days[dayKey] = {
-                plan: row.EST_PRO_QTY || 0,
-                act: row.ACT_PRO_QTY || 0
-            };
+            if (!itemsMap[key].days[dayKey]) {
+                itemsMap[key].days[dayKey] = {
+                    plan: row.EST_PRO_QTY || 0,
+                    act: row.ACT_PRO_QTY || 0
+                };
+            } else {
+                itemsMap[key].days[dayKey].act += row.ACT_PRO_QTY || 0;
+                // Don't change plan - keep first value
+            }
         });
         console.log('Items grouped:', Object.keys(itemsMap).length);
 

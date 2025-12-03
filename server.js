@@ -86,37 +86,57 @@ app.get('/api/production', async (req, res) => {
             rawData = cached.data.filter(row => row.YEAR_MONTH === yearMonth);
             
             if (rawData.length > 0) {
-                console.log(`Using cached data for ${yearMonth}:`, rawData.length, 'records');
-                
                 // Apply filters to cached data
                 if (lineFilter) {
                     rawData = rawData.filter(row => row.LINE1 === lineFilter);
                 }
                 if (week) {
                     rawData = rawData.filter(row => {
-                        const day = parseInt(row.COMP_DAY.slice(6, 8));
-                        const date = new Date(year, month - 1, day);
-                        const rowWeek = getWeekNumber(date);
-                        return rowWeek === parseInt(week);
+                        try {
+                            const compDay = row.COMP_DAY.toString();
+                            const day = parseInt(compDay.slice(6, 8));
+                            const date = new Date(year, month - 1, day);
+                            const rowWeek = getWeekNumber(date);
+                            return rowWeek === parseInt(week);
+                        } catch (error) {
+                            return false;
+                        }
                     });
                 }
             } else {
-                // No cached data for this month, query database
-                rawData = await dbService.getData(year, month, week, detailed, startDate, endDate, lineFilter);
-                console.log(`No cached data for ${yearMonth}, querying database`);
+                // No cached data for this month, query database (without week filter)
+                rawData = await dbService.getData(year, month, null, detailed, startDate, endDate, lineFilter);
+                
+                // Apply week filter to database result
+                if (week && rawData.length > 0) {
+                    rawData = rawData.filter(row => {
+                        try {
+                            const compDay = row.COMP_DAY.toString();
+                            const day = parseInt(compDay.slice(6, 8));
+                            const date = new Date(year, month - 1, day);
+                            const rowWeek = getWeekNumber(date);
+                            return rowWeek === parseInt(week);
+                        } catch (error) {
+                            return false;
+                        }
+                    });
+                }
             }
         } else {
             // Use database for date range queries or when no cache
-            rawData = await dbService.getData(year, month, week, detailed, startDate, endDate, lineFilter);
-            console.log('Using database query (date range or no cache)');
+            rawData = await dbService.getData(year, month, null, detailed, startDate, endDate, lineFilter);
         }
         
         function getWeekNumber(d) {
-            d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
-            d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
-            var yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-            var weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
-            return weekNo;
+            try {
+                d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+                d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
+                var yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+                var weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+                return weekNo;
+            } catch (error) {
+                return 0;
+            }
         }
         
         const comments = dbService.getComments();

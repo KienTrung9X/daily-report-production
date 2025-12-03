@@ -84,15 +84,7 @@ async function getDataFromSQL(year, month, week = null, detailed = false, startD
         
         let rows = result;
         
-        // Filter by week if needed
-        if (week) {
-            rows = rows.filter(row => {
-                const day = parseInt(row.COMP_DAY.slice(6, 8));
-                const date = new Date(year, month - 1, day);
-                const rowWeek = getWeekNumber(date);
-                return rowWeek === parseInt(week);
-            });
-        }
+        // Week filtering is now handled in server.js from cache
         
         // Add default EST_PRO_QTY = 0 and create ITEM_NAME from ITEM1 and ITEM2
         rows = rows.map(row => ({
