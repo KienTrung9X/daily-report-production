@@ -76,36 +76,39 @@ app.get('/api/production', async (req, res) => {
         const endDate = req.query.endDate;
         const lineFilter = req.query.line;
 
-        // Use cached data for current month, otherwise query database
-        const currentYear = new Date().getFullYear();
-        const currentMonth = new Date().getMonth() + 1;
-        
+        // Try to use cached data first
+        const cached = dataCache.getCachedData();
         let rawData;
-        if (year === currentYear && month === currentMonth && !startDate && !endDate) {
-            const cached = dataCache.getCachedData();
-            if (cached && cached.data && cached.data.length > 0) {
-                rawData = cached.data;
-                console.log('Using cached data:', rawData.length, 'records');
+        
+        if (cached && cached.data && cached.data.length > 0 && !startDate && !endDate) {
+            // Filter cached data by year/month
+            const yearMonth = `${year}${month.toString().padStart(2, '0')}`;
+            rawData = cached.data.filter(row => row.YEAR_MONTH === yearMonth);
+            
+            if (rawData.length > 0) {
+                console.log(`Using cached data for ${yearMonth}:`, rawData.length, 'records');
+                
+                // Apply filters to cached data
+                if (lineFilter) {
+                    rawData = rawData.filter(row => row.LINE1 === lineFilter);
+                }
+                if (week) {
+                    rawData = rawData.filter(row => {
+                        const day = parseInt(row.COMP_DAY.slice(6, 8));
+                        const date = new Date(year, month - 1, day);
+                        const rowWeek = getWeekNumber(date);
+                        return rowWeek === parseInt(week);
+                    });
+                }
             } else {
+                // No cached data for this month, query database
                 rawData = await dbService.getData(year, month, week, detailed, startDate, endDate, lineFilter);
+                console.log(`No cached data for ${yearMonth}, querying database`);
             }
         } else {
+            // Use database for date range queries or when no cache
             rawData = await dbService.getData(year, month, week, detailed, startDate, endDate, lineFilter);
-        }
-        
-        // Apply filters to cached data
-        if (year === currentYear && month === currentMonth && !startDate && !endDate) {
-            if (lineFilter) {
-                rawData = rawData.filter(row => row.LINE1 === lineFilter);
-            }
-            if (week) {
-                rawData = rawData.filter(row => {
-                    const day = parseInt(row.COMP_DAY.slice(6, 8));
-                    const date = new Date(year, month - 1, day);
-                    const rowWeek = getWeekNumber(date);
-                    return rowWeek === parseInt(week);
-                });
-            }
+            console.log('Using database query (date range or no cache)');
         }
         
         function getWeekNumber(d) {

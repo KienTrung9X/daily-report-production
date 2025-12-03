@@ -4,50 +4,54 @@
 
 ### Root Level
 - `server.js` - Main Express.js application server with API routes
-- `config.js` - Database connection and application configuration
-- `db_service.js` - Database abstraction layer for production data queries
-- `user-config.js` - User-specific configuration settings
-- `package.json` - Node.js dependencies and project metadata
+- `config.js` - Application configuration settings
+- `db_service.js` - Database connection and query service
+- `data-cache.js` - Caching mechanism for performance optimization
+- `user-config.js` - User-specific configuration management
+- `check-item.js` - Item validation utilities
+- `test-group.js` - Testing utilities
 
 ### Data Files
-- `comments.json` - User comments associated with production records
+- `comments.json` - User comments for production items
 - `est_qty.json` - Manual estimated quantity overrides
-- `plan_data.json` - Imported production plan data
+- `plan_data.json` - Production plan data
 - `work_days.json` - Working days configuration per month
-- `holidays.json` - Holiday calendar affecting production schedules
+- `holidays.json` - Holiday calendar data
 
-### Frontend Assets (`public/`)
-- `css/` - Stylesheets for UI components
-  - `style.css` - Main application styles
-  - `pivot.css` - Data table and pivot view styles
-- `js/` - Client-side JavaScript modules
-  - `main.js` - Core dashboard functionality and API interactions
-  - `charts.js` - Chart rendering and data visualization
+### Frontend Structure
+```
+public/
+├── css/
+│   ├── style.css - Main application styles
+│   └── pivot.css - Pivot table specific styles
+└── js/
+    ├── main.js - Core application logic and UI management
+    ├── charts.js - Chart rendering and visualization
+    ├── data-loader.js - Data fetching and processing
+    ├── sparkline.js - Sparkline chart implementation
+    └── table-enhanced.js - Enhanced table functionality
+```
 
-### Views (`views/`)
-- `index.ejs` - Main dashboard template with EJS templating
+### Views
+- `views/index.ejs` - Main dashboard template
 
 ## Core Components
 
-### Server Layer
-- **Express Application**: RESTful API server handling production data requests
-- **Database Service**: Abstracted data access layer supporting multiple database types
-- **Configuration Management**: Centralized settings for database connections and app behavior
-
-### Data Management
-- **Production Data API**: Real-time queries for actual vs planned production
-- **Plan Import System**: Excel-compatible data import for production planning
-- **Manual Override System**: User-editable estimates and work day adjustments
-- **Comment System**: Contextual annotations for production records
+### Backend Architecture
+- **Express Server**: RESTful API with middleware for JSON/URL parsing
+- **Database Service**: Abstracted data access layer with caching
+- **File-based Storage**: JSON files for configuration and user data
+- **Auto-refresh Cache**: Background data synchronization
 
 ### Frontend Architecture
-- **Dashboard Views**: Calendar and tabular views of production data
-- **Interactive Charts**: Visual representation of performance metrics
-- **Data Entry Forms**: Interfaces for plan imports and manual adjustments
-- **Responsive Design**: Mobile-friendly interface for field access
+- **Modular JavaScript**: Separate modules for charts, tables, and data handling
+- **EJS Templating**: Server-side rendering with dynamic data injection
+- **Responsive Design**: CSS Grid and Flexbox for adaptive layouts
+- **Interactive Components**: Calendar views, pivot tables, and real-time charts
 
-## Architectural Patterns
-- **MVC Pattern**: Clear separation between data (models), presentation (views), and logic (controllers)
-- **RESTful API Design**: Consistent HTTP endpoints for data operations
-- **Configuration-Driven**: External configuration files for easy deployment customization
-- **File-Based Persistence**: JSON files for user data with database integration for production data
+## Data Flow
+1. Database queries through `db_service.js`
+2. Data processing and caching via `data-cache.js`
+3. API endpoints serve processed data
+4. Frontend modules consume API data
+5. User interactions update JSON configuration files

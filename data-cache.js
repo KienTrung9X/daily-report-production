@@ -7,6 +7,7 @@ const REFRESH_INTERVAL = 10000; // 10 seconds
 
 let existingData = {};
 let lastUpdate = null;
+let isInitialLoad = true;
 
 // Load existing data from file
 function loadExistingData() {
@@ -43,10 +44,10 @@ function getFiscalYearRange() {
     return { fiscalYear, startYear, endYear };
 }
 
-// Incremental data refresh - fetch fiscal year data
-async function refreshCache() {
+// Initial load - fetch full fiscal year data
+async function initialLoad() {
     try {
-        console.log('Checking for new fiscal year production data...');
+        console.log('Initial load: Loading full fiscal year data...');
         const { fiscalYear, startYear, endYear } = getFiscalYearRange();
         
         console.log(`Loading FY${fiscalYear}: ${startYear}/04 to ${endYear}/03`);
@@ -73,33 +74,62 @@ async function refreshCache() {
             }
         }
         
-        // Find new records not in existing data
-        const newRecords = [];
+        // Store all data
         allData.forEach(row => {
             const recordKey = `${row.COMP_DAY}_${row.ITEM}_${row.PR}`;
-            if (!existingData[recordKey]) {
-                existingData[recordKey] = row;
-                newRecords.push(row);
-            }
+            existingData[recordKey] = row;
         });
         
-        if (newRecords.length > 0) {
-            // Save updated data to public file for browser access
-            const dataForBrowser = {
-                records: Object.values(existingData),
-                fiscalYear: fiscalYear,
-                fiscalPeriod: `${startYear}/04 - ${endYear}/03`,
-                lastUpdate: new Date().toISOString(),
-                totalRecords: Object.keys(existingData).length
-            };
-            
-            fs.writeFileSync(DATA_FILE, JSON.stringify(dataForBrowser, null, 2));
-            lastUpdate = new Date();
-            
-            console.log(`FY${fiscalYear}: Added ${newRecords.length} new records. Total: ${Object.keys(existingData).length} at ${lastUpdate.toLocaleTimeString()}`);
+        console.log(`Initial load complete: ${Object.keys(existingData).length} total records`);
+        isInitialLoad = false;
+        
+    } catch (error) {
+        console.error('Initial load error:', error);
+    }
+}
+
+// Incremental refresh - only current day data
+async function refreshCache() {
+    try {
+        if (isInitialLoad) {
+            await initialLoad();
         } else {
-            console.log(`FY${fiscalYear}: No new records found`);
+            console.log('Refreshing current day data...');
+            const now = new Date();
+            const currentYear = now.getFullYear();
+            const currentMonth = now.getMonth() + 1;
+            
+            // Only fetch current month data for refresh
+            const todayData = await dbService.getData(currentYear, currentMonth, null, true);
+            
+            let newRecords = 0;
+            todayData.forEach(row => {
+                const recordKey = `${row.COMP_DAY}_${row.ITEM}_${row.PR}`;
+                if (!existingData[recordKey] || existingData[recordKey].ACT_PRO_QTY !== row.ACT_PRO_QTY) {
+                    existingData[recordKey] = row;
+                    newRecords++;
+                }
+            });
+            
+            if (newRecords > 0) {
+                console.log(`Updated ${newRecords} records for current period`);
+            }
         }
+        
+        // Save updated data to public file for browser access
+        const { fiscalYear, startYear, endYear } = getFiscalYearRange();
+        const dataForBrowser = {
+            records: Object.values(existingData),
+            fiscalYear: fiscalYear,
+            fiscalPeriod: `${startYear}/04 - ${endYear}/03`,
+            lastUpdate: new Date().toISOString(),
+            totalRecords: Object.keys(existingData).length
+        };
+        
+        fs.writeFileSync(DATA_FILE, JSON.stringify(dataForBrowser, null, 2));
+        lastUpdate = new Date();
+        
+        console.log(`Cache updated: ${Object.keys(existingData).length} total records at ${lastUpdate.toLocaleTimeString()}`);
         
     } catch (error) {
         console.error('Cache refresh error:', error);
@@ -120,13 +150,13 @@ function startAutoRefresh() {
     // Load existing data first
     loadExistingData();
     
-    // Initial refresh
+    // Initial refresh (full load)
     refreshCache();
     
-    // Set interval for auto-refresh
+    // Set interval for auto-refresh (incremental)
     setInterval(refreshCache, REFRESH_INTERVAL);
     
-    console.log(`Auto-refresh started: every ${REFRESH_INTERVAL/1000} seconds`);
+    console.log(`Auto-refresh started: Initial full load, then every ${REFRESH_INTERVAL/1000} seconds for current data`);
 }
 
 module.exports = {

@@ -2,118 +2,194 @@
 
 ## Code Quality Standards
 
-### File Structure and Organization
-- **Configuration Pattern**: Use separate config files (`config.js`, `user-config.js`) with clear separation between system and user settings
-- **Service Layer**: Implement dedicated service modules (`db_service.js`) for database operations and business logic
-- **Static Assets**: Organize frontend assets in `public/` with subdirectories for `css/` and `js/`
-- **Template Organization**: Keep view templates in dedicated `views/` directory using EJS templating
+### Formatting and Structure
+- **Consistent Indentation**: Use 4 spaces for JavaScript, 2 spaces for JSON
+- **Line Endings**: Windows CRLF (`\r\n`) format throughout codebase
+- **Semicolon Usage**: Consistent semicolon placement in JavaScript
+- **Bracket Style**: Opening braces on same line, proper spacing around operators
 
 ### Naming Conventions
-- **Variables**: Use camelCase for JavaScript variables (`startMonth`, `yearMonth`, `estQty`)
-- **Constants**: Use UPPER_CASE for file paths and database field names (`COMMENTS_FILE`, `COMP_DAY`, `ACT_PRO_QTY`)
-- **API Endpoints**: Use kebab-case for URL paths (`/api/dashboard/calendar`, `/api/plan-data`)
-- **File Names**: Use kebab-case for multi-word files (`db_service.js`, `user-config.js`)
+- **Variables**: camelCase for JavaScript variables (`currentData`, `yearMonth`)
+- **Constants**: UPPER_SNAKE_CASE for constants (`DATA_FILE`, `REFRESH_INTERVAL`)
+- **Functions**: Descriptive camelCase names (`loadData`, `renderPivotTable`)
+- **Files**: kebab-case for CSS, camelCase for JS (`data-cache.js`, `main.js`)
+- **Database Fields**: UPPER_SNAKE_CASE matching SQL conventions (`COMP_DAY`, `EST_PRO_QTY`)
 
-### Error Handling Patterns
-- **Try-Catch Blocks**: Wrap all async operations and file I/O in try-catch blocks
-- **Consistent Error Responses**: Return standardized JSON error objects with `error` field
-- **Console Logging**: Use descriptive error messages with context (`'Calendar API Error:'`, `'Error editing plan data:'`)
-- **HTTP Status Codes**: Use appropriate status codes (400 for bad requests, 500 for server errors, 404 for not found)
+### Documentation Standards
+- **Inline Comments**: Descriptive comments for complex logic sections
+- **Function Headers**: Brief descriptions for major functions
+- **Configuration Comments**: Bilingual comments (English/Vietnamese) in config files
+- **API Documentation**: Clear parameter descriptions in route handlers
 
-## API Design Standards
+## Architectural Patterns
 
-### Request Validation
-- **Required Field Checks**: Always validate required parameters before processing
-- **Type Conversion**: Use `parseInt()` and `parseFloat()` for numeric conversions with fallbacks
-- **Default Values**: Provide sensible defaults using logical OR operator (`|| new Date().getFullYear()`)
-
-### Response Structure
-- **Consistent Format**: Use standardized response objects with `data` and `summary` fields
-- **Success Indicators**: Include `success: true` in successful POST/PUT responses
-- **Data Transformation**: Process raw data before sending to client (add calculated fields, format numbers)
-
-### Route Organization
+### Modular JavaScript Architecture
 ```javascript
-// Pattern: Verb + Resource + Action
-app.get('/api/production', handler);      // Get data
-app.post('/api/est-qty', handler);        // Create/Update
-app.delete('/api/holidays/:date', handler); // Delete with parameter
+// Global state management pattern
+let currentData = [];
+let currentYear = 0;
+let currentMonth = 0;
+
+// Event-driven initialization
+document.addEventListener('DOMContentLoaded', () => {
+    // Initialize components
+});
 ```
 
-## Data Management Patterns
-
-### File-Based Persistence
-- **JSON Storage**: Use JSON files for configuration and user data with proper formatting (`JSON.stringify(data, null, 2)`)
-- **File Existence Checks**: Always check `fs.existsSync()` before reading files
-- **Atomic Writes**: Write complete objects to avoid partial data corruption
-- **Backup Strategy**: Load existing data before modifications to preserve state
-
-### Database Integration
-- **Connection Strings**: Use configuration-driven connection parameters
-- **Query Parameterization**: Build dynamic queries with proper escaping and filtering
-- **Result Processing**: Transform database results to match frontend expectations
-- **Connection Management**: Handle database errors gracefully with meaningful messages
-
-## Frontend Development Standards
-
-### JavaScript Patterns
-- **Dynamic Loading**: Load external libraries conditionally (`typeof Chart === 'undefined'`)
-- **Event-Driven Architecture**: Use callback functions for asynchronous operations
-- **Data Aggregation**: Group and process data client-side for performance
-- **Chart Configuration**: Use consistent color schemes and responsive settings
-
-### Chart.js Implementation
+### Async/Await Error Handling
 ```javascript
-// Standard chart options pattern
-options: {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: { legend: { position: 'top' } },
-    scales: { y: { beginAtZero: true } }
+async function loadData() {
+    try {
+        const response = await fetch(url);
+        const result = await response.json();
+        // Process data
+    } catch (error) {
+        console.error('Error loading data:', error);
+        // User-friendly error display
+    }
 }
 ```
 
-### Data Processing
-- **Aggregation Logic**: Group data by keys using object accumulation patterns
-- **Date Formatting**: Convert database date formats (YYYYMMDD) to display formats
-- **Percentage Calculations**: Use `.toFixed(2)` for consistent decimal places
-- **Null Safety**: Check for undefined/null values before operations
+### Modal Management Pattern
+```javascript
+const modal = new bootstrap.Modal(document.getElementById('modalId'));
+
+function openModal(data) {
+    // Populate modal fields
+    modal.show();
+}
+
+async function submitModal() {
+    // Validate and submit
+    modal.hide();
+    loadData(); // Refresh data
+}
+```
+
+## API Design Patterns
+
+### RESTful Route Structure
+- **GET /api/production** - Main data endpoint with query parameters
+- **POST /api/comments** - Save user comments
+- **POST /api/est-qty** - Manual quantity overrides
+- **GET /api/holidays** - Holiday management
+
+### Request/Response Format
+```javascript
+// Consistent error handling
+res.status(500).json({ error: 'Internal server error' });
+
+// Success responses with data
+res.json({
+    data: processedData,
+    summary: { totalPlan, totalAct, totalPercent }
+});
+```
+
+### File-based Data Storage
+```javascript
+// JSON file operations pattern
+const filePath = path.join(__dirname, 'data.json');
+let data = {};
+
+if (fs.existsSync(filePath)) {
+    data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+}
+
+fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
+```
+
+## Frontend Development Patterns
+
+### DOM Manipulation Safety
+```javascript
+// Safe element creation to prevent XSS
+const cell = document.createElement('td');
+cell.textContent = row.ITEM_NAME; // Use textContent, not innerHTML
+
+// Event listener attachment
+cell.addEventListener('click', () => {
+    openModal(row.ITEM, row.YEAR_MONTH);
+});
+```
+
+### Table Rendering Patterns
+```javascript
+// Clear and rebuild pattern
+tbody.innerHTML = '';
+
+data.forEach(row => {
+    const tr = document.createElement('tr');
+    // Build row elements
+    tbody.appendChild(tr);
+});
+```
+
+### Search and Filter Implementation
+```javascript
+// Debounced search pattern
+let searchTimeout;
+searchInput.addEventListener('input', (e) => {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(() => {
+        filterTable(e.target.value);
+    }, 300);
+});
+```
+
+## Data Processing Patterns
+
+### Caching Strategy
+```javascript
+// Incremental cache updates
+const existingData = {};
+const recordKey = `${row.COMP_DAY}_${row.ITEM}_${row.PR}`;
+if (!existingData[recordKey]) {
+    existingData[recordKey] = row;
+}
+```
+
+### Date Handling
+```javascript
+// Consistent date format conversion
+const dayString = dayStr.toString();
+const y = dayString.substring(0, 4);
+const m = dayString.substring(4, 6);
+const d = dayString.substring(6, 8);
+const dateObj = new Date(y, m - 1, d);
+```
+
+### Data Aggregation
+```javascript
+// Grouping and summarization pattern
+const itemsMap = {};
+data.forEach(row => {
+    const key = `${row.LINE1}_${row.ITEM}`;
+    if (!itemsMap[key]) {
+        itemsMap[key] = { info: row, days: {} };
+    }
+    itemsMap[key].days[dayKey] = { plan: row.EST_PRO_QTY, act: row.ACT_PRO_QTY };
+});
+```
 
 ## Configuration Management
 
-### Environment Settings
-- **User Configuration**: Keep user-modifiable settings in separate files
-- **System Configuration**: Abstract system settings through configuration layer
-- **Database Credentials**: Store connection details in configuration objects
-- **Feature Flags**: Use configuration for enabling/disabling features
+### Environment-Specific Config
+```javascript
+// Centralized configuration pattern
+const config = {
+    startMonth: 202504,
+    endMonth: 202512,
+    lineCodes: ['111', '121', '312'],
+    rowLimit: 10000000,
+    // Database connection details
+};
 
-### Multilingual Support
-- **Comment Standards**: Use Vietnamese comments for user-facing configuration
-- **Code Documentation**: Use English for technical comments and variable names
-- **User Interface**: Support localized date formats and number formatting
+module.exports = config;
+```
 
-## Performance Optimization
-
-### Database Queries
-- **Row Limiting**: Use `FETCH FIRST n ROWS ONLY` for large datasets
-- **Selective Fields**: Query only required columns to reduce data transfer
-- **Filtering**: Apply WHERE clauses at database level rather than application level
-- **Indexing**: Structure queries to leverage database indexes
-
-### Memory Management
-- **Data Streaming**: Process large datasets in chunks rather than loading entirely
-- **Object Reuse**: Reuse configuration objects and connections where possible
-- **Garbage Collection**: Clear large objects after processing to free memory
-
-## Security Considerations
-
-### Input Validation
-- **SQL Injection Prevention**: Use parameterized queries and input sanitization
-- **File Path Validation**: Validate file paths to prevent directory traversal
-- **Data Type Checking**: Verify data types before processing
-- **Range Validation**: Check numeric ranges for dates and quantities
-
-### Access Control
-- **Configuration Security**: Protect database credentials and sensitive settings
-- **File Permissions**: Ensure appropriate read/write permissions on data files
-- **Error Information**: Avoid exposing sensitive information in error messages
+### User Preferences
+- Manual overrides stored in JSON files (`est_qty.json`, `comments.json`)
+- Plan data import/export functionality
+- Holiday calendar management
+- Work days configuration per month
