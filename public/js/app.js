@@ -830,45 +830,65 @@ async function copyAsHTML() {
         if (th.classList.contains('col-upto')) th.style.background = '#f59e0b';
     });
     
-    tableClone.querySelectorAll('td').forEach(td => {
-        let bgColor = 'white';
-        let color = '#1e293b';
-        let fontWeight = 'normal';
+    tableClone.querySelectorAll('tbody tr').forEach((row, rowIndex) => {
+        const isActRow = rowIndex % 3 === 1;
+        const isPctRow = rowIndex % 3 === 2;
         
-        if (td.classList.contains('pct-high')) {
-            color = '#10b981';
-            fontWeight = '700';
-        }
-        if (td.classList.contains('pct-medium')) {
-            color = '#f59e0b';
-            fontWeight = '700';
-        }
-        if (td.classList.contains('pct-low')) {
-            color = '#ef4444';
-            fontWeight = '700';
-        }
-        if (td.classList.contains('val-zero')) color = '#991b1b';
-        if (td.classList.contains('col-total')) {
-            bgColor = '#e0f2fe';
-            fontWeight = '600';
-        }
-        if (td.classList.contains('col-upto')) {
-            bgColor = '#fef3c7';
-            fontWeight = '600';
-        }
-        if (td.classList.contains('has-comment')) {
-            bgColor = '#ef4444';
-            color = 'white';
-            fontWeight = '600';
-        }
-        
-        // Check parent row for font-weight
-        const row = td.parentElement;
-        const rowIndex = Array.from(row.parentElement.children).indexOf(row);
-        if (rowIndex % 3 === 1) fontWeight = '700'; // Act row
-        if (rowIndex % 3 === 2) fontWeight = '600'; // % row
-        
-        td.style.cssText = `padding: 8px; border: 1px solid #e2e8f0; text-align: center; background: ${bgColor}; color: ${color}; font-weight: ${fontWeight};`;
+        row.querySelectorAll('td').forEach(td => {
+            let bgColor = 'white';
+            let color = '#1e293b';
+            let fontWeight = 'normal';
+            
+            // Set font-weight based on row type
+            if (isActRow) fontWeight = '700';
+            if (isPctRow) fontWeight = '600';
+            
+            // Check if cell contains percentage value
+            const cellText = td.textContent.trim();
+            if (isPctRow && cellText.includes('%') && cellText !== '-') {
+                const pctValue = parseFloat(cellText);
+                if (!isNaN(pctValue)) {
+                    fontWeight = '700';
+                    if (pctValue >= 95) {
+                        color = '#10b981';
+                    } else if (pctValue >= 80) {
+                        color = '#f59e0b';
+                    } else {
+                        color = '#ef4444';
+                    }
+                }
+            }
+            
+            // Apply class-based colors (these override default)
+            if (td.classList.contains('pct-high')) {
+                color = '#10b981';
+                fontWeight = '700';
+            }
+            if (td.classList.contains('pct-medium')) {
+                color = '#f59e0b';
+                fontWeight = '700';
+            }
+            if (td.classList.contains('pct-low')) {
+                color = '#ef4444';
+                fontWeight = '700';
+            }
+            if (td.classList.contains('val-zero')) color = '#991b1b';
+            if (td.classList.contains('col-total')) {
+                bgColor = '#e0f2fe';
+                fontWeight = '600';
+            }
+            if (td.classList.contains('col-upto')) {
+                bgColor = '#fef3c7';
+                fontWeight = '600';
+            }
+            if (td.classList.contains('has-comment')) {
+                bgColor = '#ef4444';
+                color = 'white';
+                fontWeight = '600';
+            }
+            
+            td.style.cssText = `padding: 8px; border: 1px solid #e2e8f0; text-align: center; background: ${bgColor}; color: ${color}; font-weight: ${fontWeight};`;
+        });
     });
     
     const html = `
