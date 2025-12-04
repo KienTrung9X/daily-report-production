@@ -7,11 +7,22 @@ let workDaysPreviewData = {};
 let holidays = [];
 
 document.addEventListener('DOMContentLoaded', () => {
-    const now = new Date();
-    currentYear = now.getFullYear();
-    currentMonth = now.getMonth() + 1;
+    const dateInput = document.getElementById('monthFilter');
+    const [y, m] = dateInput.value.split('-');
+    currentYear = parseInt(y);
+    currentMonth = parseInt(m);
     
     document.getElementById('lineFilter').value = '313';
+    
+    document.getElementById('monthFilter').addEventListener('change', (e) => {
+        const [y, m] = e.target.value.split('-');
+        currentYear = parseInt(y);
+        currentMonth = parseInt(m);
+        document.getElementById('startDate').value = '';
+        document.getElementById('endDate').value = '';
+        loadData();
+    });
+    
     document.getElementById('lineFilter').addEventListener('change', () => loadData());
     
     document.getElementById('startDate').addEventListener('change', () => {
@@ -24,12 +35,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (document.getElementById('startDate').value && document.getElementById('endDate').value) {
             loadData();
         }
-    });
-    
-    let searchTimeout;
-    document.getElementById('searchInput').addEventListener('input', (e) => {
-        clearTimeout(searchTimeout);
-        searchTimeout = setTimeout(() => filterTable(e.target.value), 300);
     });
     
     document.getElementById('workdays-paste-data').addEventListener('input', previewWorkDaysData);
@@ -387,8 +392,8 @@ async function loadPlanData() {
         const workDays = await workDaysResponse.json();
         
         if (!planData || Object.keys(planData).length === 0) {
-            tbody.innerHTML = '<tr><td colspan="3">No plan data</td></tr>';
-            thead.innerHTML = '<tr><th>Line</th><th>Code</th><th>Description</th></tr>';
+            tbody.innerHTML = '<tr><td colspan="2">No plan data</td></tr>';
+            thead.innerHTML = '<tr><th>Line</th><th>Item</th></tr>';
             return;
         }
         
@@ -398,12 +403,12 @@ async function loadPlanData() {
         }).filter(m => m))].sort();
         
         if (months.length === 0) {
-            tbody.innerHTML = '<tr><td>No valid plan data</td></tr>';
-            thead.innerHTML = '<tr><th>Item</th></tr>';
+            tbody.innerHTML = '<tr><td colspan="2">No valid plan data</td></tr>';
+            thead.innerHTML = '<tr><th>Line</th><th>Item</th></tr>';
             return;
         }
         
-        let headerHtml = '<tr><th rowspan="2">Item</th>';
+        let headerHtml = '<tr><th rowspan="2">Line</th><th rowspan="2">Item</th>';
         months.forEach(month => {
             headerHtml += `<th colspan="2">${month}</th>`;
         });
@@ -413,7 +418,7 @@ async function loadPlanData() {
         });
         headerHtml += '</tr>';
         
-        headerHtml += '<tr><td>Work Days</td>';
+        headerHtml += '<tr><td colspan="2">Work Days</td>';
         months.forEach(month => {
             headerHtml += `<td colspan="2" onclick="editWorkDay('${month}',${workDays[month]||0})">${workDays[month]||0}</td>`;
         });
@@ -444,9 +449,9 @@ async function loadPlanData() {
         
         tbody.innerHTML = '';
         Object.values(itemGroups).forEach(item => {
-            let rowHtml = `<td>
+            let rowHtml = `<td>${item.line1}</td><td>
                 <div class="item-name">${item.itemName} ${item.itemDesc}</div>
-                <div class="item-details">${item.itemCode} • Line ${item.line1}</div>
+                <div class="item-details">${item.itemCode}</div>
             </td>`;
             
             months.forEach(month => {
@@ -464,8 +469,8 @@ async function loadPlanData() {
         });
     } catch (error) {
         console.error('Error loading plan data:', error);
-        tbody.innerHTML = '<tr><td colspan="3">Error loading plan data</td></tr>';
-        thead.innerHTML = '<tr><th>Line</th><th>Code</th><th>Description</th></tr>';
+        tbody.innerHTML = '<tr><td colspan="2">Error loading plan data</td></tr>';
+        thead.innerHTML = '<tr><th>Line</th><th>Item</th></tr>';
     }
 }
 
@@ -598,21 +603,7 @@ async function importWorkDays() {
     }
 }
 
-function filterTable(searchTerm) {
-    const tbody = document.getElementById('data-table-body');
-    const rows = tbody.querySelectorAll('tr');
-    
-    if (!searchTerm) {
-        rows.forEach(row => row.style.display = '');
-        return;
-    }
-    
-    const term = searchTerm.toLowerCase();
-    rows.forEach(row => {
-        const text = row.textContent.toLowerCase();
-        row.style.display = text.includes(term) ? '' : 'none';
-    });
-}
+
 
 function openHolidaysModal() {
     const now = new Date();

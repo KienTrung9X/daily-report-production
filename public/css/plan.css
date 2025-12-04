@@ -13,7 +13,7 @@
     border-collapse: separate; /* Required for sticky headers */
     border-spacing: 0;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-    font-size: 13px; /* Slightly smaller for compactness */
+    font-size: 14px;
 }
 
 /* Headers */
@@ -28,6 +28,8 @@
     border-bottom: 1px solid #cbd5e1;
     white-space: nowrap;
     box-sizing: border-box;
+    width: 80px;
+    min-width: 80px;
 }
 
 /* Body First Column (Item) Sticky */
@@ -70,7 +72,7 @@
 }
 
 .subheader-qty, .subheader-daily {
-    font-size: 11px;
+    font-size: 14px;
     text-align: center;
     font-weight: 600;
     padding: 4px;
@@ -109,6 +111,9 @@
     color: #334155;
     vertical-align: middle;
     height: 32px;
+    width: 80px;
+    min-width: 80px;
+    text-align: center;
 }
 
 /* Rows Hover */
@@ -154,11 +159,11 @@
 .item-name {
     font-weight: 600;
     color: #0f172a;
-    font-size: 13px;
+    font-size: 14px;
     margin-bottom: 2px;
 }
 .item-details {
-    font-size: 11px;
+    font-size: 14px;
     color: #94a3b8;
 }
 
@@ -203,7 +208,7 @@
 #plan-tab .data-table tbody tr:nth-child(n) td {
     font-weight: normal;
     color: #1e293b;
-    font-size: 13px;
+    font-size: 14px;
     background: white;
 }
 
@@ -211,14 +216,4 @@
     background: #f8fafc;
 }
 
-/* New classes for item column */
-.item-name {
-    font-weight: 600;
-    color: #0f172a;
-}
 
-.item-details {
-    font-size: 11px;
-    color: #94a3b8;
-    margin-top: 2px;
-}

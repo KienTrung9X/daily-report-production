@@ -23,6 +23,10 @@
             </div>
             <div class="card-body filters-grid">
                 <div class="filter-group">
+                    <label>Month</label>
+                    <input type="month" id="monthFilter" value="<%= year %>-<%= month.toString().padStart(2, '0') %>">
+                </div>
+                <div class="filter-group">
                     <label>Line</label>
                     <select id="lineFilter">
                         <option value="">All Lines</option>
@@ -33,10 +37,6 @@
                         <option value="315">315</option>
                         <option value="161">161</option>
                     </select>
-                </div>
-                <div class="filter-group">
-                    <label>Search</label>
-                    <input type="text" id="searchInput" placeholder="Search...">
                 </div>
                 <button class="btn-primary" onclick="loadData()">Refresh</button>
             </div>
