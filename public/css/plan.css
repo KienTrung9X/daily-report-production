@@ -1,46 +1,172 @@
+
+/* Base styling for the plan table to be more professional */
+#plan-tab .table-container {
+    max-height: 80vh;
+    overflow: auto;
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
 #plan-tab .data-table {
-    table-layout: auto;
-    font-size: 13px;
+    width: 100%;
+    border-collapse: separate; /* Required for sticky headers */
+    border-spacing: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    font-size: 13px; /* Slightly smaller for compactness */
 }
 
-#plan-tab .data-table th,
-#plan-tab .data-table td {
-    padding: 3px 8px;
+/* Headers */
+#plan-tab .data-table thead th {
+    background-color: #f1f5f9; /* Slate-100 */
+    color: #334155; /* Slate-700 */
+    font-weight: 600;
+    padding: 0 8px; /* Vertical padding handled by height */
+    height: 32px; /* Explicit height for row 1 */
+    text-align: center;
+    border-right: 1px solid #e2e8f0;
+    border-bottom: 1px solid #cbd5e1;
+    white-space: nowrap;
+    box-sizing: border-box;
 }
 
-#plan-tab .data-table thead th:nth-child(1),
-#plan-tab .data-table tbody td:nth-child(1) {
+/* Specific Header Styles */
+.month-header {
+    background-color: #e2e8f0 !important; /* Slightly darker for month groups */
+    color: #1e293b !important;
+    border-bottom: 1px solid #cbd5e1 !important;
+    font-size: 14px;
+}
+
+.subheader-qty, .subheader-daily {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #64748b; /* Slate-500 */
+    height: 28px !important; /* Row 2 is shorter */
+}
+
+.subheader-daily {
+    background-color: #f8fafc; /* Lighter than Qty to differentiate */
+}
+
+/* Sticky First Column (Item) */
+.sticky-item-header {
     position: sticky;
     left: 0;
-    width: 60px;
-    background: inherit;
-    z-index: 10;
+    z-index: 30;
+    background-color: #f1f5f9 !important;
+    border-right: 2px solid #cbd5e1 !important; /* Stronger divider */
+    text-align: left !important;
+    padding-left: 12px !important;
+    min-width: 280px;
+    width: 280px;
 }
 
-#plan-tab .data-table thead th:nth-child(2),
-#plan-tab .data-table tbody td:nth-child(2) {
+#plan-tab .data-table tbody td:first-child {
     position: sticky;
-    left: 60px;
-    width: 100px;
-    background: inherit;
-    z-index: 10;
-}
-
-#plan-tab .data-table thead th:nth-child(3),
-#plan-tab .data-table tbody td:nth-child(3) {
-    position: sticky;
-    left: 160px;
-    width: 250px;
-    background: inherit;
-    z-index: 10;
+    left: 0;
+    z-index: 20;
+    background-color: #ffffff;
+    border-right: 2px solid #cbd5e1; /* Stronger divider */
     text-align: left;
-    border-right: 1px solid #ddd;
+    padding-left: 12px;
 }
 
-#plan-tab .data-table thead th {
-    background: #1e3a5f;
-}
-
+/* Table Body */
 #plan-tab .data-table tbody td {
-    background: white;
+    padding: 4px 8px;
+    border-right: 1px solid #f1f5f9;
+    border-bottom: 1px solid #f1f5f9;
+    color: #334155;
+    vertical-align: middle;
+    height: 32px;
+}
+
+/* Rows Hover */
+#plan-tab .data-table tbody tr:hover td {
+    background-color: #f8fafc;
+}
+#plan-tab .data-table tbody tr:hover td:first-child {
+    background-color: #f8fafc; /* Ensure sticky column also highlights */
+}
+
+/* Work Days Row */
+.work-days-row td {
+    background-color: #fffbeb !important; /* Amber-50 (Yellow tint) */
+    font-weight: 600;
+    color: #b45309; /* Amber-700 */
+    border-bottom: 2px solid #e2e8f0 !important;
+    height: 32px; /* Fixed height for sticky calculation */
+    box-sizing: border-box;
+}
+.work-days-row td:first-child {
+    background-color: #fffbeb !important;
+    z-index: 35 !important; /* Higher than normal cells but lower than header corner */
+    position: sticky;
+    left: 0;
+    border-right: 2px solid #cbd5e1 !important;
+}
+
+/* Data Cells */
+.qty-cell {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    font-weight: 500;
+}
+
+.daily-cell {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    color: #64748b;
+    background-color: #fcfcfc;
+}
+
+/* Item Column Content */
+.item-name {
+    font-weight: 600;
+    color: #0f172a;
+    font-size: 13px;
+    margin-bottom: 2px;
+}
+.item-details {
+    font-size: 11px;
+    color: #94a3b8;
+}
+
+/* Input/Edit Styling */
+.editable-cell:hover {
+    cursor: pointer;
+    background-color: #e0f2fe !important; /* Light blue on hover for actionable cells */
+}
+
+/* Sticky Header positioning correction */
+/* Row 1: Months */
+#plan-tab .data-table thead tr:nth-child(1) th {
+    position: sticky;
+    top: 0;
+    z-index: 25;
+    height: 32px;
+}
+
+/* Row 2: Qty/Daily Subheaders */
+#plan-tab .data-table thead tr:nth-child(2) th {
+    position: sticky;
+    top: 32px; /* Matches height of Row 1 */
+    z-index: 25;
+    height: 28px;
+}
+
+/* Row 3: Work Days */
+#plan-tab .data-table thead tr:nth-child(3) th,
+#plan-tab .data-table thead tr:nth-child(3) td {
+    position: sticky;
+    top: 60px; /* 32px + 28px */
+    z-index: 25;
+    height: 32px;
+}
+
+/* Fix z-index for corner */
+.sticky-item-header {
+    z-index: 40 !important;
 }
