@@ -415,17 +415,17 @@ async function loadPlanData() {
         
         if (months.length === 0) {
             tbody.innerHTML = '<tr><td colspan="3">No valid plan data</td></tr>';
-            thead.innerHTML = '<tr><th>Line</th><th>Code</th><th>Description</th></tr>';
+            thead.innerHTML = '<tr><th>Item</th></tr>';
             return;
         }
         
-        let headerHtml = '<tr><th>Line</th><th>Code</th><th>Description</th>';
+        let headerHtml = '<tr><th>Item</th>';
         months.forEach(month => {
             headerHtml += `<th>${month}</th><th>Daily</th>`;
         });
         headerHtml += '</tr>';
         
-        headerHtml += '<tr><td colspan="3">Work Days</td>';
+        headerHtml += '<tr><td colspan="1">Work Days</td>';
         months.forEach(month => {
             headerHtml += `<td onclick="editWorkDay('${month}',${workDays[month]||0})">${workDays[month]||0}</td><td>-</td>`;
         });
@@ -456,7 +456,10 @@ async function loadPlanData() {
         
         tbody.innerHTML = '';
         Object.values(itemGroups).forEach(item => {
-            let rowHtml = `<td>${item.line1}</td><td>${item.itemCode}</td><td>${item.itemName} ${item.itemDesc}</td>`;
+            let rowHtml = `<td>
+                <div class="item-name">${item.itemName} ${item.itemDesc}</div>
+                <div class="item-details">${item.itemCode} • Line ${item.line1}</div>
+            </td>`;
             
             months.forEach(month => {
                 const qty = item.months[month] || 0;
