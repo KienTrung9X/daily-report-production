@@ -415,19 +415,25 @@ async function loadPlanData() {
         
         if (months.length === 0) {
             tbody.innerHTML = '<tr><td colspan="3">No valid plan data</td></tr>';
-            thead.innerHTML = '<tr><th>Line</th><th>Code</th><th>Description</th></tr>';
+            thead.innerHTML = '<tr><th>Item</th></tr>';
             return;
         }
         
-        let headerHtml = '<tr><th>Line</th><th>Code</th><th>Description</th>';
+        let headerHtml = '<tr><th rowspan="2" class="sticky-item-header">Item</th>';
         months.forEach(month => {
-            headerHtml += `<th>${month}</th><th>Daily</th>`;
+            headerHtml += `<th colspan="2" class="month-header">${month}</th>`;
+        });
+        headerHtml += '</tr>';
+
+        headerHtml += '<tr>';
+        months.forEach(month => {
+            headerHtml += `<th class="subheader-qty">Qty</th><th class="subheader-daily">Daily</th>`;
         });
         headerHtml += '</tr>';
         
-        headerHtml += '<tr><td colspan="3">Work Days</td>';
+        headerHtml += '<tr><td colspan="1" style="font-weight: bold; background-color: #f8fafc;">Work Days</td>';
         months.forEach(month => {
-            headerHtml += `<td onclick="editWorkDay('${month}',${workDays[month]||0})">${workDays[month]||0}</td><td>-</td>`;
+            headerHtml += `<td onclick="editWorkDay('${month}',${workDays[month]||0})">${workDays[month]||0}</td><td class="daily-col">-</td>`;
         });
         headerHtml += '</tr>';
         thead.innerHTML = headerHtml;
@@ -456,7 +462,10 @@ async function loadPlanData() {
         
         tbody.innerHTML = '';
         Object.values(itemGroups).forEach(item => {
-            let rowHtml = `<td>${item.line1}</td><td>${item.itemCode}</td><td>${item.itemName} ${item.itemDesc}</td>`;
+            let rowHtml = `<td>
+                <div class="item-name">${item.itemName} ${item.itemDesc}</div>
+                <div class="item-details">${item.itemCode} • Line ${item.line1}</div>
+            </td>`;
             
             months.forEach(month => {
                 const qty = item.months[month] || 0;
@@ -464,7 +473,7 @@ async function loadPlanData() {
                 const dailyProduct = workDay > 0 ? ((qty * 1000) / workDay).toFixed(0) : 0;
                 
                 rowHtml += `<td onclick="editPlanQty('${item.itemCode}','${month}',${qty})">${parseFloat(qty).toLocaleString()}</td>`;
-                rowHtml += `<td>${parseInt(dailyProduct).toLocaleString()}</td>`;
+                rowHtml += `<td class="daily-col">${parseInt(dailyProduct).toLocaleString()}</td>`;
             });
             
             const tr = document.createElement('tr');
