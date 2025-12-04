@@ -2,7 +2,6 @@ let currentData = [];
 let currentYear = 0;
 let currentMonth = 0;
 let currentWeek = '';
-let currentViewMode = 'pivot';
 let currentTab = 'production';
 let previewData = [];
 let workDaysPreviewData = {};
@@ -50,13 +49,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
     
-    document.querySelectorAll('input[name="viewMode"]').forEach(radio => {
-        radio.addEventListener('change', (e) => {
-            currentViewMode = e.target.value;
-            loadData();
-        });
-    });
-    
     let searchTimeout;
     document.getElementById('searchInput').addEventListener('input', (e) => {
         clearTimeout(searchTimeout);
@@ -81,13 +73,11 @@ async function loadData() {
         
         let url;
         if (startDate && endDate) {
-            url = `/api/production?startDate=${startDate.replace(/-/g, '')}&endDate=${endDate.replace(/-/g, '')}`;
+            url = `/api/production?startDate=${startDate.replace(/-/g, '')}&endDate=${endDate.replace(/-/g, '')}&detailed=true`;
         } else {
-            url = `/api/production?year=${currentYear}&month=${currentMonth}`;
+            url = `/api/production?year=${currentYear}&month=${currentMonth}&detailed=true`;
             if (currentWeek) url += `&week=${currentWeek}`;
         }
-        
-        if (currentViewMode === 'pivot') url += '&detailed=true';
         
         const selectedLine = document.getElementById('lineFilter').value;
         if (selectedLine) url += `&line=${selectedLine}`;
@@ -97,12 +87,7 @@ async function loadData() {
         currentData = result.data;
         
         if (result.summary) renderSummary(result.summary);
-        
-        if (currentViewMode === 'pivot') {
-            renderPivotTable(currentData, workDays, currentYear, currentMonth);
-        } else {
-            renderTable(currentData);
-        }
+        renderPivotTable(currentData, workDays, currentYear, currentMonth);
     } catch (error) {
         console.error('Error:', error);
         tbody.innerHTML = '<tr><td colspan="10">Error loading data</td></tr>';
@@ -117,33 +102,6 @@ function renderSummary(summary) {
     if (sumPlan) sumPlan.textContent = summary.totalPlan;
     if (sumAct) sumAct.textContent = summary.totalAct;
     if (percentEl) percentEl.textContent = summary.totalPercent + '%';
-}
-
-function renderTable(data) {
-    const thead = document.getElementById('data-table-header');
-    const tbody = document.getElementById('data-table-body');
-    
-    thead.innerHTML = '<tr><th>Line</th><th>Item</th><th>Code</th><th>Plan</th><th>Actual</th><th>%</th><th>Comment</th></tr>';
-    tbody.innerHTML = '';
-    
-    if (data.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="7">No data</td></tr>';
-        return;
-    }
-    
-    data.forEach(row => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-            <td>${row.LINE1}</td>
-            <td>${row.ITEM_NAME}</td>
-            <td>${row.ITEM}</td>
-            <td>${row.EST_PRO_QTY.toLocaleString()}</td>
-            <td>${row.ACT_PRO_QTY.toLocaleString()}</td>
-            <td>${row.PERCENTAGE}%</td>
-            <td onclick="openCommentModal('${row.ITEM}','${row.YEAR_MONTH}','${(row.COMMENT || '').replace(/'/g, "\\'")}')">${row.COMMENT || 'Add...'}</td>
-        `;
-        tbody.appendChild(tr);
-    });
 }
 
 function renderPivotTable(data, workDays, year, month) {
@@ -173,8 +131,21 @@ function renderPivotTable(data, workDays, year, month) {
             itemsMap[key].days[dayKey] = { plan: row.EST_PRO_QTY || 0, act: row.ACT_PRO_QTY || 0 };
         } else {
             itemsMap[key].days[dayKey].act += row.ACT_PRO_QTY || 0;
+            if (row.EST_PRO_QTY) itemsMap[key].days[dayKey].plan = row.EST_PRO_QTY;
         }
     });
+    
+    Object.values(itemsMap).forEach(itemGroup => {
+        const planQty = itemGroup.info.EST_PRO_QTY || 0;
+        sortedDays.forEach(day => {
+            if (!itemGroup.days[day]) {
+                itemGroup.days[day] = { plan: planQty, act: 0 };
+            }
+        });
+    });
+    
+    const upToDate = document.getElementById('upToDate').value;
+    const upToDateStr = upToDate ? upToDate.replace(/-/g, '') : '';
     
     let headerHtml = '<tr><th>Item</th><th>Metric</th>';
     sortedDays.forEach(dayStr => {
@@ -182,7 +153,13 @@ function renderPivotTable(data, workDays, year, month) {
         const m = dayStr.substring(4, 6);
         headerHtml += `<th>${d}/${m}</th>`;
     });
-    headerHtml += '<th>Total</th><th>Comment</th></tr>';
+    headerHtml += '<th class="col-total">Total</th>';
+    if (upToDateStr) {
+        const d = upToDateStr.substring(6, 8);
+        const m = upToDateStr.substring(4, 6);
+        headerHtml += `<th class="col-upto">Up To ${d}/${m}</th>`;
+    }
+    headerHtml += '<th>Comment</th></tr>';
     thead.innerHTML = headerHtml;
     
     tbody.innerHTML = '';
@@ -198,6 +175,22 @@ function renderPivotTable(data, workDays, year, month) {
                 totalAct += dayData.act;
             }
         });
+        
+        let upToPlan = 0;
+        let upToAct = 0;
+        if (upToDateStr) {
+            sortedDays.forEach(day => {
+                if (day <= upToDateStr) {
+                    const dayData = itemGroup.days[day];
+                    if (dayData) {
+                        const yearMonth = `${year}${month.toString().padStart(2, '0')}`;
+                        const workDaysInMonth = workDays[yearMonth] || 20;
+                        upToPlan += dayData.plan / workDaysInMonth;
+                        upToAct += dayData.act;
+                    }
+                }
+            });
+        }
         
         ['Plan', 'Act', '%'].forEach((metric, index) => {
             const tr = document.createElement('tr');
@@ -242,9 +235,11 @@ function renderPivotTable(data, workDays, year, month) {
             });
             
             if (metric === 'Plan') {
-                html += `<td>${Math.round(totalPlan / 1000).toLocaleString()}</td>`;
+                html += `<td class="col-total">${Math.round(totalPlan / 1000).toLocaleString()}</td>`;
+                if (upToDateStr) html += `<td class="col-upto">${Math.round(upToPlan / 1000).toLocaleString()}</td>`;
             } else if (metric === 'Act') {
-                html += `<td>${Math.round(totalAct / 1000).toLocaleString()}</td>`;
+                html += `<td class="col-total">${Math.round(totalAct / 1000).toLocaleString()}</td>`;
+                if (upToDateStr) html += `<td class="col-upto">${Math.round(upToAct / 1000).toLocaleString()}</td>`;
             } else {
                 if (totalPlan > 0) {
                     const pctVal = (totalAct / totalPlan * 100);
@@ -253,9 +248,22 @@ function renderPivotTable(data, workDays, year, month) {
                     if (pctVal >= 95) pctClass = 'pct-high';
                     else if (pctVal >= 80) pctClass = 'pct-medium';
                     else pctClass = 'pct-low';
-                    html += `<td class="${pctClass}">${pct}</td>`;
+                    html += `<td class="col-total ${pctClass}">${pct}</td>`;
                 } else {
-                    html += '<td>-</td>';
+                    html += '<td class="col-total">-</td>';
+                }
+                if (upToDateStr) {
+                    if (upToPlan > 0) {
+                        const pctVal = (upToAct / upToPlan * 100);
+                        const pct = pctVal.toFixed(0) + '%';
+                        let pctClass = '';
+                        if (pctVal >= 95) pctClass = 'pct-high';
+                        else if (pctVal >= 80) pctClass = 'pct-medium';
+                        else pctClass = 'pct-low';
+                        html += `<td class="col-upto ${pctClass}">${pct}</td>`;
+                    } else {
+                        html += '<td class="col-upto">-</td>';
+                    }
                 }
             }
             
@@ -414,26 +422,24 @@ async function loadPlanData() {
         }).filter(m => m))].sort();
         
         if (months.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="3">No valid plan data</td></tr>';
+            tbody.innerHTML = '<tr><td>No valid plan data</td></tr>';
             thead.innerHTML = '<tr><th>Item</th></tr>';
             return;
         }
         
-        let headerHtml = '<tr><th>Item</th>';
+        let headerHtml = '<tr><th rowspan="2">Item</th>';
         months.forEach(month => {
-            headerHtml += `<th colspan="2" class="month-header">${month}</th>`;
+            headerHtml += `<th colspan="2">${month}</th>`;
         });
-        headerHtml += '</tr>';
-
-        headerHtml += '<tr>';
+        headerHtml += '</tr><tr>';
         months.forEach(month => {
-            headerHtml += `<th class="subheader-qty">Qty</th><th class="subheader-daily">Daily</th>`;
+            headerHtml += `<th>Plan</th><th>Daily</th>`;
         });
         headerHtml += '</tr>';
         
-        headerHtml += '<tr><td colspan="1">Work Days</td>';
+        headerHtml += '<tr><td>Work Days</td>';
         months.forEach(month => {
-            headerHtml += `<td onclick="editWorkDay('${month}',${workDays[month]||0})">${workDays[month]||0}</td><td class="daily-col">-</td>`;
+            headerHtml += `<td colspan="2" onclick="editWorkDay('${month}',${workDays[month]||0})">${workDays[month]||0}</td>`;
         });
         headerHtml += '</tr>';
         thead.innerHTML = headerHtml;
@@ -470,10 +476,10 @@ async function loadPlanData() {
             months.forEach(month => {
                 const qty = item.months[month] || 0;
                 const workDay = workDays[month] || 0;
-                const dailyProduct = workDay > 0 ? ((qty * 1000) / workDay).toFixed(0) : 0;
+                const dailyProduct = workDay > 0 ? (qty / workDay).toFixed(2) : 0;
                 
                 rowHtml += `<td onclick="editPlanQty('${item.itemCode}','${month}',${qty})">${parseFloat(qty).toLocaleString()}</td>`;
-                rowHtml += `<td class="daily-col">${parseInt(dailyProduct).toLocaleString()}</td>`;
+                rowHtml += `<td>${parseFloat(dailyProduct).toLocaleString()}</td>`;
             });
             
             const tr = document.createElement('tr');

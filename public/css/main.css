@@ -251,9 +251,9 @@ button {
 .data-table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 1rem;
+    font-size: 14px;
     font-variant-numeric: tabular-nums;
-    font-family: 'Inter', 'Segoe UI', sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     table-layout: fixed;
 }
 
@@ -263,7 +263,7 @@ button {
     padding: 10px 12px;
     text-align: center;
     font-weight: 600;
-    font-size: 13px;
+    font-size: 14px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
     position: sticky;
@@ -294,6 +294,7 @@ button {
     border-bottom: 1px solid #f1f5f9;
     text-align: center;
     vertical-align: middle;
+    font-size: 14px;
 }
 
 .data-table td:first-child {
@@ -313,7 +314,7 @@ button {
     text-align: center;
     font-weight: 500;
     color: #94a3b8;
-    font-size: 10px;
+    font-size: 14px;
     text-transform: uppercase;
     letter-spacing: 0;
     background: white;
@@ -323,7 +324,7 @@ button {
 }
 
 .data-table tbody tr:first-child td:first-child {
-    font-size: 15px;
+    font-size: 14px;
     padding-top: 8px;
     border-top: 2px solid #cbd5e1;
 }
@@ -353,7 +354,7 @@ button {
 
 .data-table tbody tr:nth-child(3n) td {
     font-weight: 600;
-    font-size: 15px;
+    font-size: 14px;
 }
 
 .data-table td[onclick] {
@@ -373,6 +374,9 @@ button {
 .pct-medium { color: #f59e0b !important; font-weight: 700 !important; }
 .pct-low { color: #ef4444 !important; font-weight: 700 !important; background: #fef2f2 !important; }
 .val-zero { background: #fee2e2 !important; color: #991b1b !important; }
+
+.col-total { background: #e0f2fe !important; font-weight: 600 !important; }
+.col-upto { background: #fef3c7 !important; font-weight: 600 !important; }
 
 .modal {
     display: none;

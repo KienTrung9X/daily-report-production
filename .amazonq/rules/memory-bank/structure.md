@@ -6,123 +6,144 @@
 daily-report-production/
 ├── public/                    # Static client-side assets
 │   ├── css/                   # Stylesheets
-│   │   ├── style.css          # Main application styles
-│   │   ├── pivot.css          # Pivot table styles
-│   │   └── pivot-improvements.css  # Enhanced pivot styles
+│   │   ├── main.css          # Global styles and table formatting
+│   │   └── plan.css          # Plan tab specific styles (sticky headers/columns)
 │   ├── js/                    # Client-side JavaScript
-│   │   ├── main.js            # Core application logic
-│   │   ├── charts.js          # Chart rendering
-│   │   ├── sparkline.js       # Sparkline visualizations
-│   │   ├── data-loader.js     # Data fetching utilities
-│   │   ├── table-enhanced.js  # Table functionality
-│   │   └── column-resizer.js  # Column resize handling
-│   └── production_data.json   # Static production data
-├── views/                     # Server-side templates
-│   └── index.ejs              # Main dashboard template
-├── server.js                  # Express server and API routes
-├── config.js                  # Configuration loader
-├── user-config.js             # User-specific database config
-├── db_service.js              # Database access layer
-├── data-cache.js              # Data caching service
-├── comments.json              # Production comments storage
-├── est_qty.json               # Manual estimated quantities
-├── plan_data.json             # Production plan data
-├── work_days.json             # Work days per month
-├── holidays.json              # Holiday calendar
-├── check-item.js              # Item validation utility
-├── test-group.js              # Testing utility
-└── package.json               # Dependencies and scripts
+│   │   └── app.js            # Main frontend application logic
+│   └── production_data.json   # Cached production data
+├── views/                     # EJS templates
+│   └── index.ejs             # Main dashboard page
+├── .amazonq/                  # Amazon Q configuration
+│   └── rules/                 # Project rules and documentation
+│       └── memory-bank/       # Memory bank documentation
+├── config.js                  # Database connection configuration
+├── user-config.js            # User-specific configuration (gitignored)
+├── db_service.js             # Database query service layer
+├── data-cache.js             # Data caching mechanism with auto-refresh
+├── server.js                 # Express server and API routes
+├── comments.json             # User comments storage
+├── est_qty.json              # Manual estimated quantities
+├── plan_data.json            # Production plan data
+├── work_days.json            # Work days per month
+├── holidays.json             # Holiday dates and descriptions
+├── check-item.js             # Item validation utility
+├── test-group.js             # Testing utility
+├── package.json              # Node.js dependencies and scripts
+└── .gitignore                # Git ignore rules
 ```
 
 ## Core Components
 
-### Server Layer (server.js)
-- Express.js web server
-- RESTful API endpoints for production data
-- Static file serving
-- EJS template rendering
-- Request routing and middleware
+### Backend Layer
 
-### Database Layer (db_service.js)
-- Access database connectivity via node-adodb
-- SQL query execution
-- Data retrieval with filtering
-- Comment persistence
+**server.js** - Express application server
+- Middleware configuration (body-parser, static files)
+- EJS view engine setup
+- RESTful API endpoints for production data, plans, comments, holidays
+- CSV export functionality
+- Data caching integration
 
-### Caching Layer (data-cache.js)
-- In-memory data caching
-- Auto-refresh mechanism
-- Performance optimization for repeated queries
+**db_service.js** - Database abstraction layer
+- Access database connection via node-adodb
+- SQL query execution for production data
+- Comment persistence (JSON file-based)
+- Data aggregation and filtering logic
 
-### Configuration (config.js, user-config.js)
-- Database connection parameters
-- Application settings
-- Line codes and row limits
-- Date range configurations
+**data-cache.js** - Performance optimization
+- In-memory caching of production data
+- Auto-refresh mechanism (periodic updates)
+- Cache invalidation strategies
+- Reduces database load for frequent queries
 
-### Client Layer (public/)
-- Single-page application interface
-- Dynamic data visualization
-- Interactive tables and charts
-- AJAX-based data loading
+**config.js** - Database configuration
+- Access database connection string
+- Database path configuration
+- Environment-specific settings
+
+**user-config.js** - User-specific overrides
+- Local configuration (not version controlled)
+- User-specific database paths or settings
+
+### Frontend Layer
+
+**views/index.ejs** - Main dashboard template
+- Server-side rendered HTML structure
+- Tab-based interface (Dashboard, Plan, Settings)
+- Dynamic year/month initialization
+- Client-side script inclusion
+
+**public/js/app.js** - Client application logic
+- Tab management and navigation
+- API communication (fetch requests)
+- Data table rendering and updates
+- Calendar view generation
+- Plan import/export handling
+- Comment and holiday management
+- Filter controls (year, month, week, line)
+
+**public/css/main.css** - Global styles
+- Table styling and formatting
+- Color schemes and themes
+- Responsive layout rules
+- General UI components
+
+**public/css/plan.css** - Plan-specific styles
+- Sticky header implementation (multi-row)
+- Sticky first column (item names)
+- Month column grouping
+- Daily vs. quantity column differentiation
+- Z-index layering for sticky elements
+
+### Data Storage
+
+**JSON Files** (File-based persistence)
+- `comments.json` - Item comments by key (ITEM_YEARMONTH)
+- `est_qty.json` - Manual estimated quantities overrides
+- `plan_data.json` - Production plans with metadata (quantity, line, item info)
+- `work_days.json` - Working days per month (YYYYMM format)
+- `holidays.json` - Holiday dates and descriptions
+- `production_data.json` - Cached production data from database
+
+**Access Database** (External)
+- Production data source (actual quantities)
+- Queried via ADODB connection
+- Contains: YEAR_MONTH, COMP_DAY, LINE1, LINE2, ITEM, ACT_PRO_QTY, etc.
 
 ## Architectural Patterns
 
 ### MVC-like Structure
-- **Model**: Database service and JSON data files
-- **View**: EJS templates and client-side rendering
-- **Controller**: Express route handlers in server.js
+- **Model**: db_service.js, JSON files (data layer)
+- **View**: EJS templates, CSS (presentation layer)
+- **Controller**: server.js API routes, app.js (logic layer)
 
-### Data Flow
-1. Client requests data via AJAX
-2. Server checks cache for existing data
-3. If cache miss, query database via db_service
-4. Apply filters and transformations
-5. Merge with plan data and comments
-6. Return JSON response to client
-7. Client renders data in tables/charts
+### API Design
+- RESTful endpoints with consistent naming
+- GET for data retrieval, POST for mutations, DELETE for removal
+- JSON request/response format
+- Query parameters for filtering (year, month, week, line, dates)
 
 ### Caching Strategy
-- Cache production data in memory
-- Auto-refresh on configurable intervals
-- Filter cached data by year/month
-- Fallback to database for cache misses
-- Reduces database load for repeated queries
-
-### Data Storage
-- **Database**: Primary production data (Access DB)
-- **JSON Files**: Configuration, plans, comments, holidays
-- **Memory Cache**: Frequently accessed production data
-
-## Component Relationships
-
-### Server Dependencies
-- server.js → config.js → user-config.js
-- server.js → db_service.js → config.js
-- server.js → data-cache.js → db_service.js
-
-### Client Dependencies
-- index.ejs → main.js → data-loader.js
-- main.js → charts.js, sparkline.js, table-enhanced.js
-- table-enhanced.js → column-resizer.js
+- Two-tier data access: cache-first, then database fallback
+- Auto-refresh cache to keep data current
+- Manual cache invalidation on data changes
+- Reduces database query load significantly
 
 ### Data Flow
-- Database → db_service → data-cache → server API → client
-- Client → server API → JSON files (comments, plans, holidays)
+1. Client requests data via API (app.js → server.js)
+2. Server checks cache (data-cache.js)
+3. If cache miss, query database (db_service.js)
+4. Merge with JSON file data (plans, comments, holidays)
+5. Process and calculate percentages
+6. Return JSON response to client
+7. Client renders data in tables/calendar
 
-## Key Design Decisions
+### Configuration Management
+- Base configuration in config.js (version controlled)
+- User overrides in user-config.js (gitignored)
+- Allows team sharing while supporting local customization
 
-### Separation of Concerns
-- Database logic isolated in db_service.js
-- Caching logic separated in data-cache.js
-- Client-side logic modularized by feature
-
-### File-based Storage
-- JSON files for user-editable data (plans, comments)
-- Enables easy backup and version control
-- Simplifies data persistence without additional database
-
-### Client-side Rendering
-- Server provides raw data via API
-- Client handles presentation and interactivity
-- Reduces server load and improves responsiveness
+### File-based Persistence
+- Simple JSON file storage for user-generated data
+- No additional database setup required
+- Easy backup and version control
+- Suitable for low-concurrency scenarios

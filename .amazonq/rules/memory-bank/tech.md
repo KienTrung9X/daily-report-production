@@ -1,144 +1,188 @@
 # Technology Stack
 
 ## Programming Languages
-- **JavaScript (Node.js)**: Server-side runtime environment
-- **JavaScript (ES6+)**: Client-side application logic
-- **HTML5**: Page structure and templates
-- **CSS3**: Styling and layout
-- **EJS**: Server-side templating
+- **JavaScript (Node.js)**: Backend server and API logic
+- **JavaScript (ES6+)**: Frontend client application
+- **HTML5**: Page structure via EJS templates
+- **CSS3**: Styling and responsive design
 
 ## Backend Technologies
 
-### Core Framework
-- **Express.js 4.18.2**: Web application framework
+### Runtime & Framework
+- **Node.js**: JavaScript runtime environment
+- **Express.js v4.18.2**: Web application framework
   - Routing and middleware
   - Static file serving
-  - RESTful API implementation
-
-### Database
-- **node-adodb 5.0.3**: Access database connectivity
-  - SQL query execution
-  - Windows-based database access
-  - ADODB provider integration
-
-### Middleware
-- **body-parser 1.20.2**: Request body parsing
-  - JSON payload handling
-  - URL-encoded form data
+  - RESTful API endpoints
 
 ### Template Engine
-- **EJS 3.1.9**: Embedded JavaScript templates
-  - Server-side HTML rendering
-  - Dynamic content generation
+- **EJS v3.1.9**: Embedded JavaScript templates
+  - Server-side rendering
+  - Dynamic HTML generation
+
+### Database & Data Access
+- **node-adodb v5.0.3**: Access database connector
+  - ADODB connection for legacy Access databases
+  - SQL query execution
+  - Windows-specific dependency
+
+### Middleware
+- **body-parser v1.20.2**: Request body parsing
+  - JSON payload parsing
+  - URL-encoded form data
+
+### Development Tools
+- **nodemon v3.0.1**: Development server with auto-reload
+  - File watching
+  - Automatic server restart on changes
 
 ## Frontend Technologies
 
-### Core Libraries
-- Native JavaScript (no framework dependencies)
-- DOM manipulation
-- Fetch API for AJAX requests
-- ES6+ features (arrow functions, template literals, destructuring)
-
-### Visualization
-- Custom chart implementations
-- Sparkline rendering
-- Calendar-based data display
-- Interactive pivot tables
+### Core Technologies
+- **Vanilla JavaScript**: No framework dependencies
+- **Fetch API**: HTTP requests to backend
+- **DOM Manipulation**: Direct DOM API usage
 
 ### UI Components
-- Dynamic data tables
-- Column resizing
-- Inline editing
-- Modal dialogs
-- Date pickers
+- Custom tab navigation system
+- Dynamic table generation
+- Calendar view rendering
+- Modal dialogs for data entry
 
-## Development Tools
-
-### Package Manager
-- **npm**: Dependency management and scripts
-
-### Development Server
-- **nodemon 3.0.1**: Auto-restart on file changes
-  - Development workflow optimization
-  - Hot reload capability
+### Styling Approach
+- Custom CSS (no frameworks)
+- Sticky positioning for table headers/columns
+- Responsive design patterns
+- Color-coded status indicators
 
 ## Data Storage
 
 ### Primary Database
-- Microsoft Access Database (.mdb/.accdb)
-- ADODB connection via OLE DB provider
+- **Microsoft Access Database**: Production data source
+  - Legacy system integration
+  - ADODB connection via COM
 
 ### File-based Storage
-- **JSON files**: Configuration and user data
-  - comments.json: Production comments
-  - est_qty.json: Manual estimated quantities
-  - plan_data.json: Production plans
-  - work_days.json: Work day configurations
-  - holidays.json: Holiday calendar
+- **JSON Files**: Application data persistence
+  - comments.json
+  - est_qty.json
+  - plan_data.json
+  - work_days.json
+  - holidays.json
+  - production_data.json (cache)
 
-## Development Commands
+## Development Setup
 
-### Start Production Server
+### Prerequisites
+- Node.js (v14+ recommended)
+- Windows OS (required for node-adodb)
+- Microsoft Access Database Engine
+- Access database file with production data
+
+### Installation
 ```bash
-npm start
+npm install
 ```
-Runs: `node server.js`
-- Starts Express server on dynamic port
-- Initializes data cache with auto-refresh
-- Serves production dashboard
 
-### Start Development Server
+### Configuration
+1. Copy `config.js` to `user-config.js`
+2. Update database path in `user-config.js`
+3. Ensure Access database is accessible
+
+### Running the Application
+
+**Development Mode** (with auto-reload):
 ```bash
 npm run dev
 ```
-Runs: `nodemon server.js`
-- Auto-restarts on file changes
-- Development mode with hot reload
-- Useful for rapid iteration
 
-## Environment Requirements
+**Production Mode**:
+```bash
+npm start
+```
 
-### Runtime
-- Node.js (compatible with ES6+)
-- Windows OS (for Access database connectivity)
+Server starts on random available port (PORT=0), actual port logged to console.
 
-### Database
-- Microsoft Access Database Engine
-- ADODB provider installed
-- Proper database file permissions
+### Project Scripts
+- `npm start`: Run server with node
+- `npm run dev`: Run server with nodemon (auto-reload)
 
-### Network
-- Port availability for Express server
-- Database file access permissions
-
-## Build System
-- No build step required
-- Direct JavaScript execution
-- Static assets served as-is
-- EJS templates compiled on-demand
-
-## Dependencies Overview
+## Dependencies
 
 ### Production Dependencies
 ```json
 {
-  "express": "^4.18.2",      // Web framework
-  "body-parser": "^1.20.2",  // Request parsing
-  "ejs": "^3.1.9",           // Templating
-  "node-adodb": "^5.0.3"     // Database access
+  "express": "^4.18.2",
+  "body-parser": "^1.20.2",
+  "ejs": "^3.1.9",
+  "node-adodb": "^5.0.3"
 }
 ```
 
 ### Development Dependencies
 ```json
 {
-  "nodemon": "^3.0.1"        // Development server
+  "nodemon": "^3.0.1"
 }
 ```
 
-## Architecture Style
-- Server-side rendering with EJS
-- RESTful API for data operations
-- Client-side SPA-like behavior
-- File-based configuration
-- In-memory caching layer
+## Build & Deployment
+
+### No Build Step Required
+- Pure Node.js application
+- No transpilation or bundling
+- Static assets served directly
+
+### Deployment Considerations
+- Windows server required (node-adodb dependency)
+- Access database must be accessible
+- File system write permissions for JSON files
+- Port configuration via environment variable
+
+## API Architecture
+
+### RESTful Endpoints
+- `GET /` - Main dashboard page
+- `GET /api/production` - Production data with caching
+- `GET /api/dashboard/calendar` - Calendar view data
+- `GET /api/data` - Legacy production data endpoint
+- `POST /api/est-qty` - Save manual estimated quantity
+- `POST /api/plan-import` - Import plan data
+- `GET /api/plan-data` - Retrieve plan data
+- `GET /api/work-days` - Retrieve work days
+- `GET /api/est-qty` - Retrieve estimated quantities
+- `POST /api/comments` - Save comments
+- `POST /api/plan-clear` - Clear all plan data
+- `POST /api/plan-edit` - Edit plan quantity
+- `POST /api/workday-edit` - Edit work days
+- `POST /api/workdays-bulk` - Bulk edit work days
+- `GET /api/holidays` - Retrieve holidays
+- `POST /api/holidays` - Add holiday
+- `DELETE /api/holidays/:date` - Delete holiday
+- `GET /api/export-csv` - Export data to CSV
+
+### Data Format
+- Request: JSON or URL-encoded
+- Response: JSON with data and summary objects
+- Date format: YYYYMMDD (string)
+- Month format: YYYYMM (string)
+
+## Performance Optimizations
+
+### Caching Strategy
+- In-memory data cache (data-cache.js)
+- Auto-refresh mechanism
+- Cache-first data retrieval
+- Reduces database query frequency
+
+### Frontend Optimizations
+- Minimal external dependencies
+- Direct DOM manipulation
+- Efficient table rendering
+- Lazy loading of data
+
+## Browser Compatibility
+- Modern browsers (Chrome, Firefox, Edge, Safari)
+- ES6+ JavaScript features
+- Fetch API support required
+- CSS Grid and Flexbox support

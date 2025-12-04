@@ -84,9 +84,9 @@
             <div class="card-header">
                 <h2>Production Data</h2>
                 <div class="card-actions">
-                    <div class="view-toggle">
-                        <label><input type="radio" name="viewMode" value="list"> List</label>
-                        <label><input type="radio" name="viewMode" value="pivot" checked> Pivot</label>
+                    <div class="filter-group" style="margin: 0;">
+                        <label style="margin-bottom: 0.25rem;">Up to Date</label>
+                        <input type="date" id="upToDate" onchange="loadData()">
                     </div>
                     <button class="btn-secondary" onclick="exportToExcel()">Export CSV</button>
                 </div>
