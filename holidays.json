@@ -8,7 +8,7 @@
     "description": "Holiday"
   },
   {
-    "date": "2025-11-07",
+    "date": "2025-11-02",
     "description": "Holiday"
   },
   {
@@ -16,7 +16,7 @@
     "description": "Holiday"
   },
   {
-    "date": "2025-11-14",
+    "date": "2025-11-09",
     "description": "Holiday"
   },
   {
@@ -24,7 +24,7 @@
     "description": "Holiday"
   },
   {
-    "date": "2025-11-21",
+    "date": "2025-11-16",
     "description": "Holiday"
   },
   {
@@ -32,11 +32,47 @@
     "description": "Holiday"
   },
   {
-    "date": "2025-11-28",
+    "date": "2025-11-23",
     "description": "Holiday"
   },
   {
     "date": "2025-11-29",
+    "description": "Holiday"
+  },
+  {
+    "date": "2025-11-30",
+    "description": "Holiday"
+  },
+  {
+    "date": "2025-12-06",
+    "description": "Holiday"
+  },
+  {
+    "date": "2025-12-12",
+    "description": "Holiday"
+  },
+  {
+    "date": "2025-12-13",
+    "description": "Holiday"
+  },
+  {
+    "date": "2025-12-20",
+    "description": "Holiday"
+  },
+  {
+    "date": "2025-12-24",
+    "description": "Holiday"
+  },
+  {
+    "date": "2025-12-25",
+    "description": "Holiday"
+  },
+  {
+    "date": "2025-12-26",
+    "description": "Holiday"
+  },
+  {
+    "date": "2025-12-27",
     "description": "Holiday"
   }
 ]

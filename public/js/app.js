@@ -54,15 +54,26 @@ async function loadData() {
     thead.innerHTML = '';
     
     try {
-        const workDaysResponse = await fetch('/api/work-days');
+        const [workDaysResponse, workingDaysResponse] = await Promise.all([
+            fetch('/api/work-days'),
+            fetch('/api/working-days')
+        ]);
         const workDays = await workDaysResponse.json();
+        const workingDaysData = await workingDaysResponse.json();
+        const workingDayDates = new Set(workingDaysData);
         const startDate = document.getElementById('startDate').value;
         const endDate = document.getElementById('endDate').value;
         const fiscalYear = document.getElementById('fiscalYearFilter').value;
         
-        let url = `/api/production?fiscalYear=${fiscalYear}&detailed=true`;
+        let url;
         if (startDate && endDate) {
-            url += `&startDate=${startDate.replace(/-/g, '')}&endDate=${endDate.replace(/-/g, '')}`;
+            url = `/api/production?fiscalYear=${fiscalYear}&detailed=true&startDate=${startDate.replace(/-/g, '')}&endDate=${endDate.replace(/-/g, '')}`;
+        } else {
+            // Chỉ lấy dữ liệu tháng hiện tại
+            const yearMonth = `${currentYear}${currentMonth.toString().padStart(2, '0')}`;
+            const firstDay = `${yearMonth}01`;
+            const lastDay = `${yearMonth}${new Date(currentYear, currentMonth, 0).getDate()}`;
+            url = `/api/production?fiscalYear=${fiscalYear}&detailed=true&startDate=${firstDay}&endDate=${lastDay}`;
         }
         
         const selectedLine = document.getElementById('lineFilter').value;
@@ -71,8 +82,11 @@ async function loadData() {
         const response = await fetch(url);
         const result = await response.json();
         currentData = result.data;
+        console.log('API URL:', url);
+        console.log('Current Year:', currentYear, 'Current Month:', currentMonth);
+        console.log('Data received:', currentData.length, 'rows');
         
-        renderPivotTable(currentData, workDays, currentYear, currentMonth);
+        renderPivotTable(currentData, workDays, currentYear, currentMonth, workingDayDates);
     } catch (error) {
         console.error('Error:', error);
         tbody.innerHTML = '<tr><td colspan="10">Error loading data</td></tr>';
@@ -84,12 +98,12 @@ function renderSummary(summary) {
     const sumAct = document.getElementById('sum-act');
     const percentEl = document.getElementById('sum-percent');
     
-    if (sumPlan) sumPlan.textContent = summary.totalPlan;
-    if (sumAct) sumAct.textContent = summary.totalAct;
+    if (sumPlan) sumPlan.textContent = summary.totalPlan + ' km';
+    if (sumAct) sumAct.textContent = summary.totalAct + ' km';
     if (percentEl) percentEl.textContent = summary.totalPercent + '%';
 }
 
-function renderPivotTable(data, workDays, year, month) {
+function renderPivotTable(data, workDays, year, month, workingDayDates = new Set()) {
     const thead = document.getElementById('data-table-header');
     const tbody = document.getElementById('data-table-body');
     
@@ -100,22 +114,25 @@ function renderPivotTable(data, workDays, year, month) {
         return;
     }
     
-    const startDate = document.getElementById('startDate').value.replace(/-/g, '');
-    const endDate = document.getElementById('endDate').value.replace(/-/g, '');
+    const startDateInput = document.getElementById('startDate').value;
+    const endDateInput = document.getElementById('endDate').value;
+    const startDate = startDateInput ? startDateInput.replace(/-/g, '') : '';
+    const endDate = endDateInput ? endDateInput.replace(/-/g, '') : '';
     
+    // Sử dụng danh sách working days từ file JSON
     const daysSet = new Set();
-    data.forEach(row => {
-        if (row.COMP_DAY) {
-            const compDay = row.COMP_DAY.toString();
-            if (startDate && endDate) {
-                if (compDay >= startDate && compDay <= endDate) {
-                    daysSet.add(compDay);
-                }
-            } else {
-                daysSet.add(compDay);
-            }
+    const today = new Date();
+    const todayStr = `${today.getFullYear()}${(today.getMonth()+1).toString().padStart(2,'0')}${today.getDate().toString().padStart(2,'0')}`;
+    
+    // Lọc working days theo tháng hiện tại và đến ngày hiện tại
+    const yearMonth = `${year}${month.toString().padStart(2, '0')}`;
+    workingDayDates.forEach(dateStr => {
+        const dateFormatted = dateStr.replace(/-/g, '');
+        if (dateFormatted.startsWith(yearMonth) && dateFormatted <= todayStr) {
+            daysSet.add(dateFormatted);
         }
     });
+    
     const sortedDays = Array.from(daysSet).sort();
     console.log('Sorted days:', sortedDays);
     console.log('Data length:', data.length);
@@ -140,7 +157,7 @@ function renderPivotTable(data, workDays, year, month) {
     const upToDate = document.getElementById('upToDate').value;
     const upToDateStr = upToDate ? upToDate.replace(/-/g, '') : '';
     
-    let headerHtml = '<tr><th>Item</th><th>Metric</th>';
+    let headerHtml = '<tr><th>Item</th><th class="sticky-metric" style="position: sticky !important; left: 250px !important; z-index: 35 !important; background: #1e3a5f !important;">Metric</th>';
     sortedDays.forEach(dayStr => {
         const d = dayStr.substring(6, 8);
         const m = dayStr.substring(4, 6);
@@ -161,16 +178,23 @@ function renderPivotTable(data, workDays, year, month) {
     
     Object.values(itemsMap).forEach(itemGroup => {
         const info = itemGroup.info;
-        let totalPlan = 0;
+        const monthPlans = new Map();
         let totalAct = 0;
         
         sortedDays.forEach(day => {
             const dayData = itemGroup.days[day];
             if (dayData) {
-                totalPlan += dayData.plan;
+                const dayStr = day.toString();
+                const yearMonth = dayStr.substring(0, 6);
+                
+                if (!monthPlans.has(yearMonth) && dayData.plan > 0) {
+                    monthPlans.set(yearMonth, dayData.plan);
+                }
                 totalAct += dayData.act;
             }
         });
+        
+        const totalPlan = Array.from(monthPlans.values()).reduce((sum, plan) => sum + plan, 0);
         
         grandTotalPlan += totalPlan;
         grandTotalAct += totalAct;
@@ -201,41 +225,39 @@ function renderPivotTable(data, workDays, year, month) {
             if (index === 0) {
                 html += `<td rowspan="3" style="max-width: 250px;"><div style="font-weight: 600; color: #0f172a;">${info.ITEM_NAME}</div><div style="font-size: 11px; color: #94a3b8; margin-top: 2px;">${info.ITEM} • Line ${info.LINE1}</div></td>`;
             }
-            html += `<td>${metric}</td>`;
+            html += `<td class="sticky-metric" style="position: sticky !important; left: 250px !important; z-index: 25 !important; background: white !important;">${metric}</td>`;
             
             sortedDays.forEach(day => {
                 const dayData = itemGroup.days[day];
-                if (dayData) {
-                    const dayStr = day.toString();
-                    const dayYear = dayStr.substring(0, 4);
-                    const dayMonth = dayStr.substring(4, 6);
-                    const yearMonth = `${dayYear}${dayMonth}`;
-                    const workDaysInMonth = workDays[yearMonth] || 20;
-                    
-                    if (metric === 'Plan') {
-                        const dailyPlanKm = dayData.plan > 0 ? Math.round(dayData.plan / workDaysInMonth / 1000) : 0;
-                        html += `<td>${dailyPlanKm || '-'}</td>`;
-                    } else if (metric === 'Act') {
-                        const actKm = Math.round(dayData.act / 1000);
-                        const dailyPlan = dayData.plan > 0 ? dayData.plan / workDaysInMonth : 0;
-                        const isZero = actKm === 0 && dailyPlan > 0;
-                        html += `<td class="${isZero ? 'val-zero' : ''}">${actKm || '-'}</td>`;
-                    } else {
-                        const dailyPlan = dayData.plan > 0 ? dayData.plan / workDaysInMonth : 0;
-                        if (dailyPlan > 0) {
-                            const pctVal = (dayData.act / dailyPlan * 100);
-                            const pct = pctVal.toFixed(0) + '%';
-                            let pctClass = '';
-                            if (pctVal >= 95) pctClass = 'pct-high';
-                            else if (pctVal >= 80) pctClass = 'pct-medium';
-                            else pctClass = 'pct-low';
-                            html += `<td class="${pctClass}">${pct}</td>`;
-                        } else {
-                            html += '<td>-</td>';
-                        }
-                    }
+                const dayStr = day.toString();
+                const dayYear = dayStr.substring(0, 4);
+                const dayMonth = dayStr.substring(4, 6);
+                const yearMonth = `${dayYear}${dayMonth}`;
+                const workDaysInMonth = workDays[yearMonth] || 20;
+                const monthPlan = info.EST_PRO_QTY || 0;
+                
+                if (metric === 'Plan') {
+                    const dailyPlanKm = monthPlan > 0 ? Math.round(monthPlan / workDaysInMonth / 1000) : 0;
+                    html += `<td>${dailyPlanKm || '-'}</td>`;
+                } else if (metric === 'Act') {
+                    const actKm = dayData ? Math.round(dayData.act / 1000) : 0;
+                    const dailyPlan = monthPlan > 0 ? monthPlan / workDaysInMonth : 0;
+                    const isZero = actKm === 0 && dailyPlan > 0;
+                    html += `<td class="${isZero ? 'val-zero' : ''}">${actKm || '-'}</td>`;
                 } else {
-                    html += '<td>-</td>';
+                    const dailyPlan = monthPlan > 0 ? monthPlan / workDaysInMonth : 0;
+                    const actVal = dayData ? dayData.act : 0;
+                    if (dailyPlan > 0) {
+                        const pctVal = (actVal / dailyPlan * 100);
+                        const pct = pctVal.toFixed(0) + '%';
+                        let pctClass = '';
+                        if (pctVal >= 95) pctClass = 'pct-high';
+                        else if (pctVal >= 80) pctClass = 'pct-medium';
+                        else pctClass = 'pct-low';
+                        html += `<td class="${pctClass}">${pct}</td>`;
+                    } else {
+                        html += '<td>-</td>';
+                    }
                 }
             });
             
@@ -274,7 +296,9 @@ function renderPivotTable(data, workDays, year, month) {
             
             if (index === 0) {
                 const comment = (info.COMMENT || '').replace(/'/g, "\\'");
-                html += `<td rowspan="3" onclick="openCommentModal('${info.ITEM}','${info.YEAR_MONTH}','${comment}')">${info.COMMENT || 'Add...'}</td>`;
+                const hasComment = info.COMMENT && info.COMMENT.trim() !== '';
+                const commentClass = hasComment ? 'has-comment' : '';
+                html += `<td rowspan="3" class="${commentClass}" onclick="openCommentModal('${info.ITEM}','${info.YEAR_MONTH}','${comment}')">${info.COMMENT || 'Add...'}</td>`;
             }
             
             tr.innerHTML = html;
@@ -283,9 +307,10 @@ function renderPivotTable(data, workDays, year, month) {
     });
     
     const grandTotalPercent = grandTotalPlan > 0 ? ((grandTotalAct / grandTotalPlan) * 100).toFixed(2) : 0;
+    console.log('Grand Total Plan (m):', grandTotalPlan, 'Grand Total Act (m):', grandTotalAct);
     renderSummary({
-        totalPlan: grandTotalPlan.toLocaleString(),
-        totalAct: grandTotalAct.toLocaleString(),
+        totalPlan: Math.round(grandTotalPlan / 1000).toLocaleString(),
+        totalAct: Math.round(grandTotalAct / 1000).toLocaleString(),
         totalPercent: grandTotalPercent
     });
 }
@@ -710,4 +735,60 @@ function openModal(modalId) {
 
 function closeModal(modalId) {
     document.getElementById(modalId).classList.remove('active');
+}
+
+async function captureScreenshot() {
+    const productionTab = document.getElementById('production-tab');
+    if (!productionTab) return;
+    
+    // Lưu scroll position
+    const scrollY = window.scrollY;
+    const scrollX = window.scrollX;
+    
+    // Scroll về đầu trang
+    window.scrollTo(0, 0);
+    
+    // Tạm thời bỏ giới hạn chiều cao
+    const tableContainer = productionTab.querySelector('.table-container');
+    const originalMaxHeight = tableContainer.style.maxHeight;
+    const originalOverflow = tableContainer.style.overflow;
+    tableContainer.style.maxHeight = 'none';
+    tableContainer.style.overflow = 'visible';
+    
+    try {
+        const canvas = await html2canvas(productionTab, {
+            scale: 1.5,
+            backgroundColor: '#ffffff',
+            logging: false,
+            useCORS: true,
+            width: productionTab.scrollWidth,
+            height: productionTab.scrollHeight,
+            windowWidth: productionTab.scrollWidth,
+            windowHeight: productionTab.scrollHeight
+        });
+        
+        // Khôi phục
+        tableContainer.style.maxHeight = originalMaxHeight;
+        tableContainer.style.overflow = originalOverflow;
+        window.scrollTo(scrollX, scrollY);
+        
+        canvas.toBlob(blob => {
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            const now = new Date();
+            const filename = `production_report_${now.getFullYear()}${(now.getMonth()+1).toString().padStart(2,'0')}${now.getDate().toString().padStart(2,'0')}_${now.getHours()}${now.getMinutes()}.png`;
+            link.href = url;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        });
+    } catch (error) {
+        console.error('Screenshot error:', error);
+        alert('Failed to capture screenshot');
+        tableContainer.style.maxHeight = originalMaxHeight;
+        tableContainer.style.overflow = originalOverflow;
+        window.scrollTo(scrollX, scrollY);
+    }
 }

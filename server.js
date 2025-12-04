@@ -82,20 +82,18 @@ app.get('/api/production', async (req, res) => {
         let rawData;
         
         if (cached && cached.data && cached.data.length > 0) {
-            if (fiscalYear) {
+            if (startDate && endDate) {
+                rawData = cached.data.filter(row => {
+                    const compDay = row.COMP_DAY ? row.COMP_DAY.toString() : '';
+                    return compDay && compDay >= startDate && compDay <= endDate;
+                });
+            } else if (fiscalYear) {
                 const fyStart = `${fiscalYear}04`;
                 const fyEnd = `${fiscalYear + 1}03`;
                 rawData = cached.data.filter(row => {
                     const ym = row.YEAR_MONTH ? row.YEAR_MONTH.toString() : '';
                     return ym && ym >= fyStart && ym <= fyEnd;
                 });
-                
-                if (startDate && endDate) {
-                    rawData = rawData.filter(row => {
-                        const compDay = row.COMP_DAY ? row.COMP_DAY.toString() : '';
-                        return compDay && compDay >= startDate && compDay <= endDate;
-                    });
-                }
             } else {
                 const yearMonth = `${year}${month.toString().padStart(2, '0')}`;
                 rawData = cached.data.filter(row => row.YEAR_MONTH === yearMonth);
@@ -471,6 +469,68 @@ app.post('/api/workdays-bulk', (req, res) => {
 });
 
 
+
+// API to get working days
+app.get('/api/working-days', (req, res) => {
+    const workingDaysFile = path.join(__dirname, 'working_days.json');
+    let workingDays = [];
+    
+    if (fs.existsSync(workingDaysFile)) {
+        workingDays = JSON.parse(fs.readFileSync(workingDaysFile, 'utf8'));
+    }
+    
+    res.json(workingDays);
+});
+
+// API to add working day
+app.post('/api/working-days', (req, res) => {
+    const { date } = req.body;
+    if (!date) {
+        return res.status(400).json({ error: 'Date is required' });
+    }
+    
+    try {
+        const workingDaysFile = path.join(__dirname, 'working_days.json');
+        let workingDays = [];
+        
+        if (fs.existsSync(workingDaysFile)) {
+            workingDays = JSON.parse(fs.readFileSync(workingDaysFile, 'utf8'));
+        }
+        
+        if (!workingDays.includes(date)) {
+            workingDays.push(date);
+            workingDays.sort();
+            fs.writeFileSync(workingDaysFile, JSON.stringify(workingDays, null, 2));
+        }
+        
+        res.json({ success: true });
+    } catch (error) {
+        console.error('Error adding working day:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+// API to delete working day
+app.delete('/api/working-days/:date', (req, res) => {
+    const { date } = req.params;
+    
+    try {
+        const workingDaysFile = path.join(__dirname, 'working_days.json');
+        let workingDays = [];
+        
+        if (fs.existsSync(workingDaysFile)) {
+            workingDays = JSON.parse(fs.readFileSync(workingDaysFile, 'utf8'));
+        }
+        
+        workingDays = workingDays.filter(d => d !== date);
+        fs.writeFileSync(workingDaysFile, JSON.stringify(workingDays, null, 2));
+        
+        res.json({ success: true });
+    } catch (error) {
+        console.error('Error deleting working day:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
 
 // API to get holidays
 app.get('/api/holidays', (req, res) => {
