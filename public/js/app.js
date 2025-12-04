@@ -796,13 +796,85 @@ function applyFilters() {
 
 async function copyAsHTML() {
     const statsContainer = document.getElementById('stats-container');
-    const table = document.querySelector('.data-table');
+    const dataTable = document.querySelector('.data-table');
+    
+    // Build stats HTML as table
+    let statsHTML = '<table style="width: 100%; margin-bottom: 20px; border-collapse: collapse;">';
+    
+    statsContainer.querySelectorAll('[style*="grid-column"]').forEach(row => {
+        statsHTML += '<tr>';
+        row.querySelectorAll('.stat-card').forEach(card => {
+            const label = card.querySelector('.stat-label').textContent;
+            const value = card.querySelector('.stat-value').textContent;
+            const isHighlight = card.classList.contains('stat-highlight');
+            const borderColor = isHighlight ? '#10b981' : '#6366f1';
+            
+            statsHTML += `
+                <td style="background: #ffffff; padding: 15px; border-left: 4px solid ${borderColor}; box-shadow: 0 1px 3px rgba(0,0,0,0.1); width: 33.33%;">
+                    <div style="font-size: 14px; color: #64748b; font-weight: 500; margin-bottom: 8px;">${label}</div>
+                    <div style="font-size: 32px; font-weight: 700; color: #1e293b;">${value}</div>
+                </td>
+            `;
+        });
+        statsHTML += '</tr>';
+    });
+    statsHTML += '</table>';
+    
+    // Build data table HTML
+    const tableClone = dataTable.cloneNode(true);
+    tableClone.style.cssText = 'width: 100%; border-collapse: collapse; font-size: 16px; font-family: Arial, sans-serif;';
+    
+    tableClone.querySelectorAll('th').forEach(th => {
+        th.style.cssText = 'background: #1e3a5f; color: white; padding: 10px; text-align: center; font-weight: 600; border: 1px solid #334155;';
+        if (th.classList.contains('col-total')) th.style.background = '#0284c7';
+        if (th.classList.contains('col-upto')) th.style.background = '#f59e0b';
+    });
+    
+    tableClone.querySelectorAll('td').forEach(td => {
+        let bgColor = 'white';
+        let color = '#1e293b';
+        let fontWeight = 'normal';
+        
+        if (td.classList.contains('pct-high')) {
+            color = '#10b981';
+            fontWeight = '700';
+        }
+        if (td.classList.contains('pct-medium')) {
+            color = '#f59e0b';
+            fontWeight = '700';
+        }
+        if (td.classList.contains('pct-low')) {
+            color = '#ef4444';
+            fontWeight = '700';
+        }
+        if (td.classList.contains('val-zero')) color = '#991b1b';
+        if (td.classList.contains('col-total')) {
+            bgColor = '#e0f2fe';
+            fontWeight = '600';
+        }
+        if (td.classList.contains('col-upto')) {
+            bgColor = '#fef3c7';
+            fontWeight = '600';
+        }
+        if (td.classList.contains('has-comment')) {
+            bgColor = '#ef4444';
+            color = 'white';
+            fontWeight = '600';
+        }
+        
+        // Check parent row for font-weight
+        const row = td.parentElement;
+        const rowIndex = Array.from(row.parentElement.children).indexOf(row);
+        if (rowIndex % 3 === 1) fontWeight = '700'; // Act row
+        if (rowIndex % 3 === 2) fontWeight = '600'; // % row
+        
+        td.style.cssText = `padding: 8px; border: 1px solid #e2e8f0; text-align: center; background: ${bgColor}; color: ${color}; font-weight: ${fontWeight};`;
+    });
     
     const html = `
         <div style="font-family: Arial, sans-serif;">
-            ${statsContainer.outerHTML}
-            <br>
-            ${table.outerHTML}
+            ${statsHTML}
+            ${tableClone.outerHTML}
         </div>
     `;
     
