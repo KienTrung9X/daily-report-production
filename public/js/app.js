@@ -421,13 +421,19 @@ async function loadPlanData() {
         
         let headerHtml = '<tr><th>Item</th>';
         months.forEach(month => {
-            headerHtml += `<th>${month}</th><th>Daily</th>`;
+            headerHtml += `<th colspan="2" class="month-header">${month}</th>`;
+        });
+        headerHtml += '</tr>';
+
+        headerHtml += '<tr>';
+        months.forEach(month => {
+            headerHtml += `<th class="subheader-qty">Qty</th><th class="subheader-daily">Daily</th>`;
         });
         headerHtml += '</tr>';
         
         headerHtml += '<tr><td colspan="1">Work Days</td>';
         months.forEach(month => {
-            headerHtml += `<td onclick="editWorkDay('${month}',${workDays[month]||0})">${workDays[month]||0}</td><td>-</td>`;
+            headerHtml += `<td onclick="editWorkDay('${month}',${workDays[month]||0})">${workDays[month]||0}</td><td class="daily-col">-</td>`;
         });
         headerHtml += '</tr>';
         thead.innerHTML = headerHtml;
@@ -467,7 +473,7 @@ async function loadPlanData() {
                 const dailyProduct = workDay > 0 ? ((qty * 1000) / workDay).toFixed(0) : 0;
                 
                 rowHtml += `<td onclick="editPlanQty('${item.itemCode}','${month}',${qty})">${parseFloat(qty).toLocaleString()}</td>`;
-                rowHtml += `<td>${parseInt(dailyProduct).toLocaleString()}</td>`;
+                rowHtml += `<td class="daily-col">${parseInt(dailyProduct).toLocaleString()}</td>`;
             });
             
             const tr = document.createElement('tr');
