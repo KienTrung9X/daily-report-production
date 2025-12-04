@@ -137,6 +137,20 @@ input, select, textarea {
     font-family: inherit;
 }
 
+select[multiple] {
+    padding: 0.5rem;
+}
+
+select[multiple] option {
+    padding: 0.5rem;
+    margin-bottom: 2px;
+}
+
+select[multiple] option:checked {
+    background: var(--primary) !important;
+    color: white !important;
+}
+
 input:focus, select:focus, textarea:focus {
     outline: none;
     border-color: var(--primary);

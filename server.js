@@ -100,9 +100,10 @@ app.get('/api/production', async (req, res) => {
             }
             
             
-            // Apply filters
+            // Apply line filter
             if (lineFilter && rawData.length > 0) {
-                rawData = rawData.filter(row => row.LINE1 === lineFilter);
+                const lines = lineFilter.split(',').map(l => l.trim());
+                rawData = rawData.filter(row => lines.includes(row.LINE1));
             }
             if (week && rawData.length > 0) {
                 rawData = rawData.filter(row => {
@@ -118,12 +119,20 @@ app.get('/api/production', async (req, res) => {
                 });
             }
         } else {
-            rawData = await dbService.getData(year, month, null, detailed, startDate, endDate, lineFilter);
+            rawData = await dbService.getData(year, month, null, detailed, startDate, endDate, null);
+            if (lineFilter) {
+                const lines = lineFilter.split(',').map(l => l.trim());
+                rawData = rawData.filter(row => lines.includes(row.LINE1));
+            }
         }
         
         // Fallback to database if no data from cache
         if (!rawData || rawData.length === 0) {
-            rawData = await dbService.getData(year, month, null, detailed, startDate, endDate, lineFilter);
+            rawData = await dbService.getData(year, month, null, detailed, startDate, endDate, null);
+            if (lineFilter) {
+                const lines = lineFilter.split(',').map(l => l.trim());
+                rawData = rawData.filter(row => lines.includes(row.LINE1));
+            }
         }
         
         function getWeekNumber(d) {
@@ -172,8 +181,8 @@ app.get('/api/production', async (req, res) => {
                 estQty = manualEstQty[estQtyKey];
             } else if (planData[estQtyKey] !== undefined) {
                 let planQty = typeof planData[estQtyKey] === 'object' ? planData[estQtyKey].quantity : planData[estQtyKey];
-                // Convert km to m (plan is in km, actual is in m)
-                estQty = planQty * 1000;
+                // Line 312 is in kg, others are in km (need to convert to m)
+                estQty = row.LINE1 === '312' ? planQty : planQty * 1000;
             }
             
             return {
@@ -602,7 +611,14 @@ app.get('/api/export-csv', async (req, res) => {
         const month = parseInt(req.query.month) || (new Date().getMonth() + 1);
         const lineFilter = req.query.line;
         
-        const rawData = await dbService.getData(year, month, null, true, null, null, lineFilter);
+        let rawData;
+        if (lineFilter) {
+            const lines = lineFilter.split(',');
+            rawData = await dbService.getData(year, month, null, true, null, null, null);
+            rawData = rawData.filter(row => lines.includes(row.LINE1));
+        } else {
+            rawData = await dbService.getData(year, month, null, true, null, null, null);
+        }
         
         // Full CSV headers matching SQL query fields
         const headers = [

@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
     currentYear = parseInt(y);
     currentMonth = parseInt(m);
     
-    document.getElementById('lineFilter').value = '313';
+    // Multiple selection is set in HTML
     
     const now = new Date();
     const currentFY = now.getMonth() >= 3 ? now.getFullYear() : now.getFullYear() - 1;
@@ -76,8 +76,9 @@ async function loadData() {
             url = `/api/production?fiscalYear=${fiscalYear}&detailed=true&startDate=${firstDay}&endDate=${lastDay}`;
         }
         
-        const selectedLine = document.getElementById('lineFilter').value;
-        if (selectedLine) url += `&line=${selectedLine}`;
+        const lineSelect = document.getElementById('lineFilter');
+        const selectedLines = Array.from(lineSelect.selectedOptions).map(opt => opt.value);
+        if (selectedLines.length > 0) url += `&line=${selectedLines.join(',')}`;
         
         const response = await fetch(url);
         const result = await response.json();
@@ -98,14 +99,17 @@ function renderSummary(summary) {
     const sumAct = document.getElementById('sum-act');
     const percentEl = document.getElementById('sum-percent');
     
-    if (sumPlan) sumPlan.textContent = summary.totalPlan + ' km';
-    if (sumAct) sumAct.textContent = summary.totalAct + ' km';
+    if (sumPlan) sumPlan.textContent = summary.totalPlan;
+    if (sumAct) sumAct.textContent = summary.totalAct;
     if (percentEl) percentEl.textContent = summary.totalPercent + '%';
 }
 
 function renderPivotTable(data, workDays, year, month, workingDayDates = new Set()) {
     const thead = document.getElementById('data-table-header');
     const tbody = document.getElementById('data-table-body');
+    const lineSelect = document.getElementById('lineFilter');
+    const selectedLines = Array.from(lineSelect.selectedOptions).map(opt => opt.value);
+    const isLine312 = selectedLines.includes('312') && selectedLines.length === 1;
     
     if (!data || data.length === 0) {
         thead.innerHTML = '<tr><th>No data</th></tr>';
@@ -175,8 +179,20 @@ function renderPivotTable(data, workDays, year, month, workingDayDates = new Set
     tbody.innerHTML = '';
     let grandTotalPlan = 0;
     let grandTotalAct = 0;
+    const lineTotals = {}; // Track totals per line
     
-    Object.values(itemsMap).forEach(itemGroup => {
+    // Sort items: line 313 first, then 312, then others
+    const sortedItems = Object.values(itemsMap).sort((a, b) => {
+        const lineA = a.info.LINE1;
+        const lineB = b.info.LINE1;
+        if (lineA === '313' && lineB !== '313') return -1;
+        if (lineA !== '313' && lineB === '313') return 1;
+        if (lineA === '312' && lineB !== '312' && lineB !== '313') return -1;
+        if (lineA !== '312' && lineB === '312' && lineA !== '313') return 1;
+        return lineA.localeCompare(lineB);
+    });
+    
+    sortedItems.forEach(itemGroup => {
         const info = itemGroup.info;
         const monthPlans = new Map();
         let totalAct = 0;
@@ -198,6 +214,14 @@ function renderPivotTable(data, workDays, year, month, workingDayDates = new Set
         
         grandTotalPlan += totalPlan;
         grandTotalAct += totalAct;
+        
+        // Track line totals
+        const lineKey = info.LINE1;
+        if (!lineTotals[lineKey]) {
+            lineTotals[lineKey] = { plan: 0, act: 0 };
+        }
+        lineTotals[lineKey].plan += totalPlan;
+        lineTotals[lineKey].act += totalAct;
         
         let upToPlan = 0;
         let upToAct = 0;
@@ -237,13 +261,13 @@ function renderPivotTable(data, workDays, year, month, workingDayDates = new Set
                 const monthPlan = info.EST_PRO_QTY || 0;
                 
                 if (metric === 'Plan') {
-                    const dailyPlanKm = monthPlan > 0 ? Math.round(monthPlan / workDaysInMonth / 1000) : 0;
-                    html += `<td>${dailyPlanKm || '-'}</td>`;
+                    const dailyPlan = monthPlan > 0 ? Math.round(monthPlan / workDaysInMonth / (isLine312 ? 1 : 1000)) : 0;
+                    html += `<td>${dailyPlan || '-'}</td>`;
                 } else if (metric === 'Act') {
-                    const actKm = dayData ? Math.round(dayData.act / 1000) : 0;
+                    const actVal = dayData ? Math.round(dayData.act / (isLine312 ? 1 : 1000)) : 0;
                     const dailyPlan = monthPlan > 0 ? monthPlan / workDaysInMonth : 0;
-                    const isZero = actKm === 0 && dailyPlan > 0;
-                    html += `<td class="${isZero ? 'val-zero' : ''}">${actKm || '-'}</td>`;
+                    const isZero = actVal === 0 && dailyPlan > 0;
+                    html += `<td class="${isZero ? 'val-zero' : ''}">${actVal || '-'}</td>`;
                 } else {
                     const dailyPlan = monthPlan > 0 ? monthPlan / workDaysInMonth : 0;
                     const actVal = dayData ? dayData.act : 0;
@@ -262,11 +286,11 @@ function renderPivotTable(data, workDays, year, month, workingDayDates = new Set
             });
             
             if (metric === 'Plan') {
-                html += `<td class="col-total">${Math.round(totalPlan / 1000).toLocaleString()}</td>`;
-                if (upToDateStr) html += `<td class="col-upto">${Math.round(upToPlan / 1000).toLocaleString()}</td>`;
+                html += `<td class="col-total">${Math.round(totalPlan / (isLine312 ? 1 : 1000)).toLocaleString('de-DE')}</td>`;
+                if (upToDateStr) html += `<td class="col-upto">${Math.round(upToPlan / (isLine312 ? 1 : 1000)).toLocaleString('de-DE')}</td>`;
             } else if (metric === 'Act') {
-                html += `<td class="col-total">${Math.round(totalAct / 1000).toLocaleString()}</td>`;
-                if (upToDateStr) html += `<td class="col-upto">${Math.round(upToAct / 1000).toLocaleString()}</td>`;
+                html += `<td class="col-total">${Math.round(totalAct / (isLine312 ? 1 : 1000)).toLocaleString('de-DE')}</td>`;
+                if (upToDateStr) html += `<td class="col-upto">${Math.round(upToAct / (isLine312 ? 1 : 1000)).toLocaleString('de-DE')}</td>`;
             } else {
                 if (totalPlan > 0) {
                     const pctVal = (totalAct / totalPlan * 100);
@@ -306,12 +330,39 @@ function renderPivotTable(data, workDays, year, month, workingDayDates = new Set
         });
     });
     
-    const grandTotalPercent = grandTotalPlan > 0 ? ((grandTotalAct / grandTotalPlan) * 100).toFixed(2) : 0;
-    console.log('Grand Total Plan (m):', grandTotalPlan, 'Grand Total Act (m):', grandTotalAct);
-    renderSummary({
-        totalPlan: Math.round(grandTotalPlan / 1000).toLocaleString(),
-        totalAct: Math.round(grandTotalAct / 1000).toLocaleString(),
-        totalPercent: grandTotalPercent
+    // Render separate stats for each line
+    const statsContainer = document.getElementById('stats-container');
+    statsContainer.innerHTML = '';
+    
+    const lineNames = { '312': 'Forming', '313': 'Sewing' };
+    
+    Object.keys(lineTotals).sort((a, b) => {
+        if (a === '313') return -1;
+        if (b === '313') return 1;
+        return a.localeCompare(b);
+    }).forEach(lineKey => {
+        const totals = lineTotals[lineKey];
+        const unit = lineKey === '312' ? 'kg' : 'km';
+        const divisor = lineKey === '312' ? 1 : 1000;
+        const percent = totals.plan > 0 ? ((totals.act / totals.plan) * 100).toFixed(2) : 0;
+        const lineName = lineNames[lineKey] || `Line ${lineKey}`;
+        
+        statsContainer.innerHTML += `
+            <div style="grid-column: 1 / -1; display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;">
+                <div class="stat-card">
+                    <div class="stat-label">${lineName} - Plan</div>
+                    <div class="stat-value">${Math.round(totals.plan / divisor).toLocaleString('de-DE').replace(/\./g, ',')} ${unit}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">${lineName} - Actual</div>
+                    <div class="stat-value">${Math.round(totals.act / divisor).toLocaleString('de-DE').replace(/\./g, ',')} ${unit}</div>
+                </div>
+                <div class="stat-card stat-highlight">
+                    <div class="stat-label">${lineName} - Achievement</div>
+                    <div class="stat-value">${percent}%</div>
+                </div>
+            </div>
+        `;
     });
 }
 
@@ -531,9 +582,10 @@ async function loadPlanData() {
 }
 
 async function exportToExcel() {
-    const selectedLine = document.getElementById('lineFilter').value;
+    const lineSelect = document.getElementById('lineFilter');
+    const selectedLines = Array.from(lineSelect.selectedOptions).map(opt => opt.value);
     let url = `/api/export-csv?year=${currentYear}&month=${currentMonth}`;
-    if (selectedLine) url += `&line=${selectedLine}`;
+    if (selectedLines.length > 0) url += `&line=${selectedLines.join(',')}`;
     
     const link = document.createElement('a');
     link.href = url;
@@ -737,23 +789,56 @@ function closeModal(modalId) {
     document.getElementById(modalId).classList.remove('active');
 }
 
+function applyFilters() {
+    closeModal('filterModal');
+    loadData();
+}
+
+async function copyAsHTML() {
+    const statsContainer = document.getElementById('stats-container');
+    const table = document.querySelector('.data-table');
+    
+    const html = `
+        <div style="font-family: Arial, sans-serif;">
+            ${statsContainer.outerHTML}
+            <br>
+            ${table.outerHTML}
+        </div>
+    `;
+    
+    try {
+        await navigator.clipboard.write([
+            new ClipboardItem({
+                'text/html': new Blob([html], { type: 'text/html' })
+            })
+        ]);
+        alert('Copied! Paste vào Outlook bằng Ctrl+V');
+    } catch (error) {
+        console.error('Copy error:', error);
+        alert('Copy failed. Please try again.');
+    }
+}
+
 async function captureScreenshot() {
     const productionTab = document.getElementById('production-tab');
     if (!productionTab) return;
     
-    // Lưu scroll position
     const scrollY = window.scrollY;
     const scrollX = window.scrollX;
-    
-    // Scroll về đầu trang
     window.scrollTo(0, 0);
     
-    // Tạm thời bỏ giới hạn chiều cao
     const tableContainer = productionTab.querySelector('.table-container');
+    const filterSection = productionTab.querySelector('.card-actions');
+    const filterCard = productionTab.querySelector('.card');
     const originalMaxHeight = tableContainer.style.maxHeight;
     const originalOverflow = tableContainer.style.overflow;
+    const originalFilterDisplay = filterSection.style.display;
+    const originalFilterCardDisplay = filterCard.style.display;
+    
     tableContainer.style.maxHeight = 'none';
     tableContainer.style.overflow = 'visible';
+    filterSection.style.display = 'none';
+    filterCard.style.display = 'none';
     
     try {
         const canvas = await html2canvas(productionTab, {
@@ -767,9 +852,10 @@ async function captureScreenshot() {
             windowHeight: productionTab.scrollHeight
         });
         
-        // Khôi phục
         tableContainer.style.maxHeight = originalMaxHeight;
         tableContainer.style.overflow = originalOverflow;
+        filterSection.style.display = originalFilterDisplay;
+        filterCard.style.display = originalFilterCardDisplay;
         window.scrollTo(scrollX, scrollY);
         
         canvas.toBlob(blob => {
@@ -789,6 +875,8 @@ async function captureScreenshot() {
         alert('Failed to capture screenshot');
         tableContainer.style.maxHeight = originalMaxHeight;
         tableContainer.style.overflow = originalOverflow;
+        filterSection.style.display = originalFilterDisplay;
+        filterCard.style.display = originalFilterCardDisplay;
         window.scrollTo(scrollX, scrollY);
     }
 }
