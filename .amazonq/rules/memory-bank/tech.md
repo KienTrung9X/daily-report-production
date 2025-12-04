@@ -1,69 +1,144 @@
 # Technology Stack
 
 ## Programming Languages
-- **JavaScript (Node.js)** - Backend server and API development
-- **JavaScript (ES6+)** - Frontend client-side functionality
-- **HTML5** - Markup structure
-- **CSS3** - Styling and responsive design
-- **EJS** - Server-side templating engine
+- **JavaScript (Node.js)**: Server-side runtime environment
+- **JavaScript (ES6+)**: Client-side application logic
+- **HTML5**: Page structure and templates
+- **CSS3**: Styling and layout
+- **EJS**: Server-side templating
 
 ## Backend Technologies
-- **Node.js** - Runtime environment
-- **Express.js ^4.18.2** - Web application framework
-- **node-adodb ^5.0.3** - DB2 database connectivity
-- **body-parser ^1.20.2** - HTTP request body parsing
-- **EJS ^3.1.9** - Embedded JavaScript templating
 
-## Database
-- **IBM DB2** - Production data storage
-- **JSON Files** - Configuration and user data storage
-  - Comments, estimated quantities, plan data, holidays, work days
+### Core Framework
+- **Express.js 4.18.2**: Web application framework
+  - Routing and middleware
+  - Static file serving
+  - RESTful API implementation
+
+### Database
+- **node-adodb 5.0.3**: Access database connectivity
+  - SQL query execution
+  - Windows-based database access
+  - ADODB provider integration
+
+### Middleware
+- **body-parser 1.20.2**: Request body parsing
+  - JSON payload handling
+  - URL-encoded form data
+
+### Template Engine
+- **EJS 3.1.9**: Embedded JavaScript templates
+  - Server-side HTML rendering
+  - Dynamic content generation
+
+## Frontend Technologies
+
+### Core Libraries
+- Native JavaScript (no framework dependencies)
+- DOM manipulation
+- Fetch API for AJAX requests
+- ES6+ features (arrow functions, template literals, destructuring)
+
+### Visualization
+- Custom chart implementations
+- Sparkline rendering
+- Calendar-based data display
+- Interactive pivot tables
+
+### UI Components
+- Dynamic data tables
+- Column resizing
+- Inline editing
+- Modal dialogs
+- Date pickers
 
 ## Development Tools
-- **nodemon ^3.0.1** - Development server with auto-restart
-- **npm** - Package management
 
-## Frontend Libraries
-- **Vanilla JavaScript** - No external frameworks, pure JS implementation
-- **CSS Grid & Flexbox** - Modern layout systems
-- **Custom Chart Library** - Proprietary chart rendering system
+### Package Manager
+- **npm**: Dependency management and scripts
 
-## Build System
-- **npm scripts** - Simple build and development commands
-  - `npm start` - Production server start
-  - `npm run dev` - Development server with auto-reload
+### Development Server
+- **nodemon 3.0.1**: Auto-restart on file changes
+  - Development workflow optimization
+  - Hot reload capability
+
+## Data Storage
+
+### Primary Database
+- Microsoft Access Database (.mdb/.accdb)
+- ADODB connection via OLE DB provider
+
+### File-based Storage
+- **JSON files**: Configuration and user data
+  - comments.json: Production comments
+  - est_qty.json: Manual estimated quantities
+  - plan_data.json: Production plans
+  - work_days.json: Work day configurations
+  - holidays.json: Holiday calendar
 
 ## Development Commands
 
-### Installation
+### Start Production Server
 ```bash
-npm install
+npm start
+```
+Runs: `node server.js`
+- Starts Express server on dynamic port
+- Initializes data cache with auto-refresh
+- Serves production dashboard
+
+### Start Development Server
+```bash
+npm run dev
+```
+Runs: `nodemon server.js`
+- Auto-restarts on file changes
+- Development mode with hot reload
+- Useful for rapid iteration
+
+## Environment Requirements
+
+### Runtime
+- Node.js (compatible with ES6+)
+- Windows OS (for Access database connectivity)
+
+### Database
+- Microsoft Access Database Engine
+- ADODB provider installed
+- Proper database file permissions
+
+### Network
+- Port availability for Express server
+- Database file access permissions
+
+## Build System
+- No build step required
+- Direct JavaScript execution
+- Static assets served as-is
+- EJS templates compiled on-demand
+
+## Dependencies Overview
+
+### Production Dependencies
+```json
+{
+  "express": "^4.18.2",      // Web framework
+  "body-parser": "^1.20.2",  // Request parsing
+  "ejs": "^3.1.9",           // Templating
+  "node-adodb": "^5.0.3"     // Database access
+}
 ```
 
-### Development
-```bash
-npm run dev  # Start development server with nodemon
+### Development Dependencies
+```json
+{
+  "nodemon": "^3.0.1"        // Development server
+}
 ```
 
-### Production
-```bash
-npm start    # Start production server
-```
-
-## Database Configuration
-- **Provider**: IBMDA400.DataSource
-- **Connection**: DB2 system via ODBC
-- **Authentication**: Username/password based
-- **Data Source**: WAVEDLIB database
-
-## Performance Features
-- **Data Caching**: Intelligent caching system with auto-refresh
-- **Lazy Loading**: On-demand data loading for large datasets
-- **Compression**: Efficient data transfer and storage
-- **Connection Pooling**: Optimized database connections
-
-## Security Considerations
-- **Input Validation**: Server-side validation for all API inputs
-- **SQL Injection Prevention**: Parameterized queries
-- **File System Security**: Controlled file access and validation
-- **Error Handling**: Comprehensive error management without data exposure
+## Architecture Style
+- Server-side rendering with EJS
+- RESTful API for data operations
+- Client-side SPA-like behavior
+- File-based configuration
+- In-memory caching layer

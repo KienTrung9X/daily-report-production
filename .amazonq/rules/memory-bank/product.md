@@ -1,31 +1,57 @@
-# Daily Production Report Dashboard
+# Product Overview
 
-## Project Purpose
-A comprehensive web-based dashboard for monitoring and analyzing daily production data from manufacturing lines. The system provides real-time insights into production performance, plan vs actual comparisons, and detailed reporting capabilities for production management.
+## Purpose
+Daily Production Report Dashboard is a web-based application that provides real-time monitoring and analysis of manufacturing production data. It connects to an Access database to retrieve production metrics and presents them through an interactive dashboard interface.
+
+## Value Proposition
+- Centralized production data visualization for manufacturing operations
+- Real-time tracking of planned vs actual production quantities
+- Historical data analysis with flexible date range filtering
+- Performance monitoring with percentage-based achievement metrics
+- Data import/export capabilities for production planning
 
 ## Key Features
-- **Real-time Production Monitoring**: Live dashboard displaying current production status across multiple manufacturing lines
-- **Plan vs Actual Analysis**: Compare planned production quantities with actual output, calculate performance percentages
-- **Calendar View**: Visual calendar interface showing daily production performance with color-coded indicators
-- **Multi-line Support**: Monitor multiple production lines (111, 121, 312, 313, 315, 161) simultaneously
-- **Data Import/Export**: Import production plans from Excel, export detailed reports to CSV
-- **Manual Adjustments**: Override estimated quantities and add comments for specific items/periods
-- **Holiday Management**: Track and manage holiday dates that affect production schedules
-- **Work Days Configuration**: Configure working days per month for accurate planning calculations
-- **Caching System**: Intelligent data caching for improved performance with large datasets
-- **Responsive Design**: Mobile-friendly interface with interactive charts and tables
+
+### Production Monitoring
+- Daily, weekly, and monthly production tracking
+- Planned quantity vs actual quantity comparison
+- Achievement percentage calculations
+- Line-specific production filtering
+- Calendar view with daily performance indicators
+
+### Data Management
+- Manual estimated quantity overrides
+- Production plan import from external sources
+- Work days configuration per month
+- Holiday management system
+- Comment annotations for production records
+- CSV export functionality for raw SQL data
+
+### Interactive Dashboard
+- Dynamic data tables with sorting and filtering
+- Visual charts and sparklines for trend analysis
+- Calendar-based navigation
+- Real-time data refresh with caching
+- Responsive pivot table views
+
+### Planning Tools
+- Bulk plan data import
+- Work days tracking and editing
+- Plan quantity adjustments
+- Holiday calendar management
+- Unit conversion handling (km to meters)
 
 ## Target Users
-- **Production Managers**: Monitor overall production performance and identify bottlenecks
-- **Line Supervisors**: Track individual line performance and daily targets
-- **Planning Teams**: Import production plans and adjust forecasts based on actual performance
-- **Quality Analysts**: Review production data trends and generate reports for management
-- **Operations Staff**: Access real-time production status and update manual entries
+- Production managers monitoring daily manufacturing output
+- Operations teams tracking performance against targets
+- Planning departments managing production schedules
+- Quality assurance teams analyzing production trends
+- Management reviewing overall production efficiency
 
 ## Use Cases
-- Daily production monitoring and performance tracking
-- Monthly/weekly production planning and forecasting
-- Production line efficiency analysis and optimization
-- Holiday and work schedule impact assessment
-- Historical production data analysis and reporting
-- Plan deviation analysis and corrective action planning
+- Daily production report generation and review
+- Weekly/monthly performance analysis
+- Production planning and capacity management
+- Historical trend analysis and forecasting
+- Exception reporting for underperforming lines
+- Data export for external reporting systems

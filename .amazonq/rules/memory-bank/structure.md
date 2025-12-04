@@ -2,66 +2,127 @@
 
 ## Directory Organization
 
-### Root Level
-- `server.js` - Main Express.js application server with API routes
-- `config.js` - Database connection configuration
-- `user-config.js` - User-configurable parameters (date ranges, line codes, limits)
-- `db_service.js` - Database service layer for DB2 connectivity
-- `data-cache.js` - Intelligent caching system for performance optimization
-- `package.json` - Node.js dependencies and project metadata
-
-### Data Files
-- `comments.json` - User comments for specific production items
-- `est_qty.json` - Manual estimated quantity overrides
-- `plan_data.json` - Imported production plan data
-- `work_days.json` - Working days configuration per month
-- `holidays.json` - Holiday dates and descriptions
-- `production_data.json` - Cached production data
-
-### Frontend Assets (`/public`)
-- `css/` - Stylesheets for UI components
-  - `style.css` - Main application styles
-  - `pivot.css` - Pivot table specific styles
-  - `pivot-improvements.css` - Enhanced pivot table features
-- `js/` - Client-side JavaScript modules
-  - `main.js` - Core application logic and UI management
-  - `charts.js` - Chart rendering and data visualization
-  - `table-enhanced.js` - Advanced table features and interactions
-  - `data-loader.js` - AJAX data loading and API communication
-  - `sparkline.js` - Inline sparkline chart generation
-  - `column-resizer.js` - Dynamic table column resizing
-
-### Views (`/views`)
-- `index.ejs` - Main dashboard template with EJS templating
-
-### Configuration (`/.amazonq/rules`)
-- `memory-bank/` - Project documentation and guidelines
+```
+daily-report-production/
+├── public/                    # Static client-side assets
+│   ├── css/                   # Stylesheets
+│   │   ├── style.css          # Main application styles
+│   │   ├── pivot.css          # Pivot table styles
+│   │   └── pivot-improvements.css  # Enhanced pivot styles
+│   ├── js/                    # Client-side JavaScript
+│   │   ├── main.js            # Core application logic
+│   │   ├── charts.js          # Chart rendering
+│   │   ├── sparkline.js       # Sparkline visualizations
+│   │   ├── data-loader.js     # Data fetching utilities
+│   │   ├── table-enhanced.js  # Table functionality
+│   │   └── column-resizer.js  # Column resize handling
+│   └── production_data.json   # Static production data
+├── views/                     # Server-side templates
+│   └── index.ejs              # Main dashboard template
+├── server.js                  # Express server and API routes
+├── config.js                  # Configuration loader
+├── user-config.js             # User-specific database config
+├── db_service.js              # Database access layer
+├── data-cache.js              # Data caching service
+├── comments.json              # Production comments storage
+├── est_qty.json               # Manual estimated quantities
+├── plan_data.json             # Production plan data
+├── work_days.json             # Work days per month
+├── holidays.json              # Holiday calendar
+├── check-item.js              # Item validation utility
+├── test-group.js              # Testing utility
+└── package.json               # Dependencies and scripts
+```
 
 ## Core Components
 
-### Backend Architecture
-- **Express.js Server**: RESTful API server handling all data operations
-- **Database Layer**: DB2 connectivity through node-adodb for production data
-- **Caching System**: Intelligent data caching with auto-refresh capabilities
-- **File Management**: JSON-based storage for configuration and user data
+### Server Layer (server.js)
+- Express.js web server
+- RESTful API endpoints for production data
+- Static file serving
+- EJS template rendering
+- Request routing and middleware
 
-### Frontend Architecture
-- **Modular JavaScript**: Separate modules for different functionalities
-- **Responsive Design**: CSS Grid and Flexbox for adaptive layouts
-- **Interactive Charts**: Custom chart implementations for data visualization
-- **Dynamic Tables**: Enhanced table features with sorting, filtering, and resizing
+### Database Layer (db_service.js)
+- Access database connectivity via node-adodb
+- SQL query execution
+- Data retrieval with filtering
+- Comment persistence
 
-### Data Flow
-1. **Configuration**: User settings loaded from config files
-2. **Database Query**: Production data fetched from DB2 system
-3. **Data Processing**: Raw data transformed with plans, comments, and calculations
-4. **Caching**: Processed data cached for performance
-5. **API Response**: JSON data served to frontend
-6. **Visualization**: Charts and tables rendered from API data
+### Caching Layer (data-cache.js)
+- In-memory data caching
+- Auto-refresh mechanism
+- Performance optimization for repeated queries
+
+### Configuration (config.js, user-config.js)
+- Database connection parameters
+- Application settings
+- Line codes and row limits
+- Date range configurations
+
+### Client Layer (public/)
+- Single-page application interface
+- Dynamic data visualization
+- Interactive tables and charts
+- AJAX-based data loading
 
 ## Architectural Patterns
-- **MVC Pattern**: Clear separation of model (database), view (EJS templates), and controller (Express routes)
-- **Service Layer**: Database operations abstracted into service modules
-- **Caching Strategy**: Multi-level caching with automatic refresh
-- **Modular Frontend**: Component-based JavaScript architecture
-- **RESTful API**: Standard HTTP methods for data operations
+
+### MVC-like Structure
+- **Model**: Database service and JSON data files
+- **View**: EJS templates and client-side rendering
+- **Controller**: Express route handlers in server.js
+
+### Data Flow
+1. Client requests data via AJAX
+2. Server checks cache for existing data
+3. If cache miss, query database via db_service
+4. Apply filters and transformations
+5. Merge with plan data and comments
+6. Return JSON response to client
+7. Client renders data in tables/charts
+
+### Caching Strategy
+- Cache production data in memory
+- Auto-refresh on configurable intervals
+- Filter cached data by year/month
+- Fallback to database for cache misses
+- Reduces database load for repeated queries
+
+### Data Storage
+- **Database**: Primary production data (Access DB)
+- **JSON Files**: Configuration, plans, comments, holidays
+- **Memory Cache**: Frequently accessed production data
+
+## Component Relationships
+
+### Server Dependencies
+- server.js → config.js → user-config.js
+- server.js → db_service.js → config.js
+- server.js → data-cache.js → db_service.js
+
+### Client Dependencies
+- index.ejs → main.js → data-loader.js
+- main.js → charts.js, sparkline.js, table-enhanced.js
+- table-enhanced.js → column-resizer.js
+
+### Data Flow
+- Database → db_service → data-cache → server API → client
+- Client → server API → JSON files (comments, plans, holidays)
+
+## Key Design Decisions
+
+### Separation of Concerns
+- Database logic isolated in db_service.js
+- Caching logic separated in data-cache.js
+- Client-side logic modularized by feature
+
+### File-based Storage
+- JSON files for user-editable data (plans, comments)
+- Enables easy backup and version control
+- Simplifies data persistence without additional database
+
+### Client-side Rendering
+- Server provides raw data via API
+- Client handles presentation and interactivity
+- Reduces server load and improves responsiveness
