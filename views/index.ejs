@@ -23,21 +23,6 @@
             </div>
             <div class="card-body filters-grid">
                 <div class="filter-group">
-                    <label>Month</label>
-                    <input type="month" id="monthFilter" value="<%= year %>-<%= month.toString().padStart(2, '0') %>">
-                </div>
-                <div class="filter-group">
-                    <label>Week</label>
-                    <select id="weekFilter">
-                        <option value="">All</option>
-                        <option value="1">Week 1</option>
-                        <option value="2">Week 2</option>
-                        <option value="3">Week 3</option>
-                        <option value="4">Week 4</option>
-                        <option value="5">Week 5</option>
-                    </select>
-                </div>
-                <div class="filter-group">
                     <label>Line</label>
                     <select id="lineFilter">
                         <option value="">All Lines</option>
@@ -48,14 +33,6 @@
                         <option value="315">315</option>
                         <option value="161">161</option>
                     </select>
-                </div>
-                <div class="filter-group">
-                    <label>From</label>
-                    <input type="date" id="startDate">
-                </div>
-                <div class="filter-group">
-                    <label>To</label>
-                    <input type="date" id="endDate">
                 </div>
                 <div class="filter-group">
                     <label>Search</label>
@@ -84,6 +61,14 @@
             <div class="card-header">
                 <h2>Production Data</h2>
                 <div class="card-actions">
+                    <div class="filter-group" style="margin: 0;">
+                        <label style="margin-bottom: 0.25rem;">From</label>
+                        <input type="date" id="startDate">
+                    </div>
+                    <div class="filter-group" style="margin: 0;">
+                        <label style="margin-bottom: 0.25rem;">To</label>
+                        <input type="date" id="endDate">
+                    </div>
                     <div class="filter-group" style="margin: 0;">
                         <label style="margin-bottom: 0.25rem;">Up to Date</label>
                         <input type="date" id="upToDate" onchange="loadData()">

@@ -375,8 +375,10 @@ button {
 .pct-low { color: #ef4444 !important; font-weight: 700 !important; background: #fef2f2 !important; }
 .val-zero { background: #fee2e2 !important; color: #991b1b !important; }
 
-.col-total { background: #e0f2fe !important; font-weight: 600 !important; }
-.col-upto { background: #fef3c7 !important; font-weight: 600 !important; }
+.data-table thead th.col-total { background: #0284c7 !important; }
+.data-table thead th.col-upto { background: #f59e0b !important; }
+.data-table tbody td.col-total { background: #e0f2fe !important; font-weight: 600 !important; }
+.data-table tbody td.col-upto { background: #fef3c7 !important; font-weight: 600 !important; }
 
 .modal {
     display: none;

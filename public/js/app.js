@@ -1,50 +1,27 @@
 let currentData = [];
 let currentYear = 0;
 let currentMonth = 0;
-let currentWeek = '';
 let currentTab = 'production';
 let previewData = [];
 let workDaysPreviewData = {};
 let holidays = [];
 
 document.addEventListener('DOMContentLoaded', () => {
-    const dateInput = document.getElementById('monthFilter');
-    const [y, m] = dateInput.value.split('-');
-    currentYear = parseInt(y);
-    currentMonth = parseInt(m);
+    const now = new Date();
+    currentYear = now.getFullYear();
+    currentMonth = now.getMonth() + 1;
     
     document.getElementById('lineFilter').value = '313';
-    
-    document.getElementById('monthFilter').addEventListener('change', (e) => {
-        const [y, m] = e.target.value.split('-');
-        currentYear = parseInt(y);
-        currentMonth = parseInt(m);
-        document.getElementById('startDate').value = '';
-        document.getElementById('endDate').value = '';
-        loadData();
-    });
-    
-    document.getElementById('weekFilter').addEventListener('change', (e) => {
-        currentWeek = e.target.value;
-        document.getElementById('startDate').value = '';
-        document.getElementById('endDate').value = '';
-        loadData();
-    });
-    
     document.getElementById('lineFilter').addEventListener('change', () => loadData());
     
     document.getElementById('startDate').addEventListener('change', () => {
         if (document.getElementById('startDate').value && document.getElementById('endDate').value) {
-            document.getElementById('weekFilter').value = '';
-            currentWeek = '';
             loadData();
         }
     });
     
     document.getElementById('endDate').addEventListener('change', () => {
         if (document.getElementById('startDate').value && document.getElementById('endDate').value) {
-            document.getElementById('weekFilter').value = '';
-            currentWeek = '';
             loadData();
         }
     });
@@ -76,7 +53,6 @@ async function loadData() {
             url = `/api/production?startDate=${startDate.replace(/-/g, '')}&endDate=${endDate.replace(/-/g, '')}&detailed=true`;
         } else {
             url = `/api/production?year=${currentYear}&month=${currentMonth}&detailed=true`;
-            if (currentWeek) url += `&week=${currentWeek}`;
         }
         
         const selectedLine = document.getElementById('lineFilter').value;
