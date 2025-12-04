@@ -1,63 +1,51 @@
 # Product Overview
 
 ## Purpose
-Daily Production Report Dashboard is a web-based application designed to track, analyze, and visualize manufacturing production data. It provides real-time insights into production performance by comparing planned versus actual production quantities across multiple production lines and items.
+Daily Production Report Dashboard is a web-based application for tracking and analyzing manufacturing production data. It provides real-time visibility into production performance by comparing planned quantities against actual output across multiple production lines and items.
 
 ## Value Proposition
-- **Real-time Production Monitoring**: Track daily production performance with instant access to actual vs. planned metrics
-- **Data-Driven Decision Making**: Comprehensive analytics with percentage completion tracking and trend analysis
-- **Multi-dimensional Analysis**: Filter and view data by year, month, week, production line, and date ranges
-- **Plan Management**: Import, edit, and manage production plans with work day calculations
-- **Holiday Tracking**: Mark and track holidays to accurately assess production schedules
-- **Performance Insights**: Calendar view and detailed reports showing production efficiency
+- **Real-time Production Monitoring**: Track daily production metrics with automatic data refresh from Access database
+- **Performance Analysis**: Compare actual production against planned targets with percentage calculations
+- **Multi-dimensional Filtering**: View data by year, month, week, date range, and production line
+- **Plan Management**: Import, edit, and manage production plans with work day tracking
+- **Holiday Management**: Mark and track holidays to adjust production expectations
+- **Data Export**: Export raw SQL data to CSV for external analysis
 
 ## Key Features
 
-### Production Tracking
-- Daily production data aggregation from Access database
-- Actual vs. planned quantity comparison with percentage calculations
-- Support for manual estimated quantity overrides
-- Multi-line production tracking (LINE1, LINE2)
-- Item-level detail with categorization (ITEM, ITEM1, ITEM2)
-
-### Data Visualization
-- Interactive calendar view showing daily production summaries
-- Detailed production tables with sticky headers and columns
+### Dashboard & Visualization
+- Calendar view showing daily production totals and achievement percentages
+- Tabular production data with plan vs actual comparisons
+- Summary statistics (total plan, total actual, overall percentage)
 - Color-coded performance indicators
-- Responsive data tables with horizontal scrolling
 
 ### Plan Management
-- Excel-based plan import functionality
-- Work days configuration per month
-- Plan quantity editing (stored in kilometers, displayed in meters)
-- Bulk work days management
-- Plan data clearing and reset capabilities
-
-### Filtering & Analysis
-- Year and month selection
-- Week-based filtering
-- Production line filtering
-- Custom date range queries
-- Detailed vs. summary view modes
+- Import production plans from external sources
+- Edit plan quantities and work days per month
+- Bulk work day management across multiple months
+- Automatic conversion between units (km to meters)
 
 ### Data Management
+- Manual estimated quantity override capability
 - Comment system for production items
-- Holiday management (add/delete)
-- Manual estimated quantity adjustments
-- CSV export with full SQL data
-- Data caching for improved performance
+- Holiday calendar with add/delete functionality
+- Automatic data caching for improved performance
+
+### Filtering & Analysis
+- Filter by year, month, week, or custom date range
+- Production line filtering
+- Detailed vs summary view modes
+- Week number calculation for weekly analysis
 
 ## Target Users
-- **Production Managers**: Monitor daily production performance and identify bottlenecks
-- **Planning Teams**: Manage production plans and adjust targets based on actual performance
-- **Operations Staff**: Track line-specific production and report issues via comments
-- **Management**: Review overall production efficiency and make strategic decisions
+- **Production Managers**: Monitor overall production performance and identify bottlenecks
+- **Line Supervisors**: Track specific production line outputs and plan adherence
+- **Planning Teams**: Manage production plans and adjust targets based on work days
+- **Quality Analysts**: Export and analyze production data for trend analysis
 
 ## Use Cases
-1. **Daily Production Review**: Check actual production against plan at end of each day
-2. **Weekly Performance Analysis**: Analyze week-over-week trends and identify patterns
-3. **Plan Adjustment**: Update production plans based on capacity changes or demand shifts
-4. **Holiday Planning**: Mark holidays to exclude from production calculations
-5. **Line Comparison**: Compare performance across different production lines
-6. **Data Export**: Generate CSV reports for external analysis or archival
-7. **Issue Documentation**: Add comments to specific items for tracking problems or notes
+1. **Daily Production Review**: Check if production targets are being met across all lines
+2. **Monthly Planning**: Set and adjust production plans based on work days and capacity
+3. **Performance Reporting**: Generate reports comparing planned vs actual production
+4. **Trend Analysis**: Export historical data to identify patterns and improvement opportunities
+5. **Holiday Planning**: Mark holidays to adjust production expectations and resource allocation

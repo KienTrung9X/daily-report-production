@@ -23,6 +23,15 @@
             </div>
             <div class="card-body filters-grid">
                 <div class="filter-group">
+                    <label>Fiscal Year</label>
+                    <select id="fiscalYearFilter">
+                        <option value="2023">FY2023 (Apr 2023 - Mar 2024)</option>
+                        <option value="2024">FY2024 (Apr 2024 - Mar 2025)</option>
+                        <option value="2025" selected>FY2025 (Apr 2025 - Mar 2026)</option>
+                        <option value="2026">FY2026 (Apr 2026 - Mar 2027)</option>
+                    </select>
+                </div>
+                <div class="filter-group">
                     <label>Month</label>
                     <input type="month" id="monthFilter" value="<%= year %>-<%= month.toString().padStart(2, '0') %>">
                 </div>

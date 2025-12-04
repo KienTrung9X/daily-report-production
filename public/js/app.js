@@ -14,6 +14,10 @@ document.addEventListener('DOMContentLoaded', () => {
     
     document.getElementById('lineFilter').value = '313';
     
+    const now = new Date();
+    const currentFY = now.getMonth() >= 3 ? now.getFullYear() : now.getFullYear() - 1;
+    document.getElementById('fiscalYearFilter').value = currentFY;
+    
     document.getElementById('monthFilter').addEventListener('change', (e) => {
         const [y, m] = e.target.value.split('-');
         currentYear = parseInt(y);
@@ -45,19 +49,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function loadData() {
     const tbody = document.getElementById('data-table-body');
+    const thead = document.getElementById('data-table-header');
     tbody.innerHTML = '<tr><td colspan="10">Loading...</td></tr>';
+    thead.innerHTML = '';
     
     try {
         const workDaysResponse = await fetch('/api/work-days');
         const workDays = await workDaysResponse.json();
         const startDate = document.getElementById('startDate').value;
         const endDate = document.getElementById('endDate').value;
+        const fiscalYear = document.getElementById('fiscalYearFilter').value;
         
-        let url;
+        let url = `/api/production?fiscalYear=${fiscalYear}&detailed=true`;
         if (startDate && endDate) {
-            url = `/api/production?startDate=${startDate.replace(/-/g, '')}&endDate=${endDate.replace(/-/g, '')}&detailed=true`;
-        } else {
-            url = `/api/production?year=${currentYear}&month=${currentMonth}&detailed=true`;
+            url += `&startDate=${startDate.replace(/-/g, '')}&endDate=${endDate.replace(/-/g, '')}`;
         }
         
         const selectedLine = document.getElementById('lineFilter').value;
@@ -67,7 +72,6 @@ async function loadData() {
         const result = await response.json();
         currentData = result.data;
         
-        if (result.summary) renderSummary(result.summary);
         renderPivotTable(currentData, workDays, currentYear, currentMonth);
     } catch (error) {
         console.error('Error:', error);
@@ -92,14 +96,29 @@ function renderPivotTable(data, workDays, year, month) {
     if (!data || data.length === 0) {
         thead.innerHTML = '<tr><th>No data</th></tr>';
         tbody.innerHTML = '';
+        renderSummary({ totalPlan: '0', totalAct: '0', totalPercent: '0' });
         return;
     }
     
+    const startDate = document.getElementById('startDate').value.replace(/-/g, '');
+    const endDate = document.getElementById('endDate').value.replace(/-/g, '');
+    
     const daysSet = new Set();
     data.forEach(row => {
-        if (row.COMP_DAY) daysSet.add(row.COMP_DAY.toString());
+        if (row.COMP_DAY) {
+            const compDay = row.COMP_DAY.toString();
+            if (startDate && endDate) {
+                if (compDay >= startDate && compDay <= endDate) {
+                    daysSet.add(compDay);
+                }
+            } else {
+                daysSet.add(compDay);
+            }
+        }
     });
     const sortedDays = Array.from(daysSet).sort();
+    console.log('Sorted days:', sortedDays);
+    console.log('Data length:', data.length);
     
     const itemsMap = {};
     data.forEach(row => {
@@ -116,14 +135,7 @@ function renderPivotTable(data, workDays, year, month) {
         }
     });
     
-    Object.values(itemsMap).forEach(itemGroup => {
-        const planQty = itemGroup.info.EST_PRO_QTY || 0;
-        sortedDays.forEach(day => {
-            if (!itemGroup.days[day]) {
-                itemGroup.days[day] = { plan: planQty, act: 0 };
-            }
-        });
-    });
+
     
     const upToDate = document.getElementById('upToDate').value;
     const upToDateStr = upToDate ? upToDate.replace(/-/g, '') : '';
@@ -144,6 +156,9 @@ function renderPivotTable(data, workDays, year, month) {
     thead.innerHTML = headerHtml;
     
     tbody.innerHTML = '';
+    let grandTotalPlan = 0;
+    let grandTotalAct = 0;
+    
     Object.values(itemsMap).forEach(itemGroup => {
         const info = itemGroup.info;
         let totalPlan = 0;
@@ -157,6 +172,9 @@ function renderPivotTable(data, workDays, year, month) {
             }
         });
         
+        grandTotalPlan += totalPlan;
+        grandTotalAct += totalAct;
+        
         let upToPlan = 0;
         let upToAct = 0;
         if (upToDateStr) {
@@ -164,7 +182,10 @@ function renderPivotTable(data, workDays, year, month) {
                 if (day <= upToDateStr) {
                     const dayData = itemGroup.days[day];
                     if (dayData) {
-                        const yearMonth = `${year}${month.toString().padStart(2, '0')}`;
+                        const dayStr = day.toString();
+                        const dayYear = dayStr.substring(0, 4);
+                        const dayMonth = dayStr.substring(4, 6);
+                        const yearMonth = `${dayYear}${dayMonth}`;
                         const workDaysInMonth = workDays[yearMonth] || 20;
                         upToPlan += dayData.plan / workDaysInMonth;
                         upToAct += dayData.act;
@@ -185,7 +206,10 @@ function renderPivotTable(data, workDays, year, month) {
             sortedDays.forEach(day => {
                 const dayData = itemGroup.days[day];
                 if (dayData) {
-                    const yearMonth = `${year}${month.toString().padStart(2, '0')}`;
+                    const dayStr = day.toString();
+                    const dayYear = dayStr.substring(0, 4);
+                    const dayMonth = dayStr.substring(4, 6);
+                    const yearMonth = `${dayYear}${dayMonth}`;
                     const workDaysInMonth = workDays[yearMonth] || 20;
                     
                     if (metric === 'Plan') {
@@ -256,6 +280,13 @@ function renderPivotTable(data, workDays, year, month) {
             tr.innerHTML = html;
             tbody.appendChild(tr);
         });
+    });
+    
+    const grandTotalPercent = grandTotalPlan > 0 ? ((grandTotalAct / grandTotalPlan) * 100).toFixed(2) : 0;
+    renderSummary({
+        totalPlan: grandTotalPlan.toLocaleString(),
+        totalAct: grandTotalAct.toLocaleString(),
+        totalPercent: grandTotalPercent
     });
 }
 
@@ -392,8 +423,8 @@ async function loadPlanData() {
         const workDays = await workDaysResponse.json();
         
         if (!planData || Object.keys(planData).length === 0) {
-            tbody.innerHTML = '<tr><td colspan="2">No plan data</td></tr>';
-            thead.innerHTML = '<tr><th>Line</th><th>Item</th></tr>';
+            tbody.innerHTML = '<tr><td>No plan data</td></tr>';
+            thead.innerHTML = '<tr><th>Item</th></tr>';
             return;
         }
         
@@ -403,12 +434,12 @@ async function loadPlanData() {
         }).filter(m => m))].sort();
         
         if (months.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="2">No valid plan data</td></tr>';
-            thead.innerHTML = '<tr><th>Line</th><th>Item</th></tr>';
+            tbody.innerHTML = '<tr><td>No valid plan data</td></tr>';
+            thead.innerHTML = '<tr><th>Item</th></tr>';
             return;
         }
         
-        let headerHtml = '<tr><th rowspan="2">Line</th><th rowspan="2">Item</th>';
+        let headerHtml = '<tr><th rowspan="2">Item</th>';
         months.forEach(month => {
             headerHtml += `<th colspan="2">${month}</th>`;
         });
@@ -418,7 +449,7 @@ async function loadPlanData() {
         });
         headerHtml += '</tr>';
         
-        headerHtml += '<tr><td colspan="2">Work Days</td>';
+        headerHtml += '<tr><td>Work Days</td>';
         months.forEach(month => {
             headerHtml += `<td colspan="2" onclick="editWorkDay('${month}',${workDays[month]||0})">${workDays[month]||0}</td>`;
         });
@@ -449,9 +480,9 @@ async function loadPlanData() {
         
         tbody.innerHTML = '';
         Object.values(itemGroups).forEach(item => {
-            let rowHtml = `<td>${item.line1}</td><td>
+            let rowHtml = `<td>
                 <div class="item-name">${item.itemName} ${item.itemDesc}</div>
-                <div class="item-details">${item.itemCode}</div>
+                <div class="item-details">${item.itemCode} • Line ${item.line1}</div>
             </td>`;
             
             months.forEach(month => {
@@ -459,8 +490,8 @@ async function loadPlanData() {
                 const workDay = workDays[month] || 0;
                 const dailyProduct = workDay > 0 ? (qty / workDay).toFixed(2) : 0;
                 
-                rowHtml += `<td onclick="editPlanQty('${item.itemCode}','${month}',${qty})">${parseFloat(qty).toLocaleString()}</td>`;
-                rowHtml += `<td>${parseFloat(dailyProduct).toLocaleString()}</td>`;
+                rowHtml += `<td onclick="editPlanQty('${item.itemCode}','${month}',${qty})">${qty > 0 ? parseFloat(qty).toLocaleString() : '-'}</td>`;
+                rowHtml += `<td>${qty > 0 && dailyProduct > 0 ? parseFloat(dailyProduct).toLocaleString() : '-'}</td>`;
             });
             
             const tr = document.createElement('tr');
@@ -469,8 +500,8 @@ async function loadPlanData() {
         });
     } catch (error) {
         console.error('Error loading plan data:', error);
-        tbody.innerHTML = '<tr><td colspan="2">Error loading plan data</td></tr>';
-        thead.innerHTML = '<tr><th>Line</th><th>Item</th></tr>';
+        tbody.innerHTML = '<tr><td>Error loading plan data</td></tr>';
+        thead.innerHTML = '<tr><th>Item</th></tr>';
     }
 }
 

@@ -74,56 +74,57 @@ app.get('/api/production', async (req, res) => {
         const detailed = req.query.detailed === 'true';
         const startDate = req.query.startDate;
         const endDate = req.query.endDate;
+        const fiscalYear = req.query.fiscalYear ? parseInt(req.query.fiscalYear) : null;
         const lineFilter = req.query.line;
 
         // Try to use cached data first
         const cached = dataCache.getCachedData();
         let rawData;
         
-        if (cached && cached.data && cached.data.length > 0 && !startDate && !endDate) {
-            // Filter cached data by year/month
-            const yearMonth = `${year}${month.toString().padStart(2, '0')}`;
-            rawData = cached.data.filter(row => row.YEAR_MONTH === yearMonth);
-            
-            if (rawData.length > 0) {
-                // Apply filters to cached data
-                if (lineFilter) {
-                    rawData = rawData.filter(row => row.LINE1 === lineFilter);
-                }
-                if (week) {
+        if (cached && cached.data && cached.data.length > 0) {
+            if (fiscalYear) {
+                const fyStart = `${fiscalYear}04`;
+                const fyEnd = `${fiscalYear + 1}03`;
+                rawData = cached.data.filter(row => {
+                    const ym = row.YEAR_MONTH ? row.YEAR_MONTH.toString() : '';
+                    return ym && ym >= fyStart && ym <= fyEnd;
+                });
+                
+                if (startDate && endDate) {
                     rawData = rawData.filter(row => {
-                        try {
-                            const compDay = row.COMP_DAY.toString();
-                            const day = parseInt(compDay.slice(6, 8));
-                            const date = new Date(year, month - 1, day);
-                            const rowWeek = getWeekNumber(date);
-                            return rowWeek === parseInt(week);
-                        } catch (error) {
-                            return false;
-                        }
+                        const compDay = row.COMP_DAY ? row.COMP_DAY.toString() : '';
+                        return compDay && compDay >= startDate && compDay <= endDate;
                     });
                 }
             } else {
-                // No cached data for this month, query database (without week filter)
-                rawData = await dbService.getData(year, month, null, detailed, startDate, endDate, lineFilter);
-                
-                // Apply week filter to database result
-                if (week && rawData.length > 0) {
-                    rawData = rawData.filter(row => {
-                        try {
-                            const compDay = row.COMP_DAY.toString();
-                            const day = parseInt(compDay.slice(6, 8));
-                            const date = new Date(year, month - 1, day);
-                            const rowWeek = getWeekNumber(date);
-                            return rowWeek === parseInt(week);
-                        } catch (error) {
-                            return false;
-                        }
-                    });
-                }
+                const yearMonth = `${year}${month.toString().padStart(2, '0')}`;
+                rawData = cached.data.filter(row => row.YEAR_MONTH === yearMonth);
+            }
+            
+            
+            // Apply filters
+            if (lineFilter && rawData.length > 0) {
+                rawData = rawData.filter(row => row.LINE1 === lineFilter);
+            }
+            if (week && rawData.length > 0) {
+                rawData = rawData.filter(row => {
+                    try {
+                        const compDay = row.COMP_DAY.toString();
+                        const day = parseInt(compDay.slice(6, 8));
+                        const date = new Date(year, month - 1, day);
+                        const rowWeek = getWeekNumber(date);
+                        return rowWeek === parseInt(week);
+                    } catch (error) {
+                        return false;
+                    }
+                });
             }
         } else {
-            // Use database for date range queries or when no cache
+            rawData = await dbService.getData(year, month, null, detailed, startDate, endDate, lineFilter);
+        }
+        
+        // Fallback to database if no data from cache
+        if (!rawData || rawData.length === 0) {
             rawData = await dbService.getData(year, month, null, detailed, startDate, endDate, lineFilter);
         }
         
