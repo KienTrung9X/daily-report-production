@@ -47,6 +47,39 @@ document.addEventListener('DOMContentLoaded', () => {
     loadData();
 });
 
+// Refresh cache from database
+async function refreshCacheData() {
+    const btn = document.getElementById('refresh-btn');
+    const originalText = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = '⏳ Refreshing...';
+    
+    try {
+        const response = await fetch('/api/refresh-cache', { method: 'POST' });
+        const result = await response.json();
+        
+        if (result.success) {
+            btn.textContent = '✅ Updated!';
+            console.log(`Cache updated: ${result.totalRecords} records`);
+            // Reload data after refresh
+            setTimeout(() => {
+                loadData();
+                btn.textContent = originalText;
+                btn.disabled = false;
+            }, 1000);
+        } else {
+            throw new Error(result.error);
+        }
+    } catch (error) {
+        console.error('Refresh error:', error);
+        btn.textContent = '❌ Failed!';
+        setTimeout(() => {
+            btn.textContent = originalText;
+            btn.disabled = false;
+        }, 2000);
+    }
+}
+
 async function loadData() {
     const tbody = document.getElementById('data-table-body');
     const thead = document.getElementById('data-table-header');

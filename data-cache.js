@@ -1,155 +1,118 @@
 const fs = require('fs');
 const path = require('path');
+const readline = require('readline');
 const dbService = require('./db_service');
 
 const DATA_FILE = path.join(__dirname, 'public', 'production_data.json');
-const REFRESH_INTERVAL = 10000; // 10 seconds
+const REFRESH_INTERVAL = 3600000; // 1 hour for manual refresh only
 
-let existingData = {};
+let cachedData = null;
 let lastUpdate = null;
-let isInitialLoad = true;
+let isLoading = false;
 
-// Load existing data from file
-function loadExistingData() {
-    if (fs.existsSync(DATA_FILE)) {
-        try {
-            existingData = JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
-            // Silent
-        } catch (error) {
-            // Silent
-            existingData = {};
-        }
-    }
-}
-
-// Get fiscal year range (April to March)
-function getFiscalYearRange() {
-    const now = new Date();
-    const currentYear = now.getFullYear();
-    const currentMonth = now.getMonth() + 1; // 1-12
-    
-    let fiscalYear, startYear, endYear;
-    if (currentMonth >= 4) {
-        // April-December: FY starts this year
-        fiscalYear = currentYear;
-        startYear = currentYear;
-        endYear = currentYear + 1;
-    } else {
-        // January-March: FY started last year
-        fiscalYear = currentYear - 1;
-        startYear = currentYear - 1;
-        endYear = currentYear;
-    }
-    
-    return { fiscalYear, startYear, endYear };
-}
-
-// Initial load - fetch full fiscal year data
-async function initialLoad() {
-    try {
-        const { fiscalYear, startYear, endYear } = getFiscalYearRange();
-        
-        const allData = [];
-        
-        // Load April-December of start year
-        for (let month = 4; month <= 12; month++) {
-            try {
-                const monthData = await dbService.getData(startYear, month, null, true);
-                allData.push(...monthData);
-            } catch (error) {
-                // Silent
-            }
+// Lazy load: only load data when requested
+function loadDataFromFile() {
+    return new Promise((resolve) => {
+        if (cachedData !== null) {
+            resolve(cachedData);
+            return;
         }
         
-        // Load January-March of end year
-        for (let month = 1; month <= 3; month++) {
-            try {
-                const monthData = await dbService.getData(endYear, month, null, true);
-                allData.push(...monthData);
-            } catch (error) {
-                // Silent
-            }
-        }
-        
-        // Store all data
-        allData.forEach(row => {
-            const recordKey = `${row.COMP_DAY}_${row.ITEM}_${row.PR}`;
-            existingData[recordKey] = row;
-        });
-        
-        isInitialLoad = false;
-        
-    } catch (error) {
-        // Silent
-    }
-}
-
-// Incremental refresh - only current day data
-async function refreshCache() {
-    try {
-        if (isInitialLoad) {
-            await initialLoad();
-        } else {
-            const now = new Date();
-            const currentYear = now.getFullYear();
-            const currentMonth = now.getMonth() + 1;
-            
-            // Only fetch current month data for refresh
-            const todayData = await dbService.getData(currentYear, currentMonth, null, true);
-            
-            todayData.forEach(row => {
-                const recordKey = `${row.COMP_DAY}_${row.ITEM}_${row.PR}`;
-                if (!existingData[recordKey] || existingData[recordKey].ACT_PRO_QTY !== row.ACT_PRO_QTY) {
-                    existingData[recordKey] = row;
+        if (isLoading) {
+            // Wait for current load to finish
+            const checkInterval = setInterval(() => {
+                if (!isLoading && cachedData !== null) {
+                    clearInterval(checkInterval);
+                    resolve(cachedData);
                 }
-            });
+            }, 100);
+            return;
         }
         
-        // Save updated data to public file for browser access
-        const { fiscalYear, startYear, endYear } = getFiscalYearRange();
-        const dataForBrowser = {
-            records: Object.values(existingData),
-            fiscalYear: fiscalYear,
-            fiscalPeriod: `${startYear}/04 - ${endYear}/03`,
-            lastUpdate: new Date().toISOString(),
-            totalRecords: Object.keys(existingData).length
-        };
+        isLoading = true;
         
-        fs.writeFileSync(DATA_FILE, JSON.stringify(dataForBrowser, null, 2));
-        lastUpdate = new Date();
+        try {
+            if (fs.existsSync(DATA_FILE)) {
+                // Stream read for large files
+                const fileContent = fs.readFileSync(DATA_FILE, 'utf8');
+                const parsedData = JSON.parse(fileContent);
+                
+                // Support both array format and object with records property
+                cachedData = Array.isArray(parsedData) ? parsedData : (parsedData.records || parsedData.data || []);
+                lastUpdate = new Date();
+                
+                console.log(`✓ Loaded ${cachedData.length} records from production_data.json`);
+                isLoading = false;
+                resolve(cachedData);
+                return;
+            }
+        } catch (error) {
+            console.error('Error loading data from file:', error.message);
+        }
         
+        isLoading = false;
+        cachedData = [];
+        resolve([]);
+    });
+}
+
+// Optional: Refresh from DB when needed (manual trigger only)
+async function refreshCacheFromDB() {
+    try {
+        console.log('Starting DB refresh...');
+        const now = new Date();
+        const currentYear = now.getFullYear();
+        const currentMonth = now.getMonth() + 1;
         
+        // Only fetch current month data
+        const freshData = await dbService.getData(currentYear, currentMonth, null, true);
+        
+        if (freshData && freshData.length > 0) {
+            cachedData = freshData;
+            lastUpdate = new Date();
+            
+            // Save to file
+            fs.writeFileSync(DATA_FILE, JSON.stringify(cachedData, null, 2));
+            console.log(`✓ Refreshed ${cachedData.length} records from DB`);
+        }
     } catch (error) {
-        // Silent
+        console.error('DB refresh error:', error.message);
     }
 }
 
 // Get data for API (from memory)
 function getCachedData() {
     return {
-        data: Object.values(existingData),
+        data: cachedData || [],
         lastUpdate: lastUpdate ? lastUpdate.toISOString() : null,
-        totalRecords: Object.keys(existingData).length
+        totalRecords: cachedData ? cachedData.length : 0
     };
 }
 
-// Start auto-refresh
+// Get data async (lazy load)
+async function getCachedDataAsync() {
+    const data = await loadDataFromFile();
+    return {
+        data: data || [],
+        lastUpdate: lastUpdate ? lastUpdate.toISOString() : null,
+        totalRecords: data ? data.length : 0
+    };
+}
+
+// Start - don't load immediately (lazy load when needed)
 function startAutoRefresh() {
-    // Load existing data first
-    loadExistingData();
+    // Don't load file on startup - will load on first request
+    console.log('✓ Cache system ready (lazy load enabled)');
     
-    // Initial refresh (full load)
-    refreshCache();
-    
-    // Set interval for auto-refresh (incremental)
-    setInterval(refreshCache, REFRESH_INTERVAL);
-    
-    // Auto-refresh started silently
+    // Optional: Set interval for background DB refresh (1 hour)
+    // Uncomment if you want periodic updates from DB
+    // setInterval(refreshCacheFromDB, REFRESH_INTERVAL);
 }
 
 module.exports = {
     getCachedData,
-    refreshCache,
+    getCachedDataAsync,
+    refreshCacheFromDB,
     startAutoRefresh,
     getLastUpdate: () => lastUpdate
 };

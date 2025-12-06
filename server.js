@@ -37,7 +37,10 @@ app.get('/api/dashboard/calendar', async (req, res) => {
         const year = parseInt(req.query.year) || new Date().getFullYear();
         const month = parseInt(req.query.month) || (new Date().getMonth() + 1);
 
-        const rawData = await dbService.getData(year, month, null, true);
+        // Use cached data with lazy load
+        const cached = await dataCache.getCachedDataAsync();
+        const yearMonth = `${year}${month.toString().padStart(2, '0')}`;
+        const rawData = cached.data.filter(row => row.YEAR_MONTH === yearMonth);
         
         // Group by day for calendar
         const calendarData = {};
@@ -46,8 +49,8 @@ app.get('/api/dashboard/calendar', async (req, res) => {
             if (!calendarData[day]) {
                 calendarData[day] = { TOTAL_PLAN: 0, TOTAL_ACTUAL: 0 };
             }
-            calendarData[day].TOTAL_PLAN += row.EST_PRO_QTY;
-            calendarData[day].TOTAL_ACTUAL += row.ACT_PRO_QTY;
+            calendarData[day].TOTAL_PLAN += row.EST_PRO_QTY || 0;
+            calendarData[day].TOTAL_ACTUAL += row.ACT_PRO_QTY || 0;
         });
 
         const result = Object.keys(calendarData).map(day => ({
@@ -77,8 +80,8 @@ app.get('/api/production', async (req, res) => {
         const fiscalYear = req.query.fiscalYear ? parseInt(req.query.fiscalYear) : null;
         const lineFilter = req.query.line;
 
-        // Try to use cached data first
-        const cached = dataCache.getCachedData();
+        // Use lazy-loaded async data
+        const cached = await dataCache.getCachedDataAsync();
         let rawData;
         
         if (cached && cached.data && cached.data.length > 0) {
@@ -657,6 +660,35 @@ app.get('/api/export-csv', async (req, res) => {
         console.error('CSV Export Error:', error);
         res.status(500).json({ error: 'Export failed' });
     }
+});
+
+// API: Refresh Cache from Database
+app.post('/api/refresh-cache', async (req, res) => {
+    try {
+        console.log('📥 Cache refresh requested...');
+        await dataCache.refreshCacheFromDB();
+        const cacheInfo = await dataCache.getCachedDataAsync();
+        res.json({ 
+            success: true, 
+            message: 'Cache refreshed successfully',
+            totalRecords: cacheInfo.totalRecords,
+            lastUpdate: cacheInfo.lastUpdate
+        });
+    } catch (error) {
+        console.error('Cache refresh error:', error);
+        res.status(500).json({ success: false, error: 'Refresh failed' });
+    }
+});
+
+// API: Get Cache Status
+app.get('/api/cache-status', async (req, res) => {
+    const cacheInfo = await dataCache.getCachedDataAsync();
+    res.json({
+        status: 'active',
+        totalRecords: cacheInfo.totalRecords,
+        lastUpdate: cacheInfo.lastUpdate,
+        dataFile: '/public/production_data.json'
+    });
 });
 
 // Start Server
