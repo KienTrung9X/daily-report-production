@@ -996,60 +996,77 @@ async function captureScreenshot() {
         filterCard.style.display = originalFilterCardDisplay;
         window.scrollTo(scrollX, scrollY);
         
-        // Convert canvas to blob and copy to clipboard
-        canvas.toBlob(async (blob) => {
+        // Method 1: Try modern Clipboard API
+        let success = false;
+        
+        if (navigator.clipboard && navigator.clipboard.write) {
             try {
-                // Try modern clipboard API first
-                if (navigator.clipboard && navigator.clipboard.write) {
-                    await navigator.clipboard.write([
-                        new ClipboardItem({
-                            'image/png': blob
-                        })
-                    ]);
-                    alert('✓ Screenshot copied to clipboard!');
-                } else {
-                    // Fallback: Create data URL and copy
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        const img = new Image();
-                        img.src = e.target.result;
-                        img.style.display = 'none';
-                        document.body.appendChild(img);
-                        
-                        const range = document.createRange();
-                        range.selectNodeContents(img);
-                        const sel = window.getSelection();
-                        sel.removeAllRanges();
-                        sel.addRange(range);
-                        
-                        try {
-                            document.execCommand('copy');
-                            alert('✓ Screenshot copied to clipboard!');
-                        } catch (err) {
-                            alert('⚠ Browser clipboard access denied. Downloading file instead.');
-                        }
-                        document.body.removeChild(img);
-                    };
-                    reader.readAsDataURL(blob);
-                    return;
-                }
+                canvas.toBlob(async (blob) => {
+                    try {
+                        await navigator.clipboard.write([
+                            new ClipboardItem({ 'image/png': blob })
+                        ]);
+                        alert('✓ Screenshot copied to clipboard!');
+                        success = true;
+                    } catch (e) {
+                        console.warn('Clipboard write failed:', e);
+                        downloadScreenshot(canvas);
+                    }
+                });
+                return;
             } catch (err) {
-                console.warn('Clipboard error, downloading instead:', err);
-                alert('⚠ Clipboard access restricted. Downloading file...');
+                console.warn('Method 1 failed:', err);
             }
-            
-            // Download as backup
+        }
+        
+        // Method 2: Create temp image and use copy command
+        canvas.toBlob((blob) => {
             const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            const now = new Date();
-            const filename = `production_report_${now.getFullYear()}${(now.getMonth()+1).toString().padStart(2,'0')}${now.getDate().toString().padStart(2,'0')}_${now.getHours()}${now.getMinutes()}.png`;
-            link.href = url;
-            link.download = filename;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            URL.revokeObjectURL(url);
-        }, 'image/png');
+            const img = document.createElement('img');
+            img.src = url;
+            img.style.position = 'fixed';
+            img.style.left = '-9999px';
+            img.style.top = '-9999px';
+            img.style.maxWidth = 'none';
+            img.style.maxHeight = 'none';
+            document.body.appendChild(img);
+            
+            // Wait for image to load
+            img.onload = () => {
+                try {
+                    const range = document.createRange();
+                    const sel = window.getSelection();
+                    
+                    range.selectNodeContents(img);
+                    sel.removeAllRanges();
+                    sel.addRange(range);
+                    
+                    const copied = document.execCommand('copy');
+                    
+                    if (copied) {
+                        alert('✓ Screenshot copied to clipboard!');
+                    } else {
+                        alert('⚠ Copy command failed. Downloading file...');
+                        downloadScreenshot(canvas);
+                    }
+                } catch (err) {
+                    console.error('Copy failed:', err);
+                    alert('⚠ Cannot copy to clipboard. Downloading file...');
+                    downloadScreenshot(canvas);
+                } finally {
+                    sel.removeAllRanges();
+                    document.body.removeChild(img);
+                    URL.revokeObjectURL(url);
+                }
+            };
+            
+            img.onerror = () => {
+                console.error('Failed to load image');
+                downloadScreenshot(canvas);
+                document.body.removeChild(img);
+                URL.revokeObjectURL(url);
+            };
+        });
         
     } catch (error) {
         console.error('Screenshot error:', error);
@@ -1060,4 +1077,20 @@ async function captureScreenshot() {
         filterCard.style.display = originalFilterCardDisplay;
         window.scrollTo(scrollX, scrollY);
     }
+}
+
+// Helper function to download screenshot
+function downloadScreenshot(canvas) {
+    canvas.toBlob((blob) => {
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        const now = new Date();
+        const filename = `production_report_${now.getFullYear()}${(now.getMonth()+1).toString().padStart(2,'0')}${now.getDate().toString().padStart(2,'0')}_${now.getHours()}${now.getMinutes()}.png`;
+        link.href = url;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+    });
 }
