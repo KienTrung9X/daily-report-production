@@ -59,24 +59,37 @@ function loadDataFromFile() {
 // Optional: Refresh from DB when needed (manual trigger only)
 async function refreshCacheFromDB() {
     try {
-        console.log('Starting DB refresh...');
+        console.log('🔄 Starting cache refresh...');
         const now = new Date();
         const currentYear = now.getFullYear();
         const currentMonth = now.getMonth() + 1;
         
-        // Only fetch current month data
+        // Fetch current month data from DB
         const freshData = await dbService.getData(currentYear, currentMonth, null, true);
         
         if (freshData && freshData.length > 0) {
-            cachedData = freshData;
+            // Merge with existing cache (add new month data)
+            cachedData = Array.isArray(cachedData) ? cachedData : [];
+            
+            // Remove old data from same month
+            const yearMonth = `${currentYear}${currentMonth.toString().padStart(2, '0')}`;
+            cachedData = cachedData.filter(row => row.YEAR_MONTH !== yearMonth);
+            
+            // Add fresh data
+            cachedData.push(...freshData);
+            
             lastUpdate = new Date();
             
-            // Save to file
+            // Save updated cache to file
             fs.writeFileSync(DATA_FILE, JSON.stringify(cachedData, null, 2));
-            console.log(`✓ Refreshed ${cachedData.length} records from DB`);
+            console.log(`✓ Cache refreshed: ${freshData.length} records from DB for ${yearMonth}`);
+            console.log(`✓ Total cache now has ${cachedData.length} records`);
+        } else {
+            console.warn('⚠️ No data returned from DB');
         }
     } catch (error) {
-        console.error('DB refresh error:', error.message);
+        console.error('❌ DB refresh error:', error.message);
+        throw error;
     }
 }
 
