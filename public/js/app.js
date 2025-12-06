@@ -996,60 +996,49 @@ async function captureScreenshot() {
         filterCard.style.display = originalFilterCardDisplay;
         window.scrollTo(scrollX, scrollY);
         
-        canvas.toBlob(async blob => {
-            // Copy to clipboard (with fallback)
-            let clipboardSuccess = false;
-            
-            // Method 1: Modern Clipboard API
+        // Convert canvas to blob and copy to clipboard
+        canvas.toBlob(async (blob) => {
             try {
-                await navigator.clipboard.write([
-                    new ClipboardItem({ 'image/png': blob })
-                ]);
-                clipboardSuccess = true;
-                console.log('✓ Image copied to clipboard via API');
-            } catch (err) {
-                console.warn('Clipboard API failed, trying alternative method:', err);
-            }
-            
-            // Method 2: Fallback - Convert to canvas and use canvas API
-            if (!clipboardSuccess) {
-                try {
-                    canvas.toBlob(async (canvasBlob) => {
-                        const reader = new FileReader();
-                        reader.onload = async () => {
-                            try {
-                                const img = new Image();
-                                img.onload = () => {
-                                    const ctx = document.createElement('canvas').getContext('2d');
-                                    ctx.canvas.width = img.width;
-                                    ctx.canvas.height = img.height;
-                                    ctx.drawImage(img, 0, 0);
-                                    ctx.canvas.toBlob(async (newBlob) => {
-                                        await navigator.clipboard.write([new ClipboardItem({ 'image/png': newBlob })]);
-                                        console.log('✓ Image copied via fallback method');
-                                    });
-                                };
-                                img.src = reader.result;
-                            } catch (e) {
-                                console.error('Fallback failed:', e);
-                            }
-                        };
-                        reader.readAsDataURL(canvasBlob);
-                    });
-                    clipboardSuccess = true;
-                } catch (err) {
-                    console.warn('Fallback method also failed:', err);
+                // Try modern clipboard API first
+                if (navigator.clipboard && navigator.clipboard.write) {
+                    await navigator.clipboard.write([
+                        new ClipboardItem({
+                            'image/png': blob
+                        })
+                    ]);
+                    alert('✓ Screenshot copied to clipboard!');
+                } else {
+                    // Fallback: Create data URL and copy
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const img = new Image();
+                        img.src = e.target.result;
+                        img.style.display = 'none';
+                        document.body.appendChild(img);
+                        
+                        const range = document.createRange();
+                        range.selectNodeContents(img);
+                        const sel = window.getSelection();
+                        sel.removeAllRanges();
+                        sel.addRange(range);
+                        
+                        try {
+                            document.execCommand('copy');
+                            alert('✓ Screenshot copied to clipboard!');
+                        } catch (err) {
+                            alert('⚠ Browser clipboard access denied. Downloading file instead.');
+                        }
+                        document.body.removeChild(img);
+                    };
+                    reader.readAsDataURL(blob);
+                    return;
                 }
+            } catch (err) {
+                console.warn('Clipboard error, downloading instead:', err);
+                alert('⚠ Clipboard access restricted. Downloading file...');
             }
             
-            // Show success/warning message
-            if (clipboardSuccess) {
-                alert('✓ Screenshot copied to clipboard! You can paste it directly in Word, Excel, etc.');
-            } else {
-                alert('⚠️ Clipboard copy might have issues. Downloading file instead.');
-            }
-            
-            // Also download the file as backup
+            // Download as backup
             const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
             const now = new Date();
@@ -1060,10 +1049,11 @@ async function captureScreenshot() {
             link.click();
             document.body.removeChild(link);
             URL.revokeObjectURL(url);
-        });
+        }, 'image/png');
+        
     } catch (error) {
         console.error('Screenshot error:', error);
-        alert('❌ Failed to capture screenshot: ' + error.message);
+        alert('❌ Failed to capture screenshot');
         tableContainer.style.maxHeight = originalMaxHeight;
         tableContainer.style.overflow = originalOverflow;
         filterSection.style.display = originalFilterDisplay;
