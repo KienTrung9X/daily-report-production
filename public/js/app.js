@@ -1033,9 +1033,10 @@ async function captureScreenshot() {
             
             // Wait for image to load
             img.onload = () => {
+                let sel = null;
                 try {
                     const range = document.createRange();
-                    const sel = window.getSelection();
+                    sel = window.getSelection();
                     
                     range.selectNodeContents(img);
                     sel.removeAllRanges();
@@ -1054,7 +1055,9 @@ async function captureScreenshot() {
                     alert('⚠ Cannot copy to clipboard. Downloading file...');
                     downloadScreenshot(canvas);
                 } finally {
-                    sel.removeAllRanges();
+                    if (sel) {
+                        sel.removeAllRanges();
+                    }
                     document.body.removeChild(img);
                     URL.revokeObjectURL(url);
                 }
