@@ -106,12 +106,12 @@ async function refreshCacheData() {
         if (result.success) {
             btn.textContent = '✅ Updated!';
             console.log(`Cache updated: ${result.totalRecords} records`);
-            // Reload data after refresh
-            setTimeout(() => {
-                loadData();
+            // Reload data after refresh with delay
+            setTimeout(async () => {
+                await loadData();
                 btn.textContent = originalText;
                 btn.disabled = false;
-            }, 1000);
+            }, 1500);
         } else {
             throw new Error(result.error);
         }
@@ -144,14 +144,15 @@ async function loadData() {
         const fiscalYear = document.getElementById('fiscalYearFilter').value;
         
         let url;
+        const timestamp = Date.now();
         if (startDate && endDate) {
-            url = `/api/production?fiscalYear=${fiscalYear}&detailed=true&startDate=${startDate.replace(/-/g, '')}&endDate=${endDate.replace(/-/g, '')}`;
+            url = `/api/production?fiscalYear=${fiscalYear}&detailed=true&startDate=${startDate.replace(/-/g, '')}&endDate=${endDate.replace(/-/g, '')}&_t=${timestamp}`;
         } else {
             // Chỉ lấy dữ liệu tháng hiện tại
             const yearMonth = `${currentYear}${currentMonth.toString().padStart(2, '0')}`;
             const firstDay = `${yearMonth}01`;
             const lastDay = `${yearMonth}${new Date(currentYear, currentMonth, 0).getDate()}`;
-            url = `/api/production?fiscalYear=${fiscalYear}&detailed=true&startDate=${firstDay}&endDate=${lastDay}`;
+            url = `/api/production?fiscalYear=${fiscalYear}&detailed=true&startDate=${firstDay}&endDate=${lastDay}&_t=${timestamp}`;
         }
         
         const lineSelect = document.getElementById('lineFilter');

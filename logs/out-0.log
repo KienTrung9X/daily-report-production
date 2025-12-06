@@ -16,3 +16,6 @@
 2025-12-06 09:58:36 +07:00: ✓ Access from: http://10.247.199.210:3000
 2025-12-06 09:58:36 +07:00: ✓ Health check: http://10.247.199.210:3000/health
 2025-12-06 09:58:36 +07:00: ✓ Cache system ready (lazy load enabled)
+2025-12-06 13:51:31 +07:00: ✓ Graceful shutdown handlers registered
+2025-12-06 13:51:34 +07:00: ✓ Graceful shutdown handlers registered
+2025-12-06 13:51:38 +07:00: ✓ Graceful shutdown handlers registered

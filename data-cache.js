@@ -64,11 +64,14 @@ async function refreshCacheFromDB() {
         const currentYear = now.getFullYear();
         const currentMonth = now.getMonth() + 1;
         
-        console.log(`📅 Fetching data for ${currentYear}/${currentMonth}...`);
+        console.log(`📅 Fetching ALL data from database...`);
         
         try {
-            // Fetch current month data from DB
-            const freshData = await dbService.getData(currentYear, currentMonth, null, true, null, null, null);
+            // Fetch ALL data from DB using startDate/endDate
+            const yearMonth = `${currentYear}${currentMonth.toString().padStart(2, '0')}`;
+            const startDate = `${yearMonth}01`;
+            const endDate = `${yearMonth}31`;
+            const freshData = await dbService.getData(currentYear, currentMonth, null, true, startDate, endDate, null);
             
             console.log(`✓ DB returned ${freshData ? freshData.length : 0} records`);
             
@@ -99,6 +102,11 @@ async function refreshCacheFromDB() {
                 console.log(`✓ Cache refreshed: ${freshData.length} new records for ${yearMonth}`);
                 console.log(`✓ Total cache now has ${cachedData.length} records`);
                 console.log(`✓ File saved to: ${DATA_FILE}`);
+                
+                // Force reload from file to ensure consistency
+                cachedData = null;
+                await loadDataFromFile();
+                console.log('✓ Memory cache reloaded from file');
             } else {
                 console.warn('⚠️ No data returned from DB - using cached data');
             }
