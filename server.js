@@ -7,7 +7,8 @@ const dbService = require('./db_service');
 const dataCache = require('./data-cache');
 
 const app = express();
-const PORT = process.env.PORT || 0;
+const PORT = process.env.PORT || 3000;
+const HOST = '0.0.0.0'; // Listen on all interfaces
 
 // Middleware
 app.use(bodyParser.json());
@@ -692,9 +693,11 @@ app.get('/api/cache-status', async (req, res) => {
 });
 
 // Start Server
-const server = app.listen(PORT, () => {
+const server = app.listen(PORT, HOST, () => {
     const actualPort = server.address().port;
-    console.log(`Server is running on http://localhost:${actualPort}`);
+    const actualHost = server.address().address;
+    console.log(`✓ Server is running on http://${actualHost === '0.0.0.0' ? 'localhost' : actualHost}:${actualPort}`);
+    console.log(`✓ Access from: http://10.247.199.210:${actualPort}`);
     
     // Start auto-refresh cache
     dataCache.startAutoRefresh();
