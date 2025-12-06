@@ -226,16 +226,23 @@ function renderPivotTable(data, workDays, year, month, workingDayDates = new Set
         let upToPlan = 0;
         let upToAct = 0;
         if (upToDateStr) {
+            // Count working days up to the specified date
+            const workingDaysUpTo = sortedDays.filter(day => day <= upToDateStr).length;
+            
             sortedDays.forEach(day => {
                 if (day <= upToDateStr) {
                     const dayData = itemGroup.days[day];
+                    const dayStr = day.toString();
+                    const dayYear = dayStr.substring(0, 4);
+                    const dayMonth = dayStr.substring(4, 6);
+                    const yearMonth = `${dayYear}${dayMonth}`;
+                    const workDaysInMonth = workDays[yearMonth] || 20;
+                    const monthPlan = info.EST_PRO_QTY || 0;
+                    
+                    // Add daily plan for each working day
+                    upToPlan += monthPlan / workDaysInMonth;
+                    
                     if (dayData) {
-                        const dayStr = day.toString();
-                        const dayYear = dayStr.substring(0, 4);
-                        const dayMonth = dayStr.substring(4, 6);
-                        const yearMonth = `${dayYear}${dayMonth}`;
-                        const workDaysInMonth = workDays[yearMonth] || 20;
-                        upToPlan += dayData.plan / workDaysInMonth;
                         upToAct += dayData.act;
                     }
                 }
@@ -260,11 +267,14 @@ function renderPivotTable(data, workDays, year, month, workingDayDates = new Set
                 const workDaysInMonth = workDays[yearMonth] || 20;
                 const monthPlan = info.EST_PRO_QTY || 0;
                 
+                const itemIsLine312 = info.LINE1 === '312';
+                const divisor = itemIsLine312 ? 1 : 1000;
+                
                 if (metric === 'Plan') {
-                    const dailyPlan = monthPlan > 0 ? Math.round(monthPlan / workDaysInMonth / (isLine312 ? 1 : 1000)) : 0;
+                    const dailyPlan = monthPlan > 0 ? Math.round(monthPlan / workDaysInMonth / divisor) : 0;
                     html += `<td>${dailyPlan || '-'}</td>`;
                 } else if (metric === 'Act') {
-                    const actVal = dayData ? Math.round(dayData.act / (isLine312 ? 1 : 1000)) : 0;
+                    const actVal = dayData ? Math.round(dayData.act / divisor) : 0;
                     const dailyPlan = monthPlan > 0 ? monthPlan / workDaysInMonth : 0;
                     const isZero = actVal === 0 && dailyPlan > 0;
                     html += `<td class="${isZero ? 'val-zero' : ''}">${actVal || '-'}</td>`;
@@ -285,12 +295,15 @@ function renderPivotTable(data, workDays, year, month, workingDayDates = new Set
                 }
             });
             
+            const itemIsLine312 = info.LINE1 === '312';
+            const divisor = itemIsLine312 ? 1 : 1000;
+            
             if (metric === 'Plan') {
-                html += `<td class="col-total">${Math.round(totalPlan / (isLine312 ? 1 : 1000)).toLocaleString('de-DE')}</td>`;
-                if (upToDateStr) html += `<td class="col-upto">${Math.round(upToPlan / (isLine312 ? 1 : 1000)).toLocaleString('de-DE')}</td>`;
+                html += `<td class="col-total">${Math.round(totalPlan / divisor).toLocaleString('de-DE')}</td>`;
+                if (upToDateStr) html += `<td class="col-upto">${Math.round(upToPlan / divisor).toLocaleString('de-DE')}</td>`;
             } else if (metric === 'Act') {
-                html += `<td class="col-total">${Math.round(totalAct / (isLine312 ? 1 : 1000)).toLocaleString('de-DE')}</td>`;
-                if (upToDateStr) html += `<td class="col-upto">${Math.round(upToAct / (isLine312 ? 1 : 1000)).toLocaleString('de-DE')}</td>`;
+                html += `<td class="col-total">${Math.round(totalAct / divisor).toLocaleString('de-DE')}</td>`;
+                if (upToDateStr) html += `<td class="col-upto">${Math.round(upToAct / divisor).toLocaleString('de-DE')}</td>`;
             } else {
                 if (totalPlan > 0) {
                     const pctVal = (totalAct / totalPlan * 100);
@@ -950,7 +963,18 @@ async function captureScreenshot() {
         filterCard.style.display = originalFilterCardDisplay;
         window.scrollTo(scrollX, scrollY);
         
-        canvas.toBlob(blob => {
+        canvas.toBlob(async blob => {
+            // Copy to clipboard
+            try {
+                await navigator.clipboard.write([
+                    new ClipboardItem({ 'image/png': blob })
+                ]);
+                alert('Screenshot copied to clipboard! You can paste it directly.');
+            } catch (err) {
+                console.error('Failed to copy to clipboard:', err);
+            }
+            
+            // Also download the file
             const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
             const now = new Date();
