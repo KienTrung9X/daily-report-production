@@ -55,7 +55,7 @@ async function getDataFromSQL(year, month, week = null, detailed = false, startD
                 ON LN1 = LN1C9H AND LN2 = LN2C9H
                 WHERE LN1C9H IN (${lineCodesFilter})
                 ${lineFilter ? `AND LN1C9H = '${lineFilter}'` : ''}
-                AND SUBSTR(PCPU9H,1,6) BETWEEN '${config.startMonth}' AND '${config.endMonth}'
+                AND PCPU9H BETWEEN '${startDate}' AND '${endDate}'
                 GROUP BY SUBSTR(PCPU9H,1,6), PCPU9H, LN1C9H, LN2C9H, LN_NAME, PSHN9H, ITMC9H, IT1IA0, IT2IA0, QUNC9H, SIZCA0, CHNCA0
                 ORDER BY PCPU9H DESC
                 FETCH FIRST ${config.rowLimit} ROWS ONLY
