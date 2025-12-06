@@ -10,14 +10,75 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const HOST = '0.0.0.0'; // Listen on all interfaces
 
+// ============================================
+// ERROR HANDLING & STABILITY
+// ============================================
+
+// Handle uncaught exceptions
+process.on('uncaughtException', (error) => {
+    console.error('❌ Uncaught Exception:', error);
+    // Log to file
+    fs.appendFileSync(
+        path.join(__dirname, 'logs', 'error-uncaught.log'),
+        `${new Date().toISOString()} - ${error.message}\n${error.stack}\n\n`
+    );
+});
+
+// Handle unhandled promise rejections
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('❌ Unhandled Rejection at:', promise, 'reason:', reason);
+    fs.appendFileSync(
+        path.join(__dirname, 'logs', 'error-promise.log'),
+        `${new Date().toISOString()} - ${reason}\n\n`
+    );
+});
+
 // Middleware
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json({ limit: '50mb' }));
+app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
+
+// Request logging middleware
+app.use((req, res, next) => {
+    const start = Date.now();
+    res.on('finish', () => {
+        const duration = Date.now() - start;
+        console.log(`${req.method} ${req.path} - ${res.statusCode} (${duration}ms)`);
+    });
+    next();
+});
 
 // View Engine
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
+
+// ============================================
+// HEALTH CHECK & STATUS ENDPOINTS
+// ============================================
+
+// Health check for PM2 & monitoring
+app.get('/health', (req, res) => {
+    const uptime = process.uptime();
+    const memUsage = process.memoryUsage();
+    
+    res.json({
+        status: 'healthy',
+        timestamp: new Date().toISOString(),
+        uptime: `${Math.floor(uptime)}s`,
+        memory: {
+            heapUsed: `${Math.round(memUsage.heapUsed / 1024 / 1024)}MB`,
+            heapTotal: `${Math.round(memUsage.heapTotal / 1024 / 1024)}MB`,
+            rss: `${Math.round(memUsage.rss / 1024 / 1024)}MB`
+        },
+        node_version: process.version,
+        env: process.env.NODE_ENV || 'development'
+    });
+});
+
+// Ready signal for PM2
+app.get('/ready', (req, res) => {
+    res.json({ status: 'ready' });
+});
 
 // Routes
 app.get('/', (req, res) => {
@@ -698,7 +759,62 @@ const server = app.listen(PORT, HOST, () => {
     const actualHost = server.address().address;
     console.log(`✓ Server is running on http://${actualHost === '0.0.0.0' ? 'localhost' : actualHost}:${actualPort}`);
     console.log(`✓ Access from: http://10.247.199.210:${actualPort}`);
+    console.log(`✓ Health check: http://10.247.199.210:${actualPort}/health`);
+    
+    // Signal PM2 that app is ready
+    if (process.send) {
+        process.send('ready');
+    }
     
     // Start auto-refresh cache
     dataCache.startAutoRefresh();
 });
+
+// ============================================
+// GRACEFUL SHUTDOWN
+// ============================================
+
+let isShuttingDown = false;
+
+const gracefulShutdown = (signal) => {
+    if (isShuttingDown) return;
+    isShuttingDown = true;
+    
+    console.log(`\n⏹️  ${signal} received. Starting graceful shutdown...`);
+    
+    // Stop accepting new connections
+    server.close(() => {
+        console.log('✓ HTTP server closed');
+        process.exit(0);
+    });
+    
+    // Force close after 10 seconds
+    setTimeout(() => {
+        console.error('❌ Forced shutdown due to timeout');
+        process.exit(1);
+    }, 10000);
+};
+
+// Listen for termination signals
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+
+// Handle connection errors
+server.on('error', (err) => {
+    if (err.code === 'EADDRINUSE') {
+        console.error(`❌ Port ${PORT} is already in use`);
+        process.exit(1);
+    } else {
+        console.error('❌ Server error:', err);
+    }
+});
+
+// Log server events
+server.on('clientError', (err, socket) => {
+    console.error('❌ Client error:', err.message);
+    if (socket.writable) {
+        socket.end('HTTP/1.1 400 Bad Request\r\n\r\n');
+    }
+});
+
+console.log('✓ Graceful shutdown handlers registered');
