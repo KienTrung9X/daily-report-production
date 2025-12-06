@@ -67,11 +67,16 @@ async function refreshCacheFromDB() {
         console.log(`📅 Fetching data for ${currentYear}/${currentMonth}...`);
         
         // Fetch current month data from DB
-        const freshData = await dbService.getData(currentYear, currentMonth, null, true);
+        const freshData = await dbService.getData(currentYear, currentMonth, null, true, null, null, null);
         
         console.log(`✓ DB returned ${freshData ? freshData.length : 0} records`);
         
         if (freshData && freshData.length > 0) {
+            // Load existing cache from file first
+            if (!cachedData) {
+                await loadDataFromFile();
+            }
+            
             // Merge with existing cache (add new month data)
             cachedData = Array.isArray(cachedData) ? cachedData : [];
             
