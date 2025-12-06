@@ -221,6 +221,9 @@ function renderPivotTable(data, workDays, year, month, workingDayDates = new Set
     
     const itemsMap = {};
     data.forEach(row => {
+        // Filter by selected lines
+        if (!selectedLines.includes(row.LINE1)) return;
+        
         const key = `${row.LINE1}_${row.ITEM}`;
         if (!itemsMap[key]) {
             itemsMap[key] = { info: row, days: {} };
