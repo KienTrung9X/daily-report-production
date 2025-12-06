@@ -64,8 +64,12 @@ async function refreshCacheFromDB() {
         const currentYear = now.getFullYear();
         const currentMonth = now.getMonth() + 1;
         
+        console.log(`📅 Fetching data for ${currentYear}/${currentMonth}...`);
+        
         // Fetch current month data from DB
         const freshData = await dbService.getData(currentYear, currentMonth, null, true);
+        
+        console.log(`✓ DB returned ${freshData ? freshData.length : 0} records`);
         
         if (freshData && freshData.length > 0) {
             // Merge with existing cache (add new month data)
@@ -73,7 +77,11 @@ async function refreshCacheFromDB() {
             
             // Remove old data from same month
             const yearMonth = `${currentYear}${currentMonth.toString().padStart(2, '0')}`;
+            const beforeCount = cachedData.length;
             cachedData = cachedData.filter(row => row.YEAR_MONTH !== yearMonth);
+            const removedCount = beforeCount - cachedData.length;
+            
+            console.log(`⏮️  Removed ${removedCount} old records for ${yearMonth}`);
             
             // Add fresh data
             cachedData.push(...freshData);
@@ -82,13 +90,15 @@ async function refreshCacheFromDB() {
             
             // Save updated cache to file
             fs.writeFileSync(DATA_FILE, JSON.stringify(cachedData, null, 2));
-            console.log(`✓ Cache refreshed: ${freshData.length} records from DB for ${yearMonth}`);
+            console.log(`✓ Cache refreshed: ${freshData.length} new records for ${yearMonth}`);
             console.log(`✓ Total cache now has ${cachedData.length} records`);
+            console.log(`✓ File saved to: ${DATA_FILE}`);
         } else {
-            console.warn('⚠️ No data returned from DB');
+            console.warn('⚠️ No data returned from DB - check database connection');
         }
     } catch (error) {
         console.error('❌ DB refresh error:', error.message);
+        console.error('❌ Stack trace:', error.stack);
         throw error;
     }
 }
