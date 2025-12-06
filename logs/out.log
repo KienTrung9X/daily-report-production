@@ -99,3 +99,8 @@
 2025-12-06 10:09:15 +07:00: ✓ Access from: http://10.247.199.210:3000
 2025-12-06 10:09:15 +07:00: ✓ Health check: http://10.247.199.210:3000/health
 2025-12-06 10:09:15 +07:00: ✓ Cache system ready (lazy load enabled)
+2025-12-06 10:09:18 +07:00: GET / - 304 (9ms)
+2025-12-06 10:09:18 +07:00: GET /api/work-days - 304 (1ms)
+2025-12-06 10:09:18 +07:00: GET /api/working-days - 304 (1ms)
+2025-12-06 10:09:18 +07:00: ✓ Loaded 1326 records from production_data.json
+2025-12-06 10:09:18 +07:00: GET /api/production - 304 (20ms)

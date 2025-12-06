@@ -996,79 +996,19 @@ async function captureScreenshot() {
         filterCard.style.display = originalFilterCardDisplay;
         window.scrollTo(scrollX, scrollY);
         
-        // Method 1: Try modern Clipboard API
-        let success = false;
-        
-        if (navigator.clipboard && navigator.clipboard.write) {
-            try {
-                canvas.toBlob(async (blob) => {
-                    try {
-                        await navigator.clipboard.write([
-                            new ClipboardItem({ 'image/png': blob })
-                        ]);
-                        alert('✓ Screenshot copied to clipboard!');
-                        success = true;
-                    } catch (e) {
-                        console.warn('Clipboard write failed:', e);
-                        downloadScreenshot(canvas);
-                    }
-                });
-                return;
-            } catch (err) {
-                console.warn('Method 1 failed:', err);
-            }
-        }
-        
-        // Method 2: Create temp image and use copy command
+        // Download the screenshot
         canvas.toBlob((blob) => {
             const url = URL.createObjectURL(blob);
-            const img = document.createElement('img');
-            img.src = url;
-            img.style.position = 'fixed';
-            img.style.left = '-9999px';
-            img.style.top = '-9999px';
-            img.style.maxWidth = 'none';
-            img.style.maxHeight = 'none';
-            document.body.appendChild(img);
-            
-            // Wait for image to load
-            img.onload = () => {
-                let sel = null;
-                try {
-                    const range = document.createRange();
-                    sel = window.getSelection();
-                    
-                    range.selectNodeContents(img);
-                    sel.removeAllRanges();
-                    sel.addRange(range);
-                    
-                    const copied = document.execCommand('copy');
-                    
-                    if (copied) {
-                        alert('✓ Screenshot copied to clipboard!');
-                    } else {
-                        alert('⚠ Copy command failed. Downloading file...');
-                        downloadScreenshot(canvas);
-                    }
-                } catch (err) {
-                    console.error('Copy failed:', err);
-                    alert('⚠ Cannot copy to clipboard. Downloading file...');
-                    downloadScreenshot(canvas);
-                } finally {
-                    if (sel) {
-                        sel.removeAllRanges();
-                    }
-                    document.body.removeChild(img);
-                    URL.revokeObjectURL(url);
-                }
-            };
-            
-            img.onerror = () => {
-                console.error('Failed to load image');
-                downloadScreenshot(canvas);
-                document.body.removeChild(img);
-                URL.revokeObjectURL(url);
-            };
+            const link = document.createElement('a');
+            const now = new Date();
+            const filename = `production_report_${now.getFullYear()}${(now.getMonth()+1).toString().padStart(2,'0')}${now.getDate().toString().padStart(2,'0')}_${now.getHours()}${now.getMinutes()}.png`;
+            link.href = url;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+            alert('✓ Screenshot downloaded! File: ' + filename);
         });
         
     } catch (error) {
