@@ -22,7 +22,7 @@
         <section class="card">
             <div class="card-header">
                 <h2>Production Report</h2>
-                <button class="btn-primary" onclick="openModal('filterModal')">Filters</button>
+                <button class="btn-primary" onclick="requestPassword(() => openModal('filterModal'))">Filters</button>
             </div>
         </section>
 
@@ -220,7 +220,21 @@
         </div>
     </div>
 
+    <!-- Password Modal for Protected Features -->
+    <div id="passwordModal" class="modal">
+        <div class="modal-content">
+            <h3>🔐 Enter Password</h3>
+            <p>This feature requires a password.</p>
+            <input type="password" id="passwordInput" placeholder="Enter password" style="width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 4px;">
+            <div class="modal-actions">
+                <button class="btn-primary" onclick="verifyPassword()">Verify</button>
+                <button class="btn-secondary" onclick="closeModal('passwordModal')">Cancel</button>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="/js/app.js"></script>
 </body>
 </html>
+

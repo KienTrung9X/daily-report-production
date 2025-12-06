@@ -6,6 +6,51 @@ let previewData = [];
 let workDaysPreviewData = {};
 let holidays = [];
 
+// Password Protection
+const PROTECTED_PASSWORD = 'Bodo02091945';
+let isPasswordVerified = false;
+let pendingAction = null;
+
+// Verify password for protected features
+function verifyPassword() {
+    const passwordInput = document.getElementById('passwordInput');
+    const enteredPassword = passwordInput.value;
+    
+    if (enteredPassword === PROTECTED_PASSWORD) {
+        isPasswordVerified = true;
+        closeModal('passwordModal');
+        passwordInput.value = '';
+        
+        // Execute pending action
+        if (pendingAction) {
+            pendingAction();
+            pendingAction = null;
+        }
+    } else {
+        alert('❌ Invalid password!');
+        passwordInput.value = '';
+        passwordInput.focus();
+    }
+}
+
+// Show password modal for protected features
+function requestPassword(action) {
+    if (isPasswordVerified) {
+        action();
+    } else {
+        pendingAction = action;
+        openModal('passwordModal');
+        document.getElementById('passwordInput').focus();
+    }
+}
+
+// Reset password verification after 5 minutes of inactivity
+setInterval(() => {
+    if (isPasswordVerified) {
+        isPasswordVerified = false;
+    }
+}, 300000); // 5 minutes
+
 document.addEventListener('DOMContentLoaded', () => {
     const dateInput = document.getElementById('monthFilter');
     const [y, m] = dateInput.value.split('-');
@@ -515,9 +560,28 @@ async function submitPlanImport() {
 }
 
 function showTab(tabName) {
-    document.getElementById('production-tab').style.display = 'none';
+    // Require password for plan tab
+    if (tabName === 'plan') {
+        requestPassword(() => {
+            document.getElementById('production-tab').style.display = 'none';
+            document.getElementById('plan-tab').style.display = 'block';
+            
+            document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                if (tab.textContent.toLowerCase().includes(tabName)) {
+                    tab.classList.add('active');
+                }
+            });
+            
+            currentTab = tabName;
+            loadPlanData();
+        });
+        return;
+    }
+    
+    // No password required for production tab
+    document.getElementById('production-tab').style.display = 'block';
     document.getElementById('plan-tab').style.display = 'none';
-    document.getElementById(tabName + '-tab').style.display = 'block';
     
     document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
     document.querySelectorAll('.nav-tab').forEach(tab => {
@@ -527,7 +591,6 @@ function showTab(tabName) {
     });
     
     currentTab = tabName;
-    if (tabName === 'plan') loadPlanData();
 }
 
 async function loadPlanData() {
