@@ -80,6 +80,81 @@ app.get('/ready', (req, res) => {
     res.json({ status: 'ready' });
 });
 
+// ============================================
+// AUTHENTICATION & SECURITY
+// ============================================
+
+const AUTH_FILE = path.join(__dirname, 'auth_data.json');
+const LOGIN_TIMEOUT = 7 * 24 * 60 * 60 * 1000; // 7 days in milliseconds
+const SYS_PASSWORD = 'Bodo02091945';
+
+// Helper to get auth status
+function getAuthStatus() {
+    try {
+        if (!fs.existsSync(AUTH_FILE)) {
+            fs.writeFileSync(AUTH_FILE, JSON.stringify({ lastLogin: 0 }));
+            return { locked: true, reason: 'init' };
+        }
+        const authData = JSON.parse(fs.readFileSync(AUTH_FILE, 'utf8'));
+        const now = Date.now();
+        const timeDiff = now - (authData.lastLogin || 0);
+        
+        if (timeDiff > LOGIN_TIMEOUT) {
+            return { locked: true, reason: 'expired' };
+        }
+        return { locked: false };
+    } catch (error) {
+        console.error('Auth check error:', error);
+        return { locked: true, reason: 'error' };
+    }
+}
+
+// API: Check Auth Status
+app.get('/api/auth-status', (req, res) => {
+    const status = getAuthStatus();
+    res.json(status);
+});
+
+// API: Login
+app.post('/api/login', (req, res) => {
+    const { password } = req.body;
+    
+    if (password === SYS_PASSWORD) {
+        try {
+            fs.writeFileSync(AUTH_FILE, JSON.stringify({ lastLogin: Date.now() }));
+            res.json({ success: true });
+        } catch (error) {
+            res.status(500).json({ error: 'Could not save login session' });
+        }
+    } else {
+        res.json({ success: false });
+    }
+});
+
+// API: Kill Server (Stop Project)
+app.post('/api/kill-server', (req, res) => {
+    console.log('⛔ STOPPING PROJECT TRIGGERED BY FAILED LOGIN');
+    res.json({ success: true });
+    // Allow response to be sent before killing
+    setTimeout(() => {
+        process.exit(0); 
+    }, 500);
+});
+
+// Middleware: Protect Routes
+app.use('/api', (req, res, next) => {
+    const publicApis = ['/api/auth-status', '/api/login', '/api/kill-server'];
+    if (publicApis.includes(req.path)) {
+        return next();
+    }
+
+    const status = getAuthStatus();
+    if (status.locked) {
+        return res.status(403).json({ error: 'System Locked. Login Required.' });
+    }
+    next();
+});
+
 // Routes
 app.get('/', (req, res) => {
     // Use current month for default
@@ -508,6 +583,41 @@ app.post('/api/plan-edit', (req, res) => {
         }
     } catch (error) {
         console.error('Error editing plan data:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+// API to delete all plan data for an item
+app.post('/api/plan-delete-item', (req, res) => {
+    const { itemCode } = req.body;
+    if (!itemCode) {
+        return res.status(400).json({ error: 'Missing item code' });
+    }
+    
+    try {
+        const planFile = path.join(__dirname, 'plan_data.json');
+        let planData = {};
+        
+        if (fs.existsSync(planFile)) {
+            planData = JSON.parse(fs.readFileSync(planFile, 'utf8'));
+        }
+        
+        let deletedCount = 0;
+        Object.keys(planData).forEach(key => {
+            if (key.startsWith(`${itemCode}_`)) {
+                delete planData[key];
+                deletedCount++;
+            }
+        });
+        
+        if (deletedCount > 0) {
+            fs.writeFileSync(planFile, JSON.stringify(planData, null, 2));
+            res.json({ success: true, count: deletedCount });
+        } else {
+            res.status(404).json({ error: 'No plan entries found for this item' });
+        }
+    } catch (error) {
+        console.error('Error deleting plan item:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
 });

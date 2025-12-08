@@ -219,6 +219,19 @@
         </div>
     </div>
 
+    <!-- System Login Modal (Mandatory) -->
+    <div id="systemLoginModal" class="modal" style="background: rgba(0,0,0,0.95); z-index: 9999;">
+        <div class="modal-content" style="border: 2px solid #ef4444; box-shadow: 0 0 20px rgba(239, 68, 68, 0.5);">
+            <h3 style="color: #ef4444;">⚠️ SYSTEM LOCKED</h3>
+            <p>Verification required (7-day Security Check).</p>
+            <p style="font-size: 0.9em; color: #64748b;">Incorrect password will terminate the session.</p>
+            <input type="password" id="sysPasswordInput" placeholder="Enter System Password" style="width: 100%; padding: 12px; margin: 15px 0; border: 1px solid #ddd; border-radius: 4px; font-size: 16px;">
+            <div class="modal-actions" style="justify-content: center;">
+                <button class="btn-primary" onclick="performSystemLogin()" style="background: #ef4444; width: 100%;">AUTHENTICATE</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Password Modal for Protected Features -->
     <div id="passwordModal" class="modal">
         <div class="modal-content">

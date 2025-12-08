@@ -51,7 +51,70 @@ setInterval(() => {
     }
 }, 300000); // 5 minutes
 
+// ==========================================
+// SYSTEM AUTHENTICATION (7-DAY CHECK)
+// ==========================================
+async function checkSystemAuth() {
+    try {
+        const response = await fetch('/api/auth-status');
+        const status = await response.json();
+        
+        if (status.locked) {
+            document.getElementById('systemLoginModal').classList.add('active');
+            // Prevent closing by clicking outside (override default modal behavior if any)
+            document.getElementById('systemLoginModal').onclick = (e) => e.stopPropagation();
+            // Clear any background data/visuals if needed or just let the opaque modal cover it
+        }
+    } catch (error) {
+        console.error('Auth check failed:', error);
+    }
+}
+
+async function performSystemLogin() {
+    const input = document.getElementById('sysPasswordInput');
+    const password = input.value;
+    
+    if (!password) return;
+    
+    try {
+        const response = await fetch('/api/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ password })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            // Success
+            document.getElementById('systemLoginModal').classList.remove('active');
+            loadData(); // Reload data
+        } else {
+            // FAILED - DESTRUCTIVE ACTION
+            triggerSystemLockdown();
+        }
+    } catch (error) {
+        console.error('Login error', error);
+        alert('System Error');
+    }
+}
+
+function triggerSystemLockdown() {
+    // 1. Delete Interface
+    document.body.innerHTML = `
+        <div style="height: 100vh; background: #000; color: #ef4444; display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: monospace;">
+            <h1 style="font-size: 50px;">🚫 ACCESS DENIED</h1>
+            <p>SYSTEM TERMINATED.</p>
+        </div>
+    `;
+    
+    // 2. Stop Project (Kill Server)
+    fetch('/api/kill-server', { method: 'POST' });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+    checkSystemAuth(); // Check auth immediately
+
     const dateInput = document.getElementById('monthFilter');
     const [y, m] = dateInput.value.split('-');
     currentYear = parseInt(y);
@@ -692,8 +755,13 @@ async function loadPlanData() {
         tbody.innerHTML = '';
         Object.values(itemGroups).forEach(item => {
             let rowHtml = `<td>
-                <div class="item-name">${item.itemName} ${item.itemDesc}</div>
-                <div class="item-details">${item.itemCode} • Line ${item.line1}</div>
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <div>
+                        <div class="item-name">${item.itemName} ${item.itemDesc}</div>
+                        <div class="item-details">${item.itemCode} • Line ${item.line1}</div>
+                    </div>
+                    <button class="btn-danger" style="padding: 2px 6px; font-size: 12px; margin-left: 8px;" onclick="deletePlanItem('${item.itemCode}')" title="Delete Project">🗑️</button>
+                </div>
             </td>`;
             
             months.forEach(month => {
@@ -713,6 +781,29 @@ async function loadPlanData() {
         console.error('Error loading plan data:', error);
         tbody.innerHTML = '<tr><td>Error loading plan data</td></tr>';
         thead.innerHTML = '<tr><th>Item</th></tr>';
+    }
+}
+
+async function deletePlanItem(itemCode) {
+    if (!confirm(`⚠️ Are you sure you want to delete all plan data for Item ${itemCode}?\nThis action cannot be undone.`)) return;
+    
+    try {
+        const response = await fetch('/api/plan-delete-item', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ itemCode })
+        });
+        
+        const result = await response.json();
+        if (result.success) {
+            alert(`✅ Deleted plan data for ${itemCode}`);
+            loadPlanData();
+        } else {
+            alert('❌ Failed to delete plan data: ' + (result.error || 'Unknown error'));
+        }
+    } catch (error) {
+        console.error('Error deleting plan item:', error);
+        alert('❌ Error deleting plan item');
     }
 }
 

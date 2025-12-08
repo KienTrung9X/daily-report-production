@@ -1382,3 +1382,339 @@
 2025-12-08 09:02:55 +07:00: ✓ Access from: http://10.247.199.210:3000
 2025-12-08 09:02:55 +07:00: ✓ Health check: http://10.247.199.210:3000/health
 2025-12-08 09:02:55 +07:00: ✓ Cache system ready (lazy load enabled)
+2025-12-08 09:03:07 +07:00: GET / - 200 (9ms)
+2025-12-08 09:03:08 +07:00: GET /api/work-days - 200 (1ms)
+2025-12-08 09:03:08 +07:00: GET /api/working-days - 200 (2ms)
+2025-12-08 09:03:08 +07:00: GET /favicon.ico - 404 (1ms)
+2025-12-08 09:03:08 +07:00: ✓ Loaded 1508 records from production_data.json
+2025-12-08 09:03:08 +07:00: GET /api/production - 200 (24ms)
+2025-12-08 09:03:09 +07:00: GET / - 200 (2ms)
+2025-12-08 09:03:09 +07:00: GET /api/work-days - 200 (2ms)
+2025-12-08 09:03:09 +07:00: GET /api/working-days - 200 (1ms)
+2025-12-08 09:03:09 +07:00: GET /favicon.ico - 404 (1ms)
+2025-12-08 09:03:09 +07:00: GET /api/production - 200 (9ms)
+2025-12-08 09:03:10 +07:00: GET / - 200 (1ms)
+2025-12-08 09:03:10 +07:00: GET /api/work-days - 200 (0ms)
+2025-12-08 09:03:10 +07:00: GET /api/working-days - 200 (1ms)
+2025-12-08 09:03:10 +07:00: GET /favicon.ico - 404 (0ms)
+2025-12-08 09:03:10 +07:00: GET /api/production - 200 (7ms)
+2025-12-08 09:03:10 +07:00: GET / - 200 (1ms)
+2025-12-08 09:03:10 +07:00: GET /api/working-days - 200 (2ms)
+2025-12-08 09:03:10 +07:00: GET /api/work-days - 200 (1ms)
+2025-12-08 09:03:10 +07:00: GET /favicon.ico - 404 (0ms)
+2025-12-08 09:03:10 +07:00: GET /api/production - 200 (5ms)
+2025-12-08 09:03:11 +07:00: GET / - 200 (0ms)
+2025-12-08 09:03:11 +07:00: GET /api/work-days - 200 (1ms)
+2025-12-08 09:03:11 +07:00: GET /api/working-days - 200 (0ms)
+2025-12-08 09:03:11 +07:00: GET /favicon.ico - 404 (0ms)
+2025-12-08 09:03:11 +07:00: GET /api/production - 200 (8ms)
+2025-12-08 09:03:11 +07:00: GET / - 200 (2ms)
+2025-12-08 09:03:11 +07:00: GET /api/work-days - 200 (1ms)
+2025-12-08 09:03:11 +07:00: GET /api/working-days - 200 (1ms)
+2025-12-08 09:03:11 +07:00: GET /favicon.ico - 404 (0ms)
+2025-12-08 09:03:11 +07:00: GET /api/production - 200 (7ms)
+2025-12-08 09:03:11 +07:00: GET / - 200 (1ms)
+2025-12-08 09:03:11 +07:00: GET /api/work-days - 200 (2ms)
+2025-12-08 09:03:11 +07:00: GET /api/working-days - 200 (1ms)
+2025-12-08 09:03:11 +07:00: GET /favicon.ico - 404 (0ms)
+2025-12-08 09:03:11 +07:00: GET /api/production - 200 (7ms)
+2025-12-08 09:03:11 +07:00: GET / - 200 (1ms)
+2025-12-08 09:03:12 +07:00: GET /api/work-days - 200 (2ms)
+2025-12-08 09:03:12 +07:00: GET /api/working-days - 200 (3ms)
+2025-12-08 09:03:12 +07:00: GET /favicon.ico - 404 (1ms)
+2025-12-08 09:03:12 +07:00: GET /api/production - 200 (11ms)
+2025-12-08 09:03:12 +07:00: GET / - 200 (0ms)
+2025-12-08 09:03:12 +07:00: GET /api/work-days - 200 (2ms)
+2025-12-08 09:03:12 +07:00: GET /api/working-days - 200 (1ms)
+2025-12-08 09:03:12 +07:00: GET /favicon.ico - 404 (1ms)
+2025-12-08 09:03:12 +07:00: GET /api/production - 200 (9ms)
+2025-12-08 09:03:12 +07:00: GET / - 200 (2ms)
+2025-12-08 09:03:12 +07:00: GET /api/work-days - 200 (0ms)
+2025-12-08 09:03:12 +07:00: GET /api/working-days - 200 (0ms)
+2025-12-08 09:03:12 +07:00: GET /favicon.ico - 404 (1ms)
+2025-12-08 09:03:12 +07:00: GET /api/production - 200 (6ms)
+2025-12-08 09:03:13 +07:00: 📥 Cache refresh requested...
+2025-12-08 09:03:13 +07:00: 🔄 Starting cache refresh...
+2025-12-08 09:03:13 +07:00: 📅 Fetching ALL data from database...
+2025-12-08 09:03:14 +07:00: ✓ DB returned 1519 records
+2025-12-08 09:03:14 +07:00: ⏮️  Removed 1508 old records for 202512
+2025-12-08 09:03:14 +07:00: ✓ Cache refreshed: 1519 new records for 202512
+2025-12-08 09:03:14 +07:00: ✓ Total cache now has 1519 records
+2025-12-08 09:03:14 +07:00: ✓ File saved to: D:\Host web app\daily-report-production\public\production_data.json
+2025-12-08 09:03:14 +07:00: ✓ Loaded 1519 records from production_data.json
+2025-12-08 09:03:14 +07:00: ✓ Memory cache reloaded from file
+2025-12-08 09:03:14 +07:00: POST /api/refresh-cache - 200 (1155ms)
+2025-12-08 09:03:15 +07:00: GET /api/working-days - 304 (2ms)
+2025-12-08 09:03:15 +07:00: GET /api/work-days - 304 (1ms)
+2025-12-08 09:03:15 +07:00: GET /api/production - 200 (8ms)
+2025-12-08 09:03:16 +07:00: GET / - 200 (2ms)
+2025-12-08 09:03:16 +07:00: GET /api/work-days - 200 (1ms)
+2025-12-08 09:03:16 +07:00: GET /api/working-days - 200 (1ms)
+2025-12-08 09:03:16 +07:00: GET /favicon.ico - 404 (1ms)
+2025-12-08 09:03:16 +07:00: GET /api/production - 200 (8ms)
+2025-12-08 09:03:17 +07:00: GET / - 200 (1ms)
+2025-12-08 09:03:17 +07:00: GET /api/work-days - 200 (1ms)
+2025-12-08 09:03:17 +07:00: GET /api/working-days - 200 (1ms)
+2025-12-08 09:03:17 +07:00: GET /favicon.ico - 404 (0ms)
+2025-12-08 09:03:17 +07:00: GET /api/production - 200 (8ms)
+2025-12-08 09:04:54 +07:00: GET /api/work-days - 304 (1ms)
+2025-12-08 09:04:54 +07:00: GET /api/working-days - 304 (1ms)
+2025-12-08 09:04:54 +07:00: GET /api/production - 200 (11ms)
+2025-12-08 09:04:56 +07:00: 📥 Cache refresh requested...
+2025-12-08 09:04:56 +07:00: 🔄 Starting cache refresh...
+2025-12-08 09:04:56 +07:00: 📅 Fetching ALL data from database...
+2025-12-08 09:04:57 +07:00: ✓ DB returned 1519 records
+2025-12-08 09:04:57 +07:00: ⏮️  Removed 1519 old records for 202512
+2025-12-08 09:04:57 +07:00: ✓ Cache refreshed: 1519 new records for 202512
+2025-12-08 09:04:57 +07:00: ✓ Total cache now has 1519 records
+2025-12-08 09:04:57 +07:00: ✓ File saved to: D:\Host web app\daily-report-production\public\production_data.json
+2025-12-08 09:04:57 +07:00: ✓ Loaded 1519 records from production_data.json
+2025-12-08 09:04:57 +07:00: ✓ Memory cache reloaded from file
+2025-12-08 09:04:57 +07:00: POST /api/refresh-cache - 200 (1114ms)
+2025-12-08 09:04:59 +07:00: GET /api/work-days - 304 (2ms)
+2025-12-08 09:04:59 +07:00: GET /api/working-days - 304 (2ms)
+2025-12-08 09:04:59 +07:00: GET /api/production - 200 (7ms)
+2025-12-08 09:09:46 +07:00: GET / - 304 (0ms)
+2025-12-08 09:09:46 +07:00: GET /api/work-days - 304 (1ms)
+2025-12-08 09:09:46 +07:00: GET /api/working-days - 304 (1ms)
+2025-12-08 09:09:46 +07:00: GET /api/production - 200 (8ms)
+2025-12-08 09:10:26 +07:00: GET / - 304 (1ms)
+2025-12-08 09:10:26 +07:00: GET /api/work-days - 304 (1ms)
+2025-12-08 09:10:26 +07:00: GET /api/working-days - 304 (1ms)
+2025-12-08 09:10:26 +07:00: GET /favicon.ico - 404 (0ms)
+2025-12-08 09:10:26 +07:00: GET /api/production - 200 (10ms)
+2025-12-08 09:10:49 +07:00: GET / - 304 (0ms)
+2025-12-08 09:10:49 +07:00: GET /api/work-days - 304 (0ms)
+2025-12-08 09:10:49 +07:00: GET /api/working-days - 304 (1ms)
+2025-12-08 09:10:49 +07:00: GET /api/production - 200 (8ms)
+2025-12-08 09:39:42 +07:00: GET / - 304 (1ms)
+2025-12-08 09:39:42 +07:00: GET /api/work-days - 304 (1ms)
+2025-12-08 09:39:42 +07:00: GET /api/working-days - 304 (1ms)
+2025-12-08 09:39:42 +07:00: GET /favicon.ico - 404 (0ms)
+2025-12-08 09:39:42 +07:00: GET /api/production - 200 (9ms)
+2025-12-08 09:39:45 +07:00: GET / - 200 (1ms)
+2025-12-08 09:39:45 +07:00: GET /api/work-days - 200 (2ms)
+2025-12-08 09:39:45 +07:00: GET /api/working-days - 200 (2ms)
+2025-12-08 09:39:45 +07:00: GET /favicon.ico - 404 (0ms)
+2025-12-08 09:39:45 +07:00: GET /api/production - 200 (6ms)
+2025-12-08 09:40:11 +07:00: GET / - 304 (0ms)
+2025-12-08 09:40:11 +07:00: GET /api/working-days - 304 (0ms)
+2025-12-08 09:40:11 +07:00: GET /api/work-days - 304 (1ms)
+2025-12-08 09:40:11 +07:00: GET /api/production - 200 (9ms)
+2025-12-08 09:40:17 +07:00: GET / - 200 (2ms)
+2025-12-08 09:40:17 +07:00: GET /api/working-days - 200 (2ms)
+2025-12-08 09:40:17 +07:00: GET /api/work-days - 200 (1ms)
+2025-12-08 09:40:17 +07:00: GET /favicon.ico - 404 (0ms)
+2025-12-08 09:40:17 +07:00: GET /api/production - 200 (13ms)
+2025-12-08 09:40:25 +07:00: GET /api/work-days - 304 (1ms)
+2025-12-08 09:40:25 +07:00: GET /api/working-days - 304 (0ms)
+2025-12-08 09:40:25 +07:00: GET /api/production - 200 (10ms)
+2025-12-08 09:40:49 +07:00: 📥 Cache refresh requested...
+2025-12-08 09:40:49 +07:00: 🔄 Starting cache refresh...
+2025-12-08 09:40:49 +07:00: 📅 Fetching ALL data from database...
+2025-12-08 09:40:50 +07:00: GET /api/plan-data - 304 (3ms)
+2025-12-08 09:40:50 +07:00: GET /api/work-days - 304 (1ms)
+2025-12-08 09:40:50 +07:00: ✓ DB returned 1519 records
+2025-12-08 09:40:50 +07:00: ⏮️  Removed 1519 old records for 202512
+2025-12-08 09:40:50 +07:00: ✓ Cache refreshed: 1519 new records for 202512
+2025-12-08 09:40:50 +07:00: ✓ Total cache now has 1519 records
+2025-12-08 09:40:50 +07:00: ✓ File saved to: D:\Host web app\daily-report-production\public\production_data.json
+2025-12-08 09:40:50 +07:00: ✓ Loaded 1519 records from production_data.json
+2025-12-08 09:40:50 +07:00: ✓ Memory cache reloaded from file
+2025-12-08 09:40:50 +07:00: POST /api/refresh-cache - 200 (1310ms)
+2025-12-08 09:40:52 +07:00: GET /api/work-days - 304 (2ms)
+2025-12-08 09:40:52 +07:00: GET /api/working-days - 304 (2ms)
+2025-12-08 09:40:52 +07:00: GET /api/production - 200 (6ms)
+2025-12-08 09:45:35 +07:00: 📥 Cache refresh requested...
+2025-12-08 09:45:35 +07:00: 🔄 Starting cache refresh...
+2025-12-08 09:45:35 +07:00: 📅 Fetching ALL data from database...
+2025-12-08 09:45:36 +07:00: ✓ DB returned 1519 records
+2025-12-08 09:45:36 +07:00: ⏮️  Removed 1519 old records for 202512
+2025-12-08 09:45:36 +07:00: ✓ Cache refreshed: 1519 new records for 202512
+2025-12-08 09:45:36 +07:00: ✓ Total cache now has 1519 records
+2025-12-08 09:45:36 +07:00: ✓ File saved to: D:\Host web app\daily-report-production\public\production_data.json
+2025-12-08 09:45:36 +07:00: ✓ Loaded 1519 records from production_data.json
+2025-12-08 09:45:36 +07:00: ✓ Memory cache reloaded from file
+2025-12-08 09:45:36 +07:00: POST /api/refresh-cache - 200 (983ms)
+2025-12-08 09:45:38 +07:00: GET /api/work-days - 304 (2ms)
+2025-12-08 09:45:38 +07:00: GET /api/working-days - 304 (1ms)
+2025-12-08 09:45:38 +07:00: GET /api/production - 200 (8ms)
+2025-12-08 09:48:03 +07:00: GET / - 304 (1ms)
+2025-12-08 09:48:03 +07:00: GET /api/work-days - 304 (2ms)
+2025-12-08 09:48:03 +07:00: GET /api/working-days - 304 (1ms)
+2025-12-08 09:48:03 +07:00: GET /favicon.ico - 404 (1ms)
+2025-12-08 09:48:03 +07:00: GET /api/production - 200 (10ms)
+2025-12-08 09:49:46 +07:00: GET / - 304 (1ms)
+2025-12-08 09:49:46 +07:00: GET /api/work-days - 304 (1ms)
+2025-12-08 09:49:46 +07:00: GET /api/working-days - 304 (2ms)
+2025-12-08 09:49:46 +07:00: GET /api/production - 200 (11ms)
+2025-12-08 09:49:54 +07:00: GET /api/work-days - 304 (1ms)
+2025-12-08 09:49:54 +07:00: GET /api/plan-data - 304 (1ms)
+2025-12-08 09:54:56 +07:00: GET / - 304 (1ms)
+2025-12-08 09:54:56 +07:00: GET /api/work-days - 304 (2ms)
+2025-12-08 09:54:56 +07:00: GET /api/working-days - 304 (1ms)
+2025-12-08 09:54:56 +07:00: GET /api/production - 200 (10ms)
+2025-12-08 09:55:03 +07:00: GET / - 304 (1ms)
+2025-12-08 09:55:03 +07:00: GET /api/work-days - 304 (1ms)
+2025-12-08 09:55:03 +07:00: GET /api/working-days - 304 (1ms)
+2025-12-08 09:55:03 +07:00: GET /api/production - 200 (11ms)
+2025-12-08 09:55:05 +07:00: GET / - 200 (1ms)
+2025-12-08 09:55:06 +07:00: GET /api/work-days - 200 (2ms)
+2025-12-08 09:55:06 +07:00: GET /api/working-days - 200 (1ms)
+2025-12-08 09:55:06 +07:00: GET /favicon.ico - 404 (0ms)
+2025-12-08 09:55:06 +07:00: GET /api/production - 200 (7ms)
+2025-12-08 11:38:24 +07:00: GET / - 304 (1ms)
+2025-12-08 11:38:24 +07:00: GET /api/work-days - 304 (2ms)
+2025-12-08 11:38:24 +07:00: GET /api/working-days - 304 (2ms)
+2025-12-08 11:38:24 +07:00: GET /favicon.ico - 404 (0ms)
+2025-12-08 11:38:24 +07:00: GET /api/production - 200 (8ms)
+2025-12-08 11:38:25 +07:00: GET / - 200 (1ms)
+2025-12-08 11:38:25 +07:00: GET /api/work-days - 200 (2ms)
+2025-12-08 11:38:25 +07:00: GET /api/working-days - 200 (2ms)
+2025-12-08 11:38:25 +07:00: GET /favicon.ico - 404 (0ms)
+2025-12-08 11:38:25 +07:00: GET /api/production - 200 (9ms)
+2025-12-08 11:38:26 +07:00: GET / - 200 (1ms)
+2025-12-08 11:38:26 +07:00: GET /api/working-days - 200 (2ms)
+2025-12-08 11:38:26 +07:00: GET /api/work-days - 200 (1ms)
+2025-12-08 11:38:26 +07:00: GET /favicon.ico - 404 (1ms)
+2025-12-08 11:38:26 +07:00: GET /api/production - 200 (7ms)
+2025-12-08 11:38:27 +07:00: 📥 Cache refresh requested...
+2025-12-08 11:38:27 +07:00: 🔄 Starting cache refresh...
+2025-12-08 11:38:27 +07:00: 📅 Fetching ALL data from database...
+2025-12-08 11:38:28 +07:00: ✓ DB returned 1533 records
+2025-12-08 11:38:28 +07:00: ⏮️  Removed 1519 old records for 202512
+2025-12-08 11:38:28 +07:00: ✓ Cache refreshed: 1533 new records for 202512
+2025-12-08 11:38:28 +07:00: ✓ Total cache now has 1533 records
+2025-12-08 11:38:28 +07:00: ✓ File saved to: D:\Host web app\daily-report-production\public\production_data.json
+2025-12-08 11:38:28 +07:00: ✓ Loaded 1533 records from production_data.json
+2025-12-08 11:38:28 +07:00: ✓ Memory cache reloaded from file
+2025-12-08 11:38:28 +07:00: POST /api/refresh-cache - 200 (1080ms)
+2025-12-08 11:38:29 +07:00: GET /api/work-days - 304 (1ms)
+2025-12-08 11:38:29 +07:00: GET /api/working-days - 304 (1ms)
+2025-12-08 11:38:29 +07:00: GET /api/production - 200 (8ms)
+2025-12-08 11:41:47 +07:00: GET / - 304 (0ms)
+2025-12-08 11:41:47 +07:00: GET /api/work-days - 304 (2ms)
+2025-12-08 11:41:47 +07:00: GET /api/working-days - 304 (2ms)
+2025-12-08 11:41:47 +07:00: GET /favicon.ico - 404 (1ms)
+2025-12-08 11:41:47 +07:00: GET /api/production - 200 (8ms)
+2025-12-08 11:41:49 +07:00: GET / - 200 (1ms)
+2025-12-08 11:41:49 +07:00: GET /api/work-days - 200 (1ms)
+2025-12-08 11:41:49 +07:00: GET /api/working-days - 200 (1ms)
+2025-12-08 11:41:49 +07:00: GET /favicon.ico - 404 (0ms)
+2025-12-08 11:41:49 +07:00: GET /api/production - 200 (6ms)
+2025-12-08 11:41:49 +07:00: GET / - 200 (1ms)
+2025-12-08 11:41:49 +07:00: GET /api/work-days - 200 (2ms)
+2025-12-08 11:41:49 +07:00: GET /api/working-days - 200 (1ms)
+2025-12-08 11:41:49 +07:00: GET /favicon.ico - 404 (1ms)
+2025-12-08 11:41:49 +07:00: GET /api/production - 200 (8ms)
+2025-12-08 11:41:50 +07:00: GET / - 200 (1ms)
+2025-12-08 11:41:50 +07:00: GET /api/work-days - 200 (2ms)
+2025-12-08 11:41:50 +07:00: GET /api/working-days - 200 (1ms)
+2025-12-08 11:41:50 +07:00: GET /favicon.ico - 404 (1ms)
+2025-12-08 11:41:50 +07:00: GET /api/production - 200 (7ms)
+2025-12-08 11:41:50 +07:00: GET / - 200 (1ms)
+2025-12-08 11:41:50 +07:00: GET /api/working-days - 200 (1ms)
+2025-12-08 11:41:50 +07:00: GET /api/work-days - 200 (1ms)
+2025-12-08 11:41:50 +07:00: GET /favicon.ico - 404 (1ms)
+2025-12-08 11:41:50 +07:00: GET /api/production - 200 (6ms)
+2025-12-08 11:41:50 +07:00: GET / - 200 (2ms)
+2025-12-08 11:41:50 +07:00: GET /api/work-days - 200 (1ms)
+2025-12-08 11:41:50 +07:00: GET /api/working-days - 200 (1ms)
+2025-12-08 11:41:50 +07:00: GET /favicon.ico - 404 (0ms)
+2025-12-08 11:41:50 +07:00: GET /api/production - 200 (7ms)
+2025-12-08 11:41:50 +07:00: GET / - 200 (1ms)
+2025-12-08 11:41:51 +07:00: GET /api/work-days - 200 (2ms)
+2025-12-08 11:41:51 +07:00: GET /api/working-days - 200 (2ms)
+2025-12-08 11:41:51 +07:00: GET /favicon.ico - 404 (0ms)
+2025-12-08 11:41:51 +07:00: GET /api/production - 200 (9ms)
+2025-12-08 11:41:51 +07:00: GET / - 200 (1ms)
+2025-12-08 11:41:51 +07:00: GET /api/work-days - 200 (2ms)
+2025-12-08 11:41:51 +07:00: GET /api/working-days - 200 (3ms)
+2025-12-08 11:41:51 +07:00: GET /favicon.ico - 404 (0ms)
+2025-12-08 11:41:51 +07:00: GET /api/production - 200 (7ms)
+2025-12-08 11:41:51 +07:00: GET / - 200 (1ms)
+2025-12-08 11:41:51 +07:00: GET /api/work-days - 200 (2ms)
+2025-12-08 11:41:51 +07:00: GET /api/working-days - 200 (1ms)
+2025-12-08 11:41:51 +07:00: GET /favicon.ico - 404 (0ms)
+2025-12-08 11:41:51 +07:00: GET /api/production - 200 (8ms)
+2025-12-08 11:41:51 +07:00: GET / - 200 (1ms)
+2025-12-08 11:41:51 +07:00: GET /api/work-days - 200 (1ms)
+2025-12-08 11:41:51 +07:00: GET /api/working-days - 200 (1ms)
+2025-12-08 11:41:51 +07:00: GET /favicon.ico - 404 (1ms)
+2025-12-08 11:41:51 +07:00: GET /api/production - 200 (6ms)
+2025-12-08 11:41:51 +07:00: GET / - 200 (1ms)
+2025-12-08 11:41:51 +07:00: GET /api/work-days - 200 (2ms)
+2025-12-08 11:41:51 +07:00: GET /api/working-days - 200 (1ms)
+2025-12-08 11:41:51 +07:00: GET /favicon.ico - 404 (0ms)
+2025-12-08 11:41:51 +07:00: GET /api/production - 200 (6ms)
+2025-12-08 11:41:51 +07:00: GET / - 200 (1ms)
+2025-12-08 11:41:52 +07:00: GET /api/work-days - 200 (2ms)
+2025-12-08 11:41:52 +07:00: GET /api/working-days - 200 (1ms)
+2025-12-08 11:41:52 +07:00: GET /favicon.ico - 404 (1ms)
+2025-12-08 11:41:52 +07:00: GET /api/production - 200 (7ms)
+2025-12-08 11:41:52 +07:00: GET / - 200 (1ms)
+2025-12-08 11:41:52 +07:00: GET /api/work-days - 200 (2ms)
+2025-12-08 11:41:52 +07:00: GET /api/working-days - 200 (1ms)
+2025-12-08 11:41:52 +07:00: GET /favicon.ico - 404 (0ms)
+2025-12-08 11:41:52 +07:00: GET /api/production - 200 (5ms)
+2025-12-08 11:41:56 +07:00: 📥 Cache refresh requested...
+2025-12-08 11:41:56 +07:00: 🔄 Starting cache refresh...
+2025-12-08 11:41:56 +07:00: 📅 Fetching ALL data from database...
+2025-12-08 11:41:57 +07:00: ✓ DB returned 1533 records
+2025-12-08 11:41:57 +07:00: ⏮️  Removed 1533 old records for 202512
+2025-12-08 11:41:57 +07:00: ✓ Cache refreshed: 1533 new records for 202512
+2025-12-08 11:41:57 +07:00: ✓ Total cache now has 1533 records
+2025-12-08 11:41:57 +07:00: ✓ File saved to: D:\Host web app\daily-report-production\public\production_data.json
+2025-12-08 11:41:57 +07:00: ✓ Loaded 1533 records from production_data.json
+2025-12-08 11:41:57 +07:00: ✓ Memory cache reloaded from file
+2025-12-08 11:41:57 +07:00: POST /api/refresh-cache - 200 (1008ms)
+2025-12-08 11:41:59 +07:00: GET /api/work-days - 304 (1ms)
+2025-12-08 11:41:59 +07:00: GET /api/working-days - 304 (1ms)
+2025-12-08 11:41:59 +07:00: GET /api/production - 200 (5ms)
+2025-12-08 11:42:24 +07:00: GET / - 304 (1ms)
+2025-12-08 11:42:24 +07:00: GET /api/work-days - 304 (0ms)
+2025-12-08 11:42:24 +07:00: GET /api/working-days - 304 (0ms)
+2025-12-08 11:42:24 +07:00: GET /favicon.ico - 404 (0ms)
+2025-12-08 11:42:24 +07:00: GET /api/production - 200 (6ms)
+2025-12-08 11:58:49 +07:00: GET / - 304 (0ms)
+2025-12-08 11:58:49 +07:00: GET /api/work-days - 304 (1ms)
+2025-12-08 11:58:49 +07:00: GET /api/working-days - 304 (1ms)
+2025-12-08 11:58:49 +07:00: GET /favicon.ico - 404 (2ms)
+2025-12-08 11:58:49 +07:00: GET /api/production - 200 (10ms)
+2025-12-08 12:07:14 +07:00: ✓ Graceful shutdown handlers registered
+2025-12-08 12:07:14 +07:00: ✓ Server is running on http://localhost:3000
+2025-12-08 12:07:14 +07:00: ✓ Access from: http://10.247.199.210:3000
+2025-12-08 12:07:14 +07:00: ✓ Health check: http://10.247.199.210:3000/health
+2025-12-08 12:07:14 +07:00: ✓ Cache system ready (lazy load enabled)
+2025-12-08 12:11:21 +07:00: ✓ Graceful shutdown handlers registered
+2025-12-08 12:11:21 +07:00: ✓ Server is running on http://localhost:3000
+2025-12-08 12:11:21 +07:00: ✓ Access from: http://10.247.199.210:3000
+2025-12-08 12:11:21 +07:00: ✓ Health check: http://10.247.199.210:3000/health
+2025-12-08 12:11:21 +07:00: ✓ Cache system ready (lazy load enabled)
+2025-12-08 12:14:10 +07:00: ✓ Graceful shutdown handlers registered
+2025-12-08 12:14:10 +07:00: ✓ Server is running on http://localhost:3000
+2025-12-08 12:14:10 +07:00: ✓ Access from: http://10.247.199.210:3000
+2025-12-08 12:14:10 +07:00: ✓ Health check: http://10.247.199.210:3000/health
+2025-12-08 12:14:10 +07:00: ✓ Cache system ready (lazy load enabled)
+2025-12-08 12:14:30 +07:00: GET / - 304 (30ms)
+2025-12-08 12:14:30 +07:00: GET /api/work-days - 304 (3ms)
+2025-12-08 12:14:30 +07:00: GET /api/working-days - 304 (2ms)
+2025-12-08 12:14:30 +07:00: GET /favicon.ico - 404 (2ms)
+2025-12-08 12:14:30 +07:00: ✓ Loaded 1533 records from production_data.json
+2025-12-08 12:14:30 +07:00: GET /api/production - 200 (26ms)
+2025-12-08 12:15:48 +07:00: ✓ Graceful shutdown handlers registered
+2025-12-08 12:15:48 +07:00: ✓ Server is running on http://localhost:3000
+2025-12-08 12:15:48 +07:00: ✓ Access from: http://10.247.199.210:3000
+2025-12-08 12:15:48 +07:00: ✓ Health check: http://10.247.199.210:3000/health
+2025-12-08 12:15:48 +07:00: ✓ Cache system ready (lazy load enabled)
+2025-12-08 12:21:01 +07:00: ✓ Graceful shutdown handlers registered
+2025-12-08 12:21:01 +07:00: ✓ Server is running on http://localhost:3000
+2025-12-08 12:21:01 +07:00: ✓ Access from: http://10.247.199.210:3000
+2025-12-08 12:21:01 +07:00: ✓ Health check: http://10.247.199.210:3000/health
+2025-12-08 12:21:01 +07:00: ✓ Cache system ready (lazy load enabled)
+2025-12-08 12:28:32 +07:00: GET / - 304 (8ms)
+2025-12-08 12:28:32 +07:00: GET /api/working-days - 304 (3ms)
+2025-12-08 12:28:32 +07:00: GET /api/work-days - 304 (2ms)
+2025-12-08 12:28:32 +07:00: GET /favicon.ico - 404 (2ms)
+2025-12-08 12:28:32 +07:00: ✓ Loaded 1533 records from production_data.json
+2025-12-08 12:28:32 +07:00: GET /api/production - 200 (26ms)
