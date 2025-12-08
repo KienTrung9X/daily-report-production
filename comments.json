@@ -1,9 +1,6 @@
 {
-  "3647575_202411": "<script>alert(\"xss\")</script>",
-  "3603614_202512": "Dừng 10 máy",
-  "3647575_202512": "Chạy theo kế hoạch PC",
-  "8284071_202512": "THIẾU TAPE ",
-  "3852204_202512": "Dừng 1 máy theo Sewing",
-  "1924605_202512": "chạy 10 máy",
-  "0020109_202512": "Chạy theo kế hoạch PC"
+  "3603614_202512": "chạy 12/22 máy",
+  "3647575_202512": "theo kế hoạch PC",
+  "8284071_202512": "Tiếu tape",
+  "3852204_202512": "dừng do tồn kho nhiều bên Sewing"
 }

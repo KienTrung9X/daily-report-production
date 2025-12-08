@@ -456,6 +456,17 @@ app.post('/api/comments', (req, res) => {
     res.json({ success: true });
 });
 
+// API to clear all comments
+app.post('/api/comments-clear', (req, res) => {
+    try {
+        dbService.clearAllComments();
+        res.json({ success: true });
+    } catch (error) {
+        console.error('Error clearing comments:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
 // API to clear all plan data
 app.post('/api/plan-clear', (req, res) => {
     try {

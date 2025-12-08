@@ -486,6 +486,28 @@ async function submitComment() {
     }
 }
 
+async function clearAllComments() {
+    if (!confirm('⚠️ Are you sure you want to delete ALL comments?\nThis action cannot be undone.')) return;
+    
+    try {
+        const response = await fetch('/api/comments-clear', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        });
+        
+        const res = await response.json();
+        if (res.success) {
+            alert('✅ All comments cleared!');
+            loadData();
+        } else {
+            alert('❌ Failed to clear comments.');
+        }
+    } catch (error) {
+        console.error('Error clearing comments:', error);
+        alert('❌ Error clearing comments.');
+    }
+}
+
 function openEstQtyModal(itemCode, yearMonth, currentEstQty) {
     document.getElementById('modal-est-item-code').value = itemCode;
     document.getElementById('modal-est-year-month').value = yearMonth;
@@ -907,122 +929,7 @@ function applyFilters() {
     loadData();
 }
 
-async function copyAsHTML() {
-    const statsContainer = document.getElementById('stats-container');
-    const dataTable = document.querySelector('.data-table');
-    
-    // Build stats HTML as table
-    let statsHTML = '<table style="width: 100%; margin-bottom: 20px; border-collapse: collapse;">';
-    
-    statsContainer.querySelectorAll('[style*="grid-column"]').forEach(row => {
-        statsHTML += '<tr>';
-        row.querySelectorAll('.stat-card').forEach(card => {
-            const label = card.querySelector('.stat-label').textContent;
-            const value = card.querySelector('.stat-value').textContent;
-            const isHighlight = card.classList.contains('stat-highlight');
-            const borderColor = isHighlight ? '#10b981' : '#6366f1';
-            
-            statsHTML += `
-                <td style="background: #ffffff; padding: 15px; border-left: 4px solid ${borderColor}; box-shadow: 0 1px 3px rgba(0,0,0,0.1); width: 33.33%;">
-                    <div style="font-size: 14px; color: #64748b; font-weight: 500; margin-bottom: 8px;">${label}</div>
-                    <div style="font-size: 32px; font-weight: 700; color: #1e293b;">${value}</div>
-                </td>
-            `;
-        });
-        statsHTML += '</tr>';
-    });
-    statsHTML += '</table>';
-    
-    // Build data table HTML
-    const tableClone = dataTable.cloneNode(true);
-    tableClone.style.cssText = 'width: 100%; border-collapse: collapse; font-size: 16px; font-family: Arial, sans-serif;';
-    
-    tableClone.querySelectorAll('th').forEach(th => {
-        th.style.cssText = 'background: #1e3a5f; color: white; padding: 10px; text-align: center; font-weight: 600; border: 1px solid #334155;';
-        if (th.classList.contains('col-total')) th.style.background = '#0284c7';
-        if (th.classList.contains('col-upto')) th.style.background = '#f59e0b';
-    });
-    
-    tableClone.querySelectorAll('tbody tr').forEach((row, rowIndex) => {
-        const isActRow = rowIndex % 3 === 1;
-        const isPctRow = rowIndex % 3 === 2;
-        
-        row.querySelectorAll('td').forEach(td => {
-            let bgColor = 'white';
-            let color = '#1e293b';
-            let fontWeight = 'normal';
-            
-            // Set font-weight based on row type
-            if (isActRow) fontWeight = '700';
-            if (isPctRow) fontWeight = '600';
-            
-            // Check if cell contains percentage value
-            const cellText = td.textContent.trim();
-            if (isPctRow && cellText.includes('%') && cellText !== '-') {
-                const pctValue = parseFloat(cellText);
-                if (!isNaN(pctValue)) {
-                    fontWeight = '700';
-                    if (pctValue >= 95) {
-                        color = '#10b981';
-                    } else if (pctValue >= 80) {
-                        color = '#f59e0b';
-                    } else {
-                        color = '#ef4444';
-                    }
-                }
-            }
-            
-            // Apply class-based colors (these override default)
-            if (td.classList.contains('pct-high')) {
-                color = '#10b981';
-                fontWeight = '700';
-            }
-            if (td.classList.contains('pct-medium')) {
-                color = '#f59e0b';
-                fontWeight = '700';
-            }
-            if (td.classList.contains('pct-low')) {
-                color = '#ef4444';
-                fontWeight = '700';
-            }
-            if (td.classList.contains('val-zero')) color = '#991b1b';
-            if (td.classList.contains('col-total')) {
-                bgColor = '#e0f2fe';
-                fontWeight = '600';
-            }
-            if (td.classList.contains('col-upto')) {
-                bgColor = '#fef3c7';
-                fontWeight = '600';
-            }
-            if (td.classList.contains('has-comment')) {
-                bgColor = '#ef4444';
-                color = 'white';
-                fontWeight = '600';
-            }
-            
-            td.style.cssText = `padding: 8px; border: 1px solid #e2e8f0; text-align: center; background: ${bgColor}; color: ${color}; font-weight: ${fontWeight};`;
-        });
-    });
-    
-    const html = `
-        <div style="font-family: Arial, sans-serif;">
-            ${statsHTML}
-            ${tableClone.outerHTML}
-        </div>
-    `;
-    
-    try {
-        await navigator.clipboard.write([
-            new ClipboardItem({
-                'text/html': new Blob([html], { type: 'text/html' })
-            })
-        ]);
-        alert('Copied! Paste vào Outlook bằng Ctrl+V');
-    } catch (error) {
-        console.error('Copy error:', error);
-        alert('Copy failed. Please try again.');
-    }
-}
+
 
 async function captureScreenshot() {
     const productionTab = document.getElementById('production-tab');

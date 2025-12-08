@@ -26,6 +26,10 @@ function saveComment(itemCode, yearMonth, comment) {
     fs.writeFileSync(COMMENTS_FILE, JSON.stringify(comments, null, 2));
 }
 
+function clearAllComments() {
+    fs.writeFileSync(COMMENTS_FILE, JSON.stringify({}, null, 2));
+}
+
 // Helper to get week number
 function getWeekNumber(d) {
     d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
@@ -106,5 +110,6 @@ async function getDataFromSQL(year, month, week = null, detailed = false, startD
 module.exports = {
     getData: getDataFromSQL,
     getComments,
-    saveComment
+    saveComment,
+    clearAllComments
 };
